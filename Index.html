@@ -1,0 +1,1065 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Order Status Updater - Scanner</title>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0c0c0d;
+            --bg-card: #161618;
+            --bg-input: #1e1e21;
+            --border: #2a2a2e;
+            --text: #f5f5f5;
+            --text-dim: #8b8b8f;
+            --accent: #f43f5e;
+            --accent-glow: rgba(244, 63, 94, 0.15);
+            --success: #22c55e;
+            --success-glow: rgba(34, 197, 94, 0.15);
+            --error: #ef4444;
+            --error-glow: rgba(239, 68, 68, 0.15);
+            --warning: #f59e0b;
+            --scanner: #00d4ff;
+            --scanner-glow: rgba(0, 212, 255, 0.2);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'IBM Plex Sans Arabic', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            padding: 1.5rem;
+        }
+
+        .container {
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .header h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .header p {
+            color: var(--text-dim);
+            font-size: 0.9rem;
+        }
+
+        .badge {
+            background: var(--accent-glow);
+            color: var(--accent);
+            padding: 0.35rem 1rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: inline-block;
+            margin-top: 0.75rem;
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 0.35rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid var(--border);
+        }
+
+        .tab {
+            flex: 1;
+            padding: 0.85rem;
+            border: none;
+            background: transparent;
+            color: var(--text-dim);
+            font-family: inherit;
+            font-size: 0.95rem;
+            font-weight: 600;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .tab.active {
+            background: var(--accent);
+            color: white;
+        }
+
+        .tab:hover:not(.active) {
+            color: var(--text);
+            background: var(--bg-input);
+        }
+
+        /* Tab Content */
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Cards */
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 1.25rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .card-title {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Scanner Section */
+        .scanner-container {
+            position: relative;
+            width: 100%;
+            border-radius: 12px;
+            overflow: hidden;
+            background: #000;
+            margin-bottom: 1rem;
+        }
+
+        #scanner-video {
+            width: 100%;
+            height: 280px;
+            object-fit: cover;
+            display: block;
+        }
+
+        .scanner-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
+        }
+
+        .scanner-frame {
+            width: 80%;
+            max-width: 280px;
+            height: 100px;
+            border: 2px solid var(--scanner);
+            border-radius: 12px;
+            box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.5);
+            position: relative;
+        }
+
+        .scanner-line {
+            position: absolute;
+            top: 0;
+            left: 5%;
+            right: 5%;
+            height: 2px;
+            background: var(--scanner);
+            box-shadow: 0 0 10px var(--scanner);
+            animation: scan 2s linear infinite;
+        }
+
+        @keyframes scan {
+            0%, 100% { top: 10%; }
+            50% { top: 90%; }
+        }
+
+        .scanner-status {
+            text-align: center;
+            padding: 0.75rem;
+            background: var(--bg-input);
+            border-radius: 8px;
+            font-size: 0.9rem;
+            color: var(--text-dim);
+            margin-bottom: 1rem;
+        }
+
+        .scanner-status.success {
+            background: var(--success-glow);
+            color: var(--success);
+        }
+
+        .scanner-btn {
+            width: 100%;
+            padding: 1rem;
+            border-radius: 10px;
+            font-family: inherit;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 2px solid var(--scanner);
+            background: var(--scanner-glow);
+            color: var(--scanner);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .scanner-btn:hover {
+            background: var(--scanner);
+            color: var(--bg);
+        }
+
+        .scanner-btn.active {
+            background: var(--error);
+            border-color: var(--error);
+            color: white;
+        }
+
+        /* Scanned List */
+        .scanned-list {
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+        }
+
+        .scanned-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid var(--border);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.95rem;
+        }
+
+        .scanned-item:last-child {
+            border-bottom: none;
+        }
+
+        .scanned-item.new {
+            animation: highlight 1s ease;
+        }
+
+        @keyframes highlight {
+            0% { background: var(--success-glow); }
+            100% { background: transparent; }
+        }
+
+        .remove-btn {
+            background: none;
+            border: none;
+            color: var(--text-dim);
+            cursor: pointer;
+            padding: 0.4rem;
+            border-radius: 6px;
+            font-size: 1.1rem;
+        }
+
+        .remove-btn:hover {
+            background: var(--error-glow);
+            color: var(--error);
+        }
+
+        .empty-list {
+            padding: 2rem;
+            text-align: center;
+            color: var(--text-dim);
+        }
+
+        /* Input Groups */
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .input-group:last-child {
+            margin-bottom: 0;
+        }
+
+        .input-group label {
+            font-size: 0.85rem;
+            color: var(--text-dim);
+            font-weight: 500;
+        }
+
+        .input-group input {
+            background: var(--bg-input);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 0.85rem 1rem;
+            color: var(--text);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-glow);
+        }
+
+        /* Textarea */
+        textarea {
+            width: 100%;
+            min-height: 160px;
+            background: var(--bg-input);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 1rem;
+            color: var(--text);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1rem;
+            line-height: 1.8;
+            resize: vertical;
+            transition: all 0.2s;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-glow);
+        }
+
+        .hint {
+            font-size: 0.8rem;
+            color: var(--text-dim);
+            margin-top: 0.5rem;
+        }
+
+        /* Counter */
+        .counter-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.75rem 1rem;
+            background: var(--bg-input);
+            border-radius: 10px;
+            margin-bottom: 1rem;
+        }
+
+        .counter-text {
+            font-size: 0.9rem;
+            color: var(--text-dim);
+        }
+
+        .counter-text strong {
+            color: var(--accent);
+            font-size: 1.1rem;
+        }
+
+        .clear-btn {
+            background: none;
+            border: 1px solid var(--border);
+            color: var(--text-dim);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .clear-btn:hover {
+            border-color: var(--error);
+            color: var(--error);
+            background: var(--error-glow);
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 1rem 2rem;
+            border-radius: 10px;
+            font-family: inherit;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            width: 100%;
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            filter: brightness(1.1);
+            transform: translateY(-2px);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Results */
+        .results {
+            margin-top: 1.25rem;
+            display: none;
+        }
+
+        .results.active {
+            display: block;
+        }
+
+        .results-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 0.75rem;
+        }
+
+        .results-title {
+            font-weight: 600;
+        }
+
+        .results-stats {
+            display: flex;
+            gap: 1rem;
+            font-size: 0.9rem;
+        }
+
+        .stat {
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        .stat-success { color: var(--success); }
+        .stat-error { color: var(--error); }
+
+        .results-list {
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+        }
+
+        .result-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid var(--border);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+        }
+
+        .result-item:last-child {
+            border-bottom: none;
+        }
+
+        .result-status {
+            padding: 0.3rem 0.75rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-family: 'IBM Plex Sans Arabic', sans-serif;
+        }
+
+        .result-pending {
+            background: rgba(59, 130, 246, 0.15);
+            color: #3b82f6;
+        }
+
+        .result-success {
+            background: var(--success-glow);
+            color: var(--success);
+        }
+
+        .result-error {
+            background: var(--error-glow);
+            color: var(--error);
+        }
+
+        /* Progress */
+        .progress-bar {
+            height: 4px;
+            background: var(--border);
+            border-radius: 2px;
+            margin-bottom: 1rem;
+            overflow: hidden;
+            display: none;
+        }
+
+        .progress-bar.active {
+            display: block;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent), #ff8e53);
+            border-radius: 2px;
+            transition: width 0.3s;
+            width: 0%;
+        }
+
+        /* Settings Toggle */
+        .settings-toggle {
+            background: none;
+            border: 1px solid var(--border);
+            color: var(--text-dim);
+            padding: 0.6rem 1rem;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .settings-toggle:hover {
+            border-color: var(--accent);
+            color: var(--text);
+        }
+
+        .settings-content {
+            display: none;
+        }
+
+        .settings-content.active {
+            display: block;
+        }
+
+        /* Spinner */
+        .spinner {
+            width: 16px;
+            height: 16px;
+            border: 2px solid transparent;
+            border-top-color: currentColor;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            display: inline-block;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Sound indicator */
+        .sound-indicator {
+            position: fixed;
+            top: 1rem;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--success);
+            color: white;
+            padding: 0.5rem 1.5rem;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            opacity: 0;
+            transition: opacity 0.3s;
+            z-index: 100;
+        }
+
+        .sound-indicator.show {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="sound-indicator" id="soundIndicator">✓ تم المسح</div>
+
+    <div class="container">
+        <header class="header">
+            <h1>🚚 Order Status Updater</h1>
+            <p>تحديث حالة الأوردرات</p>
+            <div class="badge">Out for Delivery</div>
+        </header>
+
+        <!-- Tabs -->
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('scanner')">
+                📷 Scanner
+            </button>
+            <button class="tab" onclick="switchTab('manual')">
+                ⌨️ إدخال يدوي
+            </button>
+        </div>
+
+        <!-- Scanner Tab -->
+        <div class="tab-content active" id="tab-scanner">
+            <div class="card">
+                <h2 class="card-title">📷 ماسح الباركود</h2>
+                
+                <div class="scanner-container">
+                    <video id="scanner-video" playsinline></video>
+                    <div class="scanner-overlay">
+                        <div class="scanner-frame">
+                            <div class="scanner-line"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="scanner-status" id="scannerStatus">
+                    اضغط لبدء المسح
+                </div>
+
+                <button class="scanner-btn" id="scannerBtn" onclick="toggleScanner()">
+                    📷 بدء المسح
+                </button>
+            </div>
+
+            <!-- Scanned Orders -->
+            <div class="card">
+                <h2 class="card-title">📋 الأوردرات الممسوحة</h2>
+                
+                <div class="counter-bar">
+                    <span class="counter-text">العدد: <strong id="scannedCount">0</strong></span>
+                    <button class="clear-btn" onclick="clearScannedOrders()">مسح الكل</button>
+                </div>
+
+                <div class="scanned-list" id="scannedList">
+                    <div class="empty-list">لم يتم مسح أي أوردر بعد</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Manual Tab -->
+        <div class="tab-content" id="tab-manual">
+            <div class="card">
+                <h2 class="card-title">⌨️ إدخال يدوي</h2>
+                <textarea id="orderNumbers" placeholder="5765432198765
+5765432198766
+5765432198767
+..."></textarea>
+                <p class="hint">💡 كل Order ID في سطر منفصل</p>
+            </div>
+        </div>
+
+        <!-- Settings -->
+        <button class="settings-toggle" onclick="toggleSettings()">
+            ⚙️ الإعدادات
+        </button>
+
+        <div class="settings-content" id="settingsContent">
+            <div class="card">
+                <div class="input-group">
+                    <label>Flow Companion API Token</label>
+                    <input type="password" id="apiToken" placeholder="الـ Token من Flow Companion">
+                </div>
+                <div class="input-group">
+                    <label>Specifier</label>
+                    <input type="text" id="specifier" value="out-for-delivery" placeholder="out-for-delivery">
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Button -->
+        <button class="btn btn-primary" id="updateBtn" onclick="startUpdate()">
+            🚀 تحديث الكل
+        </button>
+
+        <!-- Progress -->
+        <div class="progress-bar" id="progressBar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+
+        <!-- Results -->
+        <div class="results" id="results">
+            <div class="results-header">
+                <span class="results-title">النتائج</span>
+                <div class="results-stats">
+                    <span class="stat stat-success">✓ <span id="successCount">0</span></span>
+                    <span class="stat stat-error">✗ <span id="errorCount">0</span></span>
+                </div>
+            </div>
+            <div class="results-list" id="resultsList"></div>
+        </div>
+    </div>
+
+    <!-- QuaggaJS for barcode scanning -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/quagga/0.12.1/quagga.min.js"></script>
+    
+    <script>
+        // Flow Companion API
+        const FLOW_API_URL = 'https://flow-companion.mivicle.app/rest/1/flow/start/order';
+        
+        // State
+        let scannedOrders = [];
+        let isScanning = false;
+        let lastScannedCode = '';
+        let lastScanTime = 0;
+
+        // Audio feedback
+        const beepSound = new AudioContext();
+        
+        function playBeep() {
+            const oscillator = beepSound.createOscillator();
+            const gain = beepSound.createGain();
+            oscillator.connect(gain);
+            gain.connect(beepSound.destination);
+            oscillator.frequency.value = 1200;
+            oscillator.type = 'sine';
+            gain.gain.value = 0.3;
+            oscillator.start();
+            gain.gain.exponentialRampToValueAtTime(0.01, beepSound.currentTime + 0.1);
+            oscillator.stop(beepSound.currentTime + 0.1);
+        }
+
+        // Load saved settings
+        document.getElementById('apiToken').value = localStorage.getItem('fc_api_token') || '';
+        document.getElementById('specifier').value = localStorage.getItem('fc_specifier') || 'out-for-delivery';
+
+        // Save settings
+        ['apiToken', 'specifier'].forEach(id => {
+            document.getElementById(id).addEventListener('change', (e) => {
+                localStorage.setItem('fc_' + id.toLowerCase(), e.target.value);
+            });
+        });
+
+        // Load saved scanned orders
+        const savedOrders = localStorage.getItem('scanned_orders');
+        if (savedOrders) {
+            scannedOrders = JSON.parse(savedOrders);
+            renderScannedList();
+        }
+
+        function switchTab(tab) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            
+            event.target.classList.add('active');
+            document.getElementById('tab-' + tab).classList.add('active');
+
+            // Stop scanner when switching away
+            if (tab !== 'scanner' && isScanning) {
+                stopScanner();
+            }
+        }
+
+        function toggleSettings() {
+            document.getElementById('settingsContent').classList.toggle('active');
+        }
+
+        function toggleScanner() {
+            if (isScanning) {
+                stopScanner();
+            } else {
+                startScanner();
+            }
+        }
+
+        function startScanner() {
+            const video = document.getElementById('scanner-video');
+            const btn = document.getElementById('scannerBtn');
+            const status = document.getElementById('scannerStatus');
+
+            // Request camera permission
+            navigator.mediaDevices.getUserMedia({ 
+                video: { 
+                    facingMode: 'environment',
+                    width: { ideal: 1280 },
+                    height: { ideal: 720 }
+                } 
+            })
+            .then(stream => {
+                video.srcObject = stream;
+                video.play();
+                
+                isScanning = true;
+                btn.textContent = '⏹️ إيقاف المسح';
+                btn.classList.add('active');
+                status.textContent = 'جاري المسح... وجّه الكاميرا نحو الباركود';
+
+                // Start Quagga
+                Quagga.init({
+                    inputStream: {
+                        name: "Live",
+                        type: "LiveStream",
+                        target: video,
+                        constraints: {
+                            facingMode: "environment"
+                        }
+                    },
+                    decoder: {
+                        readers: [
+                            "code_128_reader",
+                            "ean_reader",
+                            "ean_8_reader",
+                            "code_39_reader",
+                            "upc_reader",
+                            "upc_e_reader"
+                        ]
+                    },
+                    locate: true
+                }, function(err) {
+                    if (err) {
+                        console.error(err);
+                        status.textContent = 'خطأ في تشغيل الماسح';
+                        return;
+                    }
+                    Quagga.start();
+                });
+
+                Quagga.onDetected(onBarcodeDetected);
+            })
+            .catch(err => {
+                console.error(err);
+                status.textContent = 'لم يتم السماح بالوصول للكاميرا';
+            });
+        }
+
+        function stopScanner() {
+            const video = document.getElementById('scanner-video');
+            const btn = document.getElementById('scannerBtn');
+            const status = document.getElementById('scannerStatus');
+
+            isScanning = false;
+            btn.textContent = '📷 بدء المسح';
+            btn.classList.remove('active');
+            status.textContent = 'اضغط لبدء المسح';
+
+            // Stop video stream
+            if (video.srcObject) {
+                video.srcObject.getTracks().forEach(track => track.stop());
+                video.srcObject = null;
+            }
+
+            // Stop Quagga
+            Quagga.stop();
+            Quagga.offDetected(onBarcodeDetected);
+        }
+
+        function onBarcodeDetected(result) {
+            const code = result.codeResult.code;
+            const now = Date.now();
+
+            // Prevent duplicate scans (same code within 2 seconds)
+            if (code === lastScannedCode && now - lastScanTime < 2000) {
+                return;
+            }
+
+            lastScannedCode = code;
+            lastScanTime = now;
+
+            // Add to list if not already there
+            if (!scannedOrders.includes(code)) {
+                addScannedOrder(code);
+                
+                // Visual & audio feedback
+                playBeep();
+                showScanIndicator();
+                
+                // Update status
+                document.getElementById('scannerStatus').textContent = `✓ تم مسح: ${code}`;
+                document.getElementById('scannerStatus').classList.add('success');
+                
+                setTimeout(() => {
+                    document.getElementById('scannerStatus').textContent = 'جاري المسح...';
+                    document.getElementById('scannerStatus').classList.remove('success');
+                }, 1500);
+            }
+        }
+
+        function showScanIndicator() {
+            const indicator = document.getElementById('soundIndicator');
+            indicator.classList.add('show');
+            setTimeout(() => indicator.classList.remove('show'), 1000);
+        }
+
+        function addScannedOrder(code) {
+            scannedOrders.unshift(code); // Add to beginning
+            saveScannedOrders();
+            renderScannedList(true);
+        }
+
+        function removeScannedOrder(code) {
+            scannedOrders = scannedOrders.filter(o => o !== code);
+            saveScannedOrders();
+            renderScannedList();
+        }
+
+        function clearScannedOrders() {
+            if (confirm('هل تريد مسح كل الأوردرات؟')) {
+                scannedOrders = [];
+                saveScannedOrders();
+                renderScannedList();
+            }
+        }
+
+        function saveScannedOrders() {
+            localStorage.setItem('scanned_orders', JSON.stringify(scannedOrders));
+        }
+
+        function renderScannedList(isNew = false) {
+            const list = document.getElementById('scannedList');
+            const count = document.getElementById('scannedCount');
+            
+            count.textContent = scannedOrders.length;
+
+            if (scannedOrders.length === 0) {
+                list.innerHTML = '<div class="empty-list">لم يتم مسح أي أوردر بعد</div>';
+                return;
+            }
+
+            list.innerHTML = scannedOrders.map((order, index) => `
+                <div class="scanned-item ${index === 0 && isNew ? 'new' : ''}">
+                    <span>${order}</span>
+                    <button class="remove-btn" onclick="removeScannedOrder('${order}')">✕</button>
+                </div>
+            `).join('');
+        }
+
+        function getOrders() {
+            const activeTab = document.querySelector('.tab-content.active').id;
+            
+            if (activeTab === 'tab-scanner') {
+                return [...scannedOrders];
+            } else {
+                const text = document.getElementById('orderNumbers').value;
+                return text.split('\n')
+                    .map(line => line.trim())
+                    .filter(line => line.length > 0);
+            }
+        }
+
+        async function triggerFlowForOrder(orderId) {
+            const apiToken = document.getElementById('apiToken').value.trim();
+            const specifier = document.getElementById('specifier').value.trim();
+
+            const response = await fetch(FLOW_API_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `bearer ${apiToken}`
+                },
+                body: JSON.stringify({
+                    itemId: orderId.toString(),
+                    specifier: specifier
+                })
+            });
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(`${response.status}`);
+            }
+
+            return true;
+        }
+
+        function updateResultItem(orderId, status, message = '') {
+            const item = document.querySelector(`[data-order="${orderId}"]`);
+            if (item) {
+                const statusEl = item.querySelector('.result-status');
+                statusEl.className = `result-status result-${status}`;
+                
+                const messages = {
+                    pending: '⏳ انتظار',
+                    success: '✓ تم',
+                    error: message || '✗ فشل'
+                };
+                
+                statusEl.innerHTML = messages[status];
+            }
+        }
+
+        async function startUpdate() {
+            const apiToken = document.getElementById('apiToken').value.trim();
+            
+            if (!apiToken) {
+                alert('يرجى إدخال API Token في الإعدادات');
+                toggleSettings();
+                return;
+            }
+
+            const orders = getOrders();
+            if (orders.length === 0) {
+                alert('لا توجد أوردرات للتحديث');
+                return;
+            }
+
+            // Setup UI
+            const btn = document.getElementById('updateBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner"></span> جاري التحديث...';
+
+            document.getElementById('progressBar').classList.add('active');
+            document.getElementById('results').classList.add('active');
+            
+            // Create result items
+            const resultsList = document.getElementById('resultsList');
+            resultsList.innerHTML = orders.map(order => `
+                <div class="result-item" data-order="${order}">
+                    <span>${order}</span>
+                    <span class="result-status result-pending">⏳</span>
+                </div>
+            `).join('');
+
+            let successCount = 0;
+            let errorCount = 0;
+
+            for (let i = 0; i < orders.length; i++) {
+                const orderId = orders[i];
+
+                try {
+                    await triggerFlowForOrder(orderId);
+                    updateResultItem(orderId, 'success');
+                    successCount++;
+                } catch (error) {
+                    updateResultItem(orderId, 'error', error.message);
+                    errorCount++;
+                }
+
+                // Update progress
+                const progress = ((i + 1) / orders.length) * 100;
+                document.getElementById('progressFill').style.width = `${progress}%`;
+                document.getElementById('successCount').textContent = successCount;
+                document.getElementById('errorCount').textContent = errorCount;
+
+                // Delay
+                await new Promise(r => setTimeout(r, 300));
+            }
+
+            // Done
+            btn.disabled = false;
+            btn.innerHTML = '🚀 تحديث الكل';
+
+            if (errorCount === 0) {
+                alert(`✅ تم بنجاح! تم تحديث ${successCount} أوردر`);
+                // Clear scanned orders on success
+                if (document.querySelector('.tab-content.active').id === 'tab-scanner') {
+                    scannedOrders = [];
+                    saveScannedOrders();
+                    renderScannedList();
+                }
+            } else {
+                alert(`تم: ${successCount} ناجح، ${errorCount} فشل`);
+            }
+        }
+    </script>
+</body>
+</html>

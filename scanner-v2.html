@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Order Status Updater</title>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0c0c0d;
+            --bg-card: #161618;
+            --bg-input: #1e1e21;
+            --border: #2a2a2e;
+            --text: #f5f5f5;
+            --text-dim: #8b8b8f;
+            --accent: #f43f5e;
+            --accent-glow: rgba(244, 63, 94, 0.15);
+            --success: #22c55e;
+            --success-glow: rgba(34, 197, 94, 0.15);
+            --error: #ef4444;
+            --error-glow: rgba(239, 68, 68, 0.15);
+            --scanner: #00d4ff;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'IBM Plex Sans Arabic', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            padding: 1rem;
+        }
+
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .header h1 {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 0.3rem;
+        }
+
+        .header p {
+            color: var(--text-dim);
+            font-size: 0.85rem;
+        }
+
+        .badge {
+            background: var(--accent-glow);
+            color: var(--accent);
+            padding: 0.3rem 0.8rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            display: inline-block;
+            margin-top: 0.5rem;
+        }
+
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .card-title {
+            font-size: 0.95rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Scanner */
+        #reader {
+            width: 100%;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        #reader video {
+            border-radius: 10px;
+        }
+
+        .scan-status {
+            text-align: center;
+            padding: 0.6rem;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            margin-top: 0.75rem;
+            background: var(--bg-input);
+            color: var(--text-dim);
+        }
+
+        .scan-status.success {
+            background: var(--success-glow);
+            color: var(--success);
+            animation: pulse 0.5s;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+        }
+
+        .scanner-btn {
+            width: 100%;
+            padding: 0.85rem;
+            border-radius: 10px;
+            font-family: inherit;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            border: 2px solid var(--scanner);
+            background: rgba(0, 212, 255, 0.1);
+            color: var(--scanner);
+            margin-top: 0.75rem;
+            transition: all 0.2s;
+        }
+
+        .scanner-btn:hover {
+            background: var(--scanner);
+            color: var(--bg);
+        }
+
+        .scanner-btn.stop {
+            background: var(--error);
+            border-color: var(--error);
+            color: white;
+        }
+
+        /* Scanned List */
+        .counter-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 0.75rem;
+        }
+
+        .counter-text {
+            font-size: 0.85rem;
+            color: var(--text-dim);
+        }
+
+        .counter-text strong {
+            color: var(--accent);
+            font-size: 1rem;
+        }
+
+        .clear-btn {
+            background: none;
+            border: 1px solid var(--border);
+            color: var(--text-dim);
+            padding: 0.4rem 0.8rem;
+            border-radius: 6px;
+            font-family: inherit;
+            font-size: 0.8rem;
+            cursor: pointer;
+        }
+
+        .clear-btn:hover {
+            border-color: var(--error);
+            color: var(--error);
+        }
+
+        .scanned-list {
+            max-height: 180px;
+            overflow-y: auto;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+        }
+
+        .scanned-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.65rem 0.85rem;
+            border-bottom: 1px solid var(--border);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+        }
+
+        .scanned-item:last-child {
+            border-bottom: none;
+        }
+
+        .scanned-item.new {
+            animation: highlight 1s ease;
+        }
+
+        @keyframes highlight {
+            0% { background: var(--success-glow); }
+            100% { background: transparent; }
+        }
+
+        .remove-btn {
+            background: none;
+            border: none;
+            color: var(--text-dim);
+            cursor: pointer;
+            padding: 0.3rem;
+            font-size: 1rem;
+        }
+
+        .remove-btn:hover {
+            color: var(--error);
+        }
+
+        .empty-list {
+            padding: 1.5rem;
+            text-align: center;
+            color: var(--text-dim);
+            font-size: 0.85rem;
+        }
+
+        /* Settings */
+        .settings-toggle {
+            width: 100%;
+            background: none;
+            border: 1px solid var(--border);
+            color: var(--text-dim);
+            padding: 0.6rem;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 0.85rem;
+            cursor: pointer;
+            margin-bottom: 0.75rem;
+        }
+
+        .settings-content {
+            display: none;
+            margin-bottom: 1rem;
+        }
+
+        .settings-content.active {
+            display: block;
+        }
+
+        .input-group {
+            margin-bottom: 0.75rem;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 0.8rem;
+            color: var(--text-dim);
+            margin-bottom: 0.3rem;
+        }
+
+        .input-group input {
+            width: 100%;
+            background: var(--bg-input);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 0.7rem;
+            color: var(--text);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        /* Action Button */
+        .btn-primary {
+            width: 100%;
+            padding: 1rem;
+            border-radius: 10px;
+            font-family: inherit;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            background: var(--accent);
+            color: white;
+            margin-bottom: 0.75rem;
+        }
+
+        .btn-primary:hover {
+            filter: brightness(1.1);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Results */
+        .results {
+            display: none;
+        }
+
+        .results.active {
+            display: block;
+        }
+
+        .results-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .stat-success { color: var(--success); }
+        .stat-error { color: var(--error); }
+
+        .results-list {
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+        }
+
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.6rem 0.85rem;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.85rem;
+        }
+
+        .result-item:last-child {
+            border-bottom: none;
+        }
+
+        .result-status {
+            padding: 0.2rem 0.6rem;
+            border-radius: 10px;
+            font-size: 0.75rem;
+        }
+
+        .result-pending { background: rgba(59,130,246,0.15); color: #3b82f6; }
+        .result-success { background: var(--success-glow); color: var(--success); }
+        .result-error { background: var(--error-glow); color: var(--error); }
+
+        /* Progress */
+        .progress-bar {
+            height: 4px;
+            background: var(--border);
+            border-radius: 2px;
+            margin-bottom: 0.75rem;
+            display: none;
+        }
+
+        .progress-bar.active {
+            display: block;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--accent);
+            border-radius: 2px;
+            transition: width 0.3s;
+            width: 0%;
+        }
+
+        /* Manual Input */
+        .manual-input {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.75rem;
+        }
+
+        .manual-input input {
+            flex: 1;
+            background: var(--bg-input);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 0.7rem;
+            color: var(--text);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+        }
+
+        .manual-input button {
+            background: var(--success);
+            border: none;
+            border-radius: 8px;
+            padding: 0 1rem;
+            color: white;
+            font-size: 1.2rem;
+            cursor: pointer;
+        }
+
+        .spinner {
+            width: 14px;
+            height: 14px;
+            border: 2px solid transparent;
+            border-top-color: currentColor;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            display: inline-block;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            top: 1rem;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--success);
+            color: white;
+            padding: 0.6rem 1.2rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            opacity: 0;
+            transition: opacity 0.3s;
+            z-index: 100;
+        }
+
+        .toast.show {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="toast" id="toast">✓ تم المسح</div>
+
+    <div class="container">
+        <header class="header">
+            <h1>🚚 Order Status Updater</h1>
+            <p>تحديث حالة الأوردرات</p>
+            <div class="badge">Out for Delivery</div>
+        </header>
+
+        <!-- Scanner -->
+        <div class="card">
+            <h2 class="card-title">📷 ماسح الباركود</h2>
+            <div id="reader"></div>
+            <div class="scan-status" id="scanStatus">اضغط لبدء المسح</div>
+            <button class="scanner-btn" id="scannerBtn" onclick="toggleScanner()">
+                📷 بدء المسح
+            </button>
+            
+            <div class="manual-input">
+                <input type="text" id="manualInput" placeholder="أو أدخل الرقم يدوياً...">
+                <button onclick="addManualEntry()">+</button>
+            </div>
+        </div>
+
+        <!-- Scanned List -->
+        <div class="card">
+            <h2 class="card-title">📋 الأوردرات</h2>
+            <div class="counter-bar">
+                <span class="counter-text">العدد: <strong id="count">0</strong></span>
+                <button class="clear-btn" onclick="clearList()">مسح الكل</button>
+            </div>
+            <div class="scanned-list" id="scannedList">
+                <div class="empty-list">لم يتم مسح أي باركود بعد</div>
+            </div>
+        </div>
+
+        <!-- Settings -->
+        <button class="settings-toggle" onclick="toggleSettings()">⚙️ الإعدادات</button>
+        <div class="settings-content" id="settings">
+            <div class="card">
+                <div class="input-group">
+                    <label>Flow Companion API Token</label>
+                    <input type="password" id="apiToken" placeholder="أدخل الـ Token">
+                </div>
+                <div class="input-group">
+                    <label>Specifier</label>
+                    <input type="text" id="specifier" value="out-for-delivery">
+                </div>
+            </div>
+        </div>
+
+        <!-- Action -->
+        <button class="btn-primary" id="updateBtn" onclick="startUpdate()">
+            🚀 تحديث الكل
+        </button>
+
+        <div class="progress-bar" id="progressBar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+
+        <!-- Results -->
+        <div class="results" id="results">
+            <div class="results-header">
+                <span>النتائج</span>
+                <span>
+                    <span class="stat-success">✓ <span id="successCount">0</span></span>
+                    &nbsp;
+                    <span class="stat-error">✗ <span id="errorCount">0</span></span>
+                </span>
+            </div>
+            <div class="results-list" id="resultsList"></div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+    <script>
+        const FLOW_API_URL = 'https://flow-companion.mivicle.app/rest/1/flow/start/order';
+        
+        let scanner = null;
+        let isScanning = false;
+        let scannedOrders = [];
+        let lastCode = '';
+        let lastTime = 0;
+
+        // Load saved data
+        document.getElementById('apiToken').value = localStorage.getItem('api_token') || '';
+        document.getElementById('specifier').value = localStorage.getItem('specifier') || 'out-for-delivery';
+        const saved = localStorage.getItem('scanned_orders');
+        if (saved) {
+            scannedOrders = JSON.parse(saved);
+            renderList();
+        }
+
+        // Save on change
+        document.getElementById('apiToken').addEventListener('change', e => {
+            localStorage.setItem('api_token', e.target.value);
+        });
+        document.getElementById('specifier').addEventListener('change', e => {
+            localStorage.setItem('specifier', e.target.value);
+        });
+
+        // Manual input enter key
+        document.getElementById('manualInput').addEventListener('keypress', e => {
+            if (e.key === 'Enter') addManualEntry();
+        });
+
+        function toggleSettings() {
+            document.getElementById('settings').classList.toggle('active');
+        }
+
+        function toggleScanner() {
+            if (isScanning) {
+                stopScanner();
+            } else {
+                startScanner();
+            }
+        }
+
+        function startScanner() {
+            const btn = document.getElementById('scannerBtn');
+            const status = document.getElementById('scanStatus');
+            
+            scanner = new Html5Qrcode("reader");
+            
+            scanner.start(
+                { facingMode: "environment" },
+                {
+                    fps: 10,
+                    qrbox: { width: 250, height: 100 },
+                    aspectRatio: 1.5,
+                    formatsToSupport: [
+                        Html5QrcodeSupportedFormats.CODE_128,
+                        Html5QrcodeSupportedFormats.CODE_39,
+                        Html5QrcodeSupportedFormats.EAN_13,
+                        Html5QrcodeSupportedFormats.EAN_8,
+                        Html5QrcodeSupportedFormats.UPC_A,
+                        Html5QrcodeSupportedFormats.UPC_E,
+                        Html5QrcodeSupportedFormats.QR_CODE
+                    ]
+                },
+                onScanSuccess,
+                onScanError
+            ).then(() => {
+                isScanning = true;
+                btn.textContent = '⏹️ إيقاف المسح';
+                btn.classList.add('stop');
+                status.textContent = 'جاري المسح... وجّه الكاميرا للباركود';
+            }).catch(err => {
+                status.textContent = 'خطأ: ' + err;
+            });
+        }
+
+        function stopScanner() {
+            if (scanner) {
+                scanner.stop().then(() => {
+                    scanner.clear();
+                    isScanning = false;
+                    document.getElementById('scannerBtn').textContent = '📷 بدء المسح';
+                    document.getElementById('scannerBtn').classList.remove('stop');
+                    document.getElementById('scanStatus').textContent = 'تم الإيقاف';
+                });
+            }
+        }
+
+        function onScanSuccess(code) {
+            const now = Date.now();
+            
+            // Prevent duplicate scans within 2 seconds
+            if (code === lastCode && now - lastTime < 2000) {
+                return;
+            }
+            
+            lastCode = code;
+            lastTime = now;
+            
+            if (!scannedOrders.includes(code)) {
+                addOrder(code);
+                showToast();
+                
+                // Vibrate if supported
+                if (navigator.vibrate) {
+                    navigator.vibrate(100);
+                }
+                
+                document.getElementById('scanStatus').textContent = '✓ تم: ' + code;
+                document.getElementById('scanStatus').classList.add('success');
+                
+                setTimeout(() => {
+                    document.getElementById('scanStatus').textContent = 'جاري المسح...';
+                    document.getElementById('scanStatus').classList.remove('success');
+                }, 1500);
+            } else {
+                document.getElementById('scanStatus').textContent = '⚠️ موجود بالفعل: ' + code;
+            }
+        }
+
+        function onScanError(err) {
+            // Ignore scan errors (normal when no barcode in view)
+        }
+
+        function addOrder(code) {
+            scannedOrders.unshift(code);
+            saveOrders();
+            renderList(true);
+        }
+
+        function removeOrder(code) {
+            scannedOrders = scannedOrders.filter(o => o !== code);
+            saveOrders();
+            renderList();
+        }
+
+        function clearList() {
+            if (confirm('مسح كل الأوردرات؟')) {
+                scannedOrders = [];
+                saveOrders();
+                renderList();
+            }
+        }
+
+        function saveOrders() {
+            localStorage.setItem('scanned_orders', JSON.stringify(scannedOrders));
+        }
+
+        function renderList(isNew = false) {
+            const list = document.getElementById('scannedList');
+            document.getElementById('count').textContent = scannedOrders.length;
+            
+            if (scannedOrders.length === 0) {
+                list.innerHTML = '<div class="empty-list">لم يتم مسح أي باركود بعد</div>';
+                return;
+            }
+            
+            list.innerHTML = scannedOrders.map((order, i) => `
+                <div class="scanned-item ${i === 0 && isNew ? 'new' : ''}">
+                    <span>${order}</span>
+                    <button class="remove-btn" onclick="removeOrder('${order}')">✕</button>
+                </div>
+            `).join('');
+        }
+
+        function addManualEntry() {
+            const input = document.getElementById('manualInput');
+            const code = input.value.trim();
+            
+            if (code && !scannedOrders.includes(code)) {
+                addOrder(code);
+                input.value = '';
+                showToast();
+            }
+        }
+
+        function showToast() {
+            const toast = document.getElementById('toast');
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 1000);
+        }
+
+        async function startUpdate() {
+            const token = document.getElementById('apiToken').value.trim();
+            
+            if (!token) {
+                alert('أدخل API Token في الإعدادات');
+                toggleSettings();
+                return;
+            }
+            
+            if (scannedOrders.length === 0) {
+                alert('لا توجد أوردرات');
+                return;
+            }
+            
+            const btn = document.getElementById('updateBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner"></span> جاري التحديث...';
+            
+            document.getElementById('progressBar').classList.add('active');
+            document.getElementById('results').classList.add('active');
+            
+            const resultsList = document.getElementById('resultsList');
+            resultsList.innerHTML = scannedOrders.map(order => `
+                <div class="result-item" data-order="${order}">
+                    <span>${order}</span>
+                    <span class="result-status result-pending">⏳</span>
+                </div>
+            `).join('');
+            
+            let success = 0, errors = 0;
+            const specifier = document.getElementById('specifier').value.trim();
+            
+            for (let i = 0; i < scannedOrders.length; i++) {
+                const order = scannedOrders[i];
+                
+                try {
+                    const response = await fetch(FLOW_API_URL, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `bearer ${token}`
+                        },
+                        body: JSON.stringify({
+                            itemId: order,
+                            specifier: specifier
+                        })
+                    });
+                    
+                    if (response.ok) {
+                        updateResult(order, 'success', '✓');
+                        success++;
+                    } else {
+                        updateResult(order, 'error', '✗');
+                        errors++;
+                    }
+                } catch (e) {
+                    updateResult(order, 'error', '✗');
+                    errors++;
+                }
+                
+                document.getElementById('progressFill').style.width = `${((i+1)/scannedOrders.length)*100}%`;
+                document.getElementById('successCount').textContent = success;
+                document.getElementById('errorCount').textContent = errors;
+                
+                await new Promise(r => setTimeout(r, 300));
+            }
+            
+            btn.disabled = false;
+            btn.innerHTML = '🚀 تحديث الكل';
+            
+            if (errors === 0) {
+                alert(`✅ تم تحديث ${success} أوردر بنجاح!`);
+                scannedOrders = [];
+                saveOrders();
+                renderList();
+            } else {
+                alert(`تم: ${success} ناجح، ${errors} فشل`);
+            }
+        }
+
+        function updateResult(order, status, text) {
+            const item = document.querySelector(`[data-order="${order}"] .result-status`);
+            if (item) {
+                item.className = `result-status result-${status}`;
+                item.textContent = text;
+            }
+        }
+    </script>
+</body>
+</html>

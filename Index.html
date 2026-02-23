@@ -20,6 +20,14 @@
             --error: #ef4444;
             --error-glow: rgba(239, 68, 68, 0.15);
             --scanner: #00d4ff;
+            --orange: #f59e0b;
+            --orange-glow: rgba(245, 158, 11, 0.15);
+            --blue: #3b82f6;
+            --blue-glow: rgba(59, 130, 246, 0.15);
+            --purple: #8b5cf6;
+            --purple-glow: rgba(139, 92, 246, 0.15);
+            --pink: #ec4899;
+            --pink-glow: rgba(236, 72, 153, 0.15);
         }
 
         * {
@@ -57,17 +65,6 @@
             font-size: 0.85rem;
         }
 
-        .badge {
-            background: var(--accent-glow);
-            color: var(--accent);
-            padding: 0.3rem 0.8rem;
-            border-radius: 15px;
-            font-size: 0.8rem;
-            font-weight: 600;
-            display: inline-block;
-            margin-top: 0.5rem;
-        }
-
         .card {
             background: var(--bg-card);
             border: 1px solid var(--border);
@@ -85,15 +82,135 @@
             gap: 0.5rem;
         }
 
+        /* Status Selector */
+        .status-selector {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .status-btn {
+            padding: 0.6rem 0.3rem;
+            border-radius: 10px;
+            font-family: inherit;
+            font-size: 0.7rem;
+            font-weight: 600;
+            cursor: pointer;
+            border: 2px solid var(--border);
+            background: var(--bg-input);
+            color: var(--text-dim);
+            transition: all 0.2s;
+            text-align: center;
+        }
+
+        .status-btn:hover {
+            border-color: var(--text-dim);
+        }
+
+        .status-btn.active {
+            transform: scale(1.02);
+        }
+
+        .status-btn .icon {
+            font-size: 1.1rem;
+            display: block;
+            margin-bottom: 0.2rem;
+        }
+
+        /* Status Colors */
+        .status-btn.shipped.active {
+            border-color: var(--scanner);
+            background: rgba(0, 212, 255, 0.15);
+            color: var(--scanner);
+        }
+
+        .status-btn.delivered.active {
+            border-color: var(--success);
+            background: var(--success-glow);
+            color: var(--success);
+        }
+
+        .status-btn.returned.active {
+            border-color: var(--orange);
+            background: var(--orange-glow);
+            color: var(--orange);
+        }
+
+        .status-btn.cancelled.active {
+            border-color: var(--error);
+            background: var(--error-glow);
+            color: var(--error);
+        }
+
+        .status-btn.ready-to-ship.active {
+            border-color: var(--purple);
+            background: var(--purple-glow);
+            color: var(--purple);
+        }
+
+        .current-status {
+            text-align: center;
+            padding: 0.5rem;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-top: 0.5rem;
+        }
+
+        .current-status.shipped { background: rgba(0, 212, 255, 0.15); color: var(--scanner); }
+        .current-status.delivered { background: var(--success-glow); color: var(--success); }
+        .current-status.returned { background: var(--orange-glow); color: var(--orange); }
+        .current-status.cancelled { background: var(--error-glow); color: var(--error); }
+        .current-status.ready-to-ship { background: var(--purple-glow); color: var(--purple); }
+
+        /* Courier Selector */
+        .courier-selector {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.5rem;
+        }
+
+        .courier-btn {
+            padding: 0.7rem 0.5rem;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            border: 2px solid var(--border);
+            background: var(--bg-input);
+            color: var(--text-dim);
+            transition: all 0.2s;
+            text-align: center;
+        }
+
+        .courier-btn:hover {
+            border-color: var(--text-dim);
+        }
+
+        .courier-btn.active {
+            border-color: var(--pink);
+            background: var(--pink-glow);
+            color: var(--pink);
+        }
+
+        .courier-display {
+            text-align: center;
+            padding: 0.5rem;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-top: 0.5rem;
+            background: var(--pink-glow);
+            color: var(--pink);
+        }
+
         /* Scanner */
         #reader {
             width: 100%;
             border-radius: 10px;
             overflow: hidden;
-        }
-
-        #reader video {
-            border-radius: 10px;
         }
 
         .scan-status {
@@ -130,11 +247,6 @@
             color: var(--scanner);
             margin-top: 0.75rem;
             transition: all 0.2s;
-        }
-
-        .scanner-btn:hover {
-            background: var(--scanner);
-            color: var(--bg);
         }
 
         .scanner-btn.stop {
@@ -178,7 +290,7 @@
         }
 
         .scanned-list {
-            max-height: 180px;
+            max-height: 150px;
             overflow-y: auto;
             border: 1px solid var(--border);
             border-radius: 8px;
@@ -283,13 +395,14 @@
             padding: 1rem;
             border-radius: 10px;
             font-family: inherit;
-            font-size: 1rem;
+            font-size: 0.95rem;
             font-weight: 600;
             cursor: pointer;
             border: none;
             background: var(--accent);
             color: white;
             margin-bottom: 0.75rem;
+            transition: all 0.2s;
         }
 
         .btn-primary:hover {
@@ -300,6 +413,12 @@
             opacity: 0.5;
             cursor: not-allowed;
         }
+
+        .btn-primary.shipped { background: var(--scanner); }
+        .btn-primary.delivered { background: var(--success); }
+        .btn-primary.returned { background: var(--orange); }
+        .btn-primary.cancelled { background: var(--error); }
+        .btn-primary.ready-to-ship { background: var(--purple); }
 
         /* Results */
         .results {
@@ -432,6 +551,34 @@
         .toast.show {
             opacity: 1;
         }
+
+        /* Summary Box */
+        .summary-box {
+            background: var(--bg-input);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 0.75rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.3rem 0;
+            font-size: 0.85rem;
+        }
+
+        .summary-label {
+            color: var(--text-dim);
+        }
+
+        .summary-value {
+            font-weight: 600;
+        }
+
+        .summary-value.status { color: var(--scanner); }
+        .summary-value.courier { color: var(--pink); }
+        .summary-value.count { color: var(--accent); }
     </style>
 </head>
 <body>
@@ -439,10 +586,50 @@
 
     <div class="container">
         <header class="header">
-            <h1>🚚 Order Status Updater</h1>
+            <h1>📦 Order Status Updater</h1>
             <p>تحديث حالة الأوردرات</p>
-            <div class="badge">Out for Delivery</div>
         </header>
+
+        <!-- Status Selector -->
+        <div class="card">
+            <h2 class="card-title">📌 اختر الحالة</h2>
+            <div class="status-selector">
+                <button class="status-btn shipped active" onclick="selectStatus('shipped', 'Shipped', '🚚')">
+                    <span class="icon">🚚</span>
+                    Shipped
+                </button>
+                <button class="status-btn delivered" onclick="selectStatus('delivered', 'Delivered', '✅')">
+                    <span class="icon">✅</span>
+                    Delivered
+                </button>
+                <button class="status-btn returned" onclick="selectStatus('returned', 'Returned', '↩️')">
+                    <span class="icon">↩️</span>
+                    Returned
+                </button>
+                <button class="status-btn cancelled" onclick="selectStatus('cancelled', 'Cancelled', '❌')">
+                    <span class="icon">❌</span>
+                    Cancelled
+                </button>
+                <button class="status-btn ready-to-ship" onclick="selectStatus('ready-to-ship', 'Ready to Ship', '📦')">
+                    <span class="icon">📦</span>
+                    Ready to Ship
+                </button>
+            </div>
+        </div>
+
+        <!-- Courier Selector -->
+        <div class="card" id="courierCard">
+            <h2 class="card-title">🛵 اختر المندوب</h2>
+            <div class="courier-selector">
+                <button class="courier-btn active" data-courier="Bosta" onclick="selectCourier(this)">Bosta</button>
+                <button class="courier-btn" data-courier="3laa" onclick="selectCourier(this)">3laa</button>
+                <button class="courier-btn" data-courier="3bdo 3rafa" onclick="selectCourier(this)">3bdo 3rafa</button>
+                <button class="courier-btn" data-courier="Kareem" onclick="selectCourier(this)">Kareem</button>
+                <button class="courier-btn" data-courier="Mohamed Tarek" onclick="selectCourier(this)">Mohamed Tarek</button>
+                <button class="courier-btn" data-courier="Magdy" onclick="selectCourier(this)">Magdy</button>
+                <button class="courier-btn" data-courier="Abo Selim" onclick="selectCourier(this)">Abo Selim</button>
+            </div>
+        </div>
 
         <!-- Scanner -->
         <div class="card">
@@ -471,6 +658,22 @@
             </div>
         </div>
 
+        <!-- Summary -->
+        <div class="summary-box">
+            <div class="summary-row">
+                <span class="summary-label">الحالة:</span>
+                <span class="summary-value status" id="summaryStatus">🚚 Shipped</span>
+            </div>
+            <div class="summary-row" id="courierRow">
+                <span class="summary-label">المندوب:</span>
+                <span class="summary-value courier" id="summaryCourier">🛵 Bosta</span>
+            </div>
+            <div class="summary-row">
+                <span class="summary-label">عدد الأوردرات:</span>
+                <span class="summary-value count" id="summaryCount">0</span>
+            </div>
+        </div>
+
         <!-- Settings -->
         <button class="settings-toggle" onclick="toggleSettings()">⚙️ الإعدادات</button>
         <div class="settings-content" id="settings">
@@ -479,15 +682,11 @@
                     <label>Flow Companion API Token</label>
                     <input type="password" id="apiToken" placeholder="أدخل الـ Token">
                 </div>
-                <div class="input-group">
-                    <label>Specifier</label>
-                    <input type="text" id="specifier" value="out-for-delivery">
-                </div>
             </div>
         </div>
 
         <!-- Action -->
-        <button class="btn-primary" id="updateBtn" onclick="startUpdate()">
+        <button class="btn-primary shipped" id="updateBtn" onclick="startUpdate()">
             🚀 تحديث الكل
         </button>
 
@@ -519,27 +718,111 @@
         let lastCode = '';
         let lastTime = 0;
 
+        // Current selections
+        let currentSpecifier = 'shipped';
+        let currentStatusLabel = 'Shipped';
+        let currentIcon = '🚚';
+        let currentCourier = 'Bosta';
+
         // Load saved data
         document.getElementById('apiToken').value = localStorage.getItem('api_token') || '';
-        document.getElementById('specifier').value = localStorage.getItem('specifier') || 'out-for-delivery';
         const saved = localStorage.getItem('scanned_orders');
         if (saved) {
             scannedOrders = JSON.parse(saved);
             renderList();
         }
 
+        // Load saved status
+        const savedStatus = localStorage.getItem('selected_status');
+        if (savedStatus) {
+            const status = JSON.parse(savedStatus);
+            selectStatus(status.specifier, status.label, status.icon, false);
+        }
+
+        // Load saved courier
+        const savedCourier = localStorage.getItem('selected_courier');
+        if (savedCourier) {
+            selectCourier(savedCourier, false);
+        }
+
         // Save on change
         document.getElementById('apiToken').addEventListener('change', e => {
             localStorage.setItem('api_token', e.target.value);
-        });
-        document.getElementById('specifier').addEventListener('change', e => {
-            localStorage.setItem('specifier', e.target.value);
         });
 
         // Manual input enter key
         document.getElementById('manualInput').addEventListener('keypress', e => {
             if (e.key === 'Enter') addManualEntry();
         });
+
+        function selectStatus(specifier, label, icon, save = true) {
+            currentSpecifier = specifier;
+            currentStatusLabel = label;
+            currentIcon = icon;
+
+            // Update buttons
+            document.querySelectorAll('.status-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.querySelector(`.status-btn.${specifier}`).classList.add('active');
+
+            // Update summary
+            document.getElementById('summaryStatus').textContent = `${icon} ${label}`;
+
+            // Update action button
+            const btn = document.getElementById('updateBtn');
+            btn.className = `btn-primary ${specifier}`;
+
+            // Hide/show courier section based on status
+            const courierCard = document.getElementById('courierCard');
+            const courierSummary = document.getElementById('courierRow');
+            
+            if (specifier === 'ready-to-ship') {
+                courierCard.style.display = 'none';
+                courierSummary.style.display = 'none';
+            } else {
+                courierCard.style.display = 'block';
+                courierSummary.style.display = 'flex';
+            }
+
+            // Save selection
+            if (save) {
+                localStorage.setItem('selected_status', JSON.stringify({
+                    specifier, label, icon
+                }));
+            }
+        }
+
+        function selectCourier(element, save = true) {
+            let courier, btnElement;
+            
+            // Handle both element click and load from storage
+            if (typeof element === 'string') {
+                courier = element;
+                btnElement = document.querySelector(`.courier-btn[data-courier="${courier}"]`);
+            } else {
+                btnElement = element;
+                courier = element.getAttribute('data-courier');
+            }
+            
+            currentCourier = courier;
+
+            // Update buttons
+            document.querySelectorAll('.courier-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            if (btnElement) {
+                btnElement.classList.add('active');
+            }
+
+            // Update summary
+            document.getElementById('summaryCourier').textContent = `🛵 ${courier}`;
+
+            // Save selection
+            if (save) {
+                localStorage.setItem('selected_courier', courier);
+            }
+        }
 
         function toggleSettings() {
             document.getElementById('settings').classList.toggle('active');
@@ -602,7 +885,6 @@
         function onScanSuccess(code) {
             const now = Date.now();
             
-            // Prevent duplicate scans within 2 seconds
             if (code === lastCode && now - lastTime < 2000) {
                 return;
             }
@@ -614,7 +896,6 @@
                 addOrder(code);
                 showToast();
                 
-                // Vibrate if supported
                 if (navigator.vibrate) {
                     navigator.vibrate(100);
                 }
@@ -632,19 +913,21 @@
         }
 
         function onScanError(err) {
-            // Ignore scan errors (normal when no barcode in view)
+            // Ignore
         }
 
         function addOrder(code) {
             scannedOrders.unshift(code);
             saveOrders();
             renderList(true);
+            updateSummaryCount();
         }
 
         function removeOrder(code) {
             scannedOrders = scannedOrders.filter(o => o !== code);
             saveOrders();
             renderList();
+            updateSummaryCount();
         }
 
         function clearList() {
@@ -652,11 +935,17 @@
                 scannedOrders = [];
                 saveOrders();
                 renderList();
+                updateSummaryCount();
             }
         }
 
         function saveOrders() {
             localStorage.setItem('scanned_orders', JSON.stringify(scannedOrders));
+        }
+
+        function updateSummaryCount() {
+            document.getElementById('count').textContent = scannedOrders.length;
+            document.getElementById('summaryCount').textContent = scannedOrders.length;
         }
 
         function renderList(isNew = false) {
@@ -706,6 +995,18 @@
                 alert('لا توجد أوردرات');
                 return;
             }
+
+            // Confirm action
+            let confirmMsg;
+            if (currentSpecifier === 'ready-to-ship') {
+                confirmMsg = `هل تريد تحديث ${scannedOrders.length} أوردر؟\n\nالحالة: ${currentStatusLabel}\n(سيتم إزالة المندوب)`;
+            } else {
+                confirmMsg = `هل تريد تحديث ${scannedOrders.length} أوردر؟\n\nالحالة: ${currentStatusLabel}\nالمندوب: ${currentCourier}`;
+            }
+            
+            if (!confirm(confirmMsg)) {
+                return;
+            }
             
             const btn = document.getElementById('updateBtn');
             btn.disabled = true;
@@ -723,22 +1024,31 @@
             `).join('');
             
             let success = 0, errors = 0;
-            const specifier = document.getElementById('specifier').value.trim();
             
             for (let i = 0; i < scannedOrders.length; i++) {
                 const order = scannedOrders[i];
                 
                 try {
+                    // Build request body
+                    const requestBody = {
+                        itemId: order,
+                        specifier: currentSpecifier
+                    };
+                    
+                    // Only add courier if NOT ready-to-ship
+                    if (currentSpecifier !== 'ready-to-ship') {
+                        requestBody.additionalParameters = {
+                            courier: currentCourier
+                        };
+                    }
+                    
                     const response = await fetch(FLOW_API_URL, {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
                             'Authorization': `bearer ${token}`
                         },
-                        body: JSON.stringify({
-                            itemId: order,
-                            specifier: specifier
-                        })
+                        body: JSON.stringify(requestBody)
                     });
                     
                     if (response.ok) {
@@ -761,13 +1071,20 @@
             }
             
             btn.disabled = false;
-            btn.innerHTML = '🚀 تحديث الكل';
+            btn.innerHTML = `🚀 تحديث الكل`;
             
             if (errors === 0) {
-                alert(`✅ تم تحديث ${success} أوردر بنجاح!`);
+                let successMsg;
+                if (currentSpecifier === 'ready-to-ship') {
+                    successMsg = `✅ تم تحديث ${success} أوردر بنجاح!\n\nالحالة: ${currentStatusLabel}`;
+                } else {
+                    successMsg = `✅ تم تحديث ${success} أوردر بنجاح!\n\nالحالة: ${currentStatusLabel}\nالمندوب: ${currentCourier}`;
+                }
+                alert(successMsg);
                 scannedOrders = [];
                 saveOrders();
                 renderList();
+                updateSummaryCount();
             } else {
                 alert(`تم: ${success} ناجح، ${errors} فشل`);
             }
@@ -780,6 +1097,9 @@
                 item.textContent = text;
             }
         }
+
+        // Initial summary count
+        updateSummaryCount();
     </script>
 </body>
 </html>

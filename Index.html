@@ -645,7 +645,7 @@
                 <button onclick="addManualEntry()">+</button>
             </div>
             <p style="font-size: 0.75rem; color: var(--text-dim); margin-top: 0.5rem; text-align: center;">
-                💡 للـ Scanner Gun: الـ focus تلقائي على هذا الحقل
+                💡 Scanner Gun: امسح وسيتم الإضافة تلقائياً
             </p>
         </div>
 
@@ -753,10 +753,49 @@
             localStorage.setItem('api_token', e.target.value);
         });
 
-        // Manual input enter key
-        document.getElementById('manualInput').addEventListener('keypress', e => {
+        // Manual input - auto-add when scanner gun finishes (no Enter needed)
+        let inputTimeout = null;
+        const scannerInput = document.getElementById('manualInput');
+        
+        scannerInput.addEventListener('input', (e) => {
+            // Clear previous timeout
+            if (inputTimeout) {
+                clearTimeout(inputTimeout);
+            }
+            
+            // Wait 150ms after last character - if no more input, assume scan is complete
+            inputTimeout = setTimeout(() => {
+                const code = scannerInput.value.trim();
+                if (code.length >= 3) { // Minimum barcode length
+                    if (!scannedOrders.includes(code)) {
+                        addOrder(code);
+                        scannerInput.value = '';
+                        showToast();
+                        
+                        // Vibrate if on mobile
+                        if (navigator.vibrate) {
+                            navigator.vibrate(100);
+                        }
+                    } else {
+                        // Already exists
+                        scannerInput.value = '';
+                        document.getElementById('scanStatus').textContent = '⚠️ موجود بالفعل: ' + code;
+                        setTimeout(() => {
+                            document.getElementById('scanStatus').textContent = 'جاهز للمسح';
+                        }, 1500);
+                    }
+                }
+                scannerInput.focus();
+            }, 150);
+        });
+
+        // Also support Enter key as backup
+        scannerInput.addEventListener('keypress', e => {
             if (e.key === 'Enter') {
                 e.preventDefault();
+                if (inputTimeout) {
+                    clearTimeout(inputTimeout);
+                }
                 addManualEntry();
             }
         });

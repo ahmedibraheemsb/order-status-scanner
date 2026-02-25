@@ -641,9 +641,12 @@
             </button>
             
             <div class="manual-input">
-                <input type="text" id="manualInput" placeholder="أو أدخل الرقم يدوياً...">
+                <input type="text" id="manualInput" placeholder="امسح الباركود هنا..." autofocus>
                 <button onclick="addManualEntry()">+</button>
             </div>
+            <p style="font-size: 0.75rem; color: var(--text-dim); margin-top: 0.5rem; text-align: center;">
+                💡 للـ Scanner Gun: الـ focus تلقائي على هذا الحقل
+            </p>
         </div>
 
         <!-- Scanned List -->
@@ -752,7 +755,26 @@
 
         // Manual input enter key
         document.getElementById('manualInput').addEventListener('keypress', e => {
-            if (e.key === 'Enter') addManualEntry();
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                addManualEntry();
+            }
+        });
+
+        // Keep focus on input field for scanner gun
+        function focusInput() {
+            document.getElementById('manualInput').focus();
+        }
+
+        // Auto-focus on page load
+        window.addEventListener('load', focusInput);
+        
+        // Re-focus when clicking anywhere on the page (for scanner gun convenience)
+        document.addEventListener('click', (e) => {
+            // Don't refocus if clicking on buttons or other inputs
+            if (e.target.tagName !== 'BUTTON' && e.target.tagName !== 'INPUT') {
+                setTimeout(focusInput, 100);
+            }
         });
 
         function selectStatus(specifier, label, icon, save = true) {
@@ -973,7 +995,17 @@
                 addOrder(code);
                 input.value = '';
                 showToast();
+            } else if (scannedOrders.includes(code)) {
+                // Already exists - clear and show message
+                input.value = '';
+                document.getElementById('scanStatus').textContent = '⚠️ موجود بالفعل: ' + code;
+                setTimeout(() => {
+                    document.getElementById('scanStatus').textContent = 'جاهز للمسح';
+                }, 1500);
             }
+            
+            // Always refocus for next scan
+            input.focus();
         }
 
         function showToast() {

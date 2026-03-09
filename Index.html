@@ -30,11 +30,7 @@
             --pink-glow: rgba(236, 72, 153, 0.15);
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
             font-family: 'IBM Plex Sans Arabic', sans-serif;
@@ -44,26 +40,11 @@
             padding: 1rem;
         }
 
-        .container {
-            max-width: 500px;
-            margin: 0 auto;
-        }
+        .container { max-width: 500px; margin: 0 auto; }
 
-        .header {
-            text-align: center;
-            margin-bottom: 1.5rem;
-        }
-
-        .header h1 {
-            font-size: 1.4rem;
-            font-weight: 700;
-            margin-bottom: 0.3rem;
-        }
-
-        .header p {
-            color: var(--text-dim);
-            font-size: 0.85rem;
-        }
+        .header { text-align: center; margin-bottom: 1.5rem; }
+        .header h1 { font-size: 1.4rem; font-weight: 700; margin-bottom: 0.3rem; }
+        .header p { color: var(--text-dim); font-size: 0.85rem; }
 
         .card {
             background: var(--bg-card);
@@ -82,7 +63,6 @@
             gap: 0.5rem;
         }
 
-        /* Status Selector */
         .status-selector {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -104,67 +84,16 @@
             text-align: center;
         }
 
-        .status-btn:hover {
-            border-color: var(--text-dim);
-        }
+        .status-btn:hover { border-color: var(--text-dim); }
+        .status-btn.active { transform: scale(1.02); }
+        .status-btn .icon { font-size: 1.1rem; display: block; margin-bottom: 0.2rem; }
 
-        .status-btn.active {
-            transform: scale(1.02);
-        }
+        .status-btn.Shipped.active { border-color: var(--scanner); background: rgba(0, 212, 255, 0.15); color: var(--scanner); }
+        .status-btn.Delivered.active { border-color: var(--success); background: var(--success-glow); color: var(--success); }
+        .status-btn.Returned.active { border-color: var(--orange); background: var(--orange-glow); color: var(--orange); }
+        .status-btn.Cancelled.active { border-color: var(--error); background: var(--error-glow); color: var(--error); }
+        .status-btn.Ready.active { border-color: var(--purple); background: var(--purple-glow); color: var(--purple); }
 
-        .status-btn .icon {
-            font-size: 1.1rem;
-            display: block;
-            margin-bottom: 0.2rem;
-        }
-
-        /* Status Colors */
-        .status-btn.shipped.active {
-            border-color: var(--scanner);
-            background: rgba(0, 212, 255, 0.15);
-            color: var(--scanner);
-        }
-
-        .status-btn.delivered.active {
-            border-color: var(--success);
-            background: var(--success-glow);
-            color: var(--success);
-        }
-
-        .status-btn.returned.active {
-            border-color: var(--orange);
-            background: var(--orange-glow);
-            color: var(--orange);
-        }
-
-        .status-btn.cancelled.active {
-            border-color: var(--error);
-            background: var(--error-glow);
-            color: var(--error);
-        }
-
-        .status-btn.ready-to-ship.active {
-            border-color: var(--purple);
-            background: var(--purple-glow);
-            color: var(--purple);
-        }
-
-        .current-status {
-            text-align: center;
-            padding: 0.5rem;
-            border-radius: 8px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            margin-top: 0.5rem;
-        }
-
-        .current-status.shipped { background: rgba(0, 212, 255, 0.15); color: var(--scanner); }
-        .current-status.delivered { background: var(--success-glow); color: var(--success); }
-        .current-status.returned { background: var(--orange-glow); color: var(--orange); }
-        .current-status.cancelled { background: var(--error-glow); color: var(--error); }
-        .current-status.ready-to-ship { background: var(--purple-glow); color: var(--purple); }
-
-        /* Courier Selector */
         .courier-selector {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -185,33 +114,10 @@
             text-align: center;
         }
 
-        .courier-btn:hover {
-            border-color: var(--text-dim);
-        }
+        .courier-btn:hover { border-color: var(--text-dim); }
+        .courier-btn.active { border-color: var(--pink); background: var(--pink-glow); color: var(--pink); }
 
-        .courier-btn.active {
-            border-color: var(--pink);
-            background: var(--pink-glow);
-            color: var(--pink);
-        }
-
-        .courier-display {
-            text-align: center;
-            padding: 0.5rem;
-            border-radius: 8px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            margin-top: 0.5rem;
-            background: var(--pink-glow);
-            color: var(--pink);
-        }
-
-        /* Scanner */
-        #reader {
-            width: 100%;
-            border-radius: 10px;
-            overflow: hidden;
-        }
+        #reader { width: 100%; border-radius: 10px; overflow: hidden; }
 
         .scan-status {
             text-align: center;
@@ -249,29 +155,11 @@
             transition: all 0.2s;
         }
 
-        .scanner-btn.stop {
-            background: var(--error);
-            border-color: var(--error);
-            color: white;
-        }
+        .scanner-btn.stop { background: var(--error); border-color: var(--error); color: white; }
 
-        /* Scanned List */
-        .counter-bar {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 0.75rem;
-        }
-
-        .counter-text {
-            font-size: 0.85rem;
-            color: var(--text-dim);
-        }
-
-        .counter-text strong {
-            color: var(--accent);
-            font-size: 1rem;
-        }
+        .counter-bar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem; }
+        .counter-text { font-size: 0.85rem; color: var(--text-dim); }
+        .counter-text strong { color: var(--accent); font-size: 1rem; }
 
         .clear-btn {
             background: none;
@@ -284,10 +172,7 @@
             cursor: pointer;
         }
 
-        .clear-btn:hover {
-            border-color: var(--error);
-            color: var(--error);
-        }
+        .clear-btn:hover { border-color: var(--error); color: var(--error); }
 
         .scanned-list {
             max-height: 150px;
@@ -306,40 +191,19 @@
             font-size: 0.9rem;
         }
 
-        .scanned-item:last-child {
-            border-bottom: none;
-        }
-
-        .scanned-item.new {
-            animation: highlight 1s ease;
-        }
+        .scanned-item:last-child { border-bottom: none; }
+        .scanned-item.new { animation: highlight 1s ease; }
 
         @keyframes highlight {
             0% { background: var(--success-glow); }
             100% { background: transparent; }
         }
 
-        .remove-btn {
-            background: none;
-            border: none;
-            color: var(--text-dim);
-            cursor: pointer;
-            padding: 0.3rem;
-            font-size: 1rem;
-        }
+        .remove-btn { background: none; border: none; color: var(--text-dim); cursor: pointer; padding: 0.3rem; font-size: 1rem; }
+        .remove-btn:hover { color: var(--error); }
 
-        .remove-btn:hover {
-            color: var(--error);
-        }
+        .empty-list { padding: 1.5rem; text-align: center; color: var(--text-dim); font-size: 0.85rem; }
 
-        .empty-list {
-            padding: 1.5rem;
-            text-align: center;
-            color: var(--text-dim);
-            font-size: 0.85rem;
-        }
-
-        /* Settings */
         .settings-toggle {
             width: 100%;
             background: none;
@@ -353,26 +217,11 @@
             margin-bottom: 0.75rem;
         }
 
-        .settings-content {
-            display: none;
-            margin-bottom: 1rem;
-        }
+        .settings-content { display: none; margin-bottom: 1rem; }
+        .settings-content.active { display: block; }
 
-        .settings-content.active {
-            display: block;
-        }
-
-        .input-group {
-            margin-bottom: 0.75rem;
-        }
-
-        .input-group label {
-            display: block;
-            font-size: 0.8rem;
-            color: var(--text-dim);
-            margin-bottom: 0.3rem;
-        }
-
+        .input-group { margin-bottom: 0.75rem; }
+        .input-group label { display: block; font-size: 0.8rem; color: var(--text-dim); margin-bottom: 0.3rem; }
         .input-group input {
             width: 100%;
             background: var(--bg-input);
@@ -383,13 +232,8 @@
             font-family: 'JetBrains Mono', monospace;
             font-size: 0.85rem;
         }
+        .input-group input:focus { outline: none; border-color: var(--accent); }
 
-        .input-group input:focus {
-            outline: none;
-            border-color: var(--accent);
-        }
-
-        /* Action Button */
         .btn-primary {
             width: 100%;
             padding: 1rem;
@@ -405,37 +249,17 @@
             transition: all 0.2s;
         }
 
-        .btn-primary:hover {
-            filter: brightness(1.1);
-        }
+        .btn-primary:hover { filter: brightness(1.1); }
+        .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+        .btn-primary.Shipped { background: var(--scanner); }
+        .btn-primary.Delivered { background: var(--success); }
+        .btn-primary.Returned { background: var(--orange); }
+        .btn-primary.Cancelled { background: var(--error); }
+        .btn-primary.Ready { background: var(--purple); }
 
-        .btn-primary:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-        .btn-primary.shipped { background: var(--scanner); }
-        .btn-primary.delivered { background: var(--success); }
-        .btn-primary.returned { background: var(--orange); }
-        .btn-primary.cancelled { background: var(--error); }
-        .btn-primary.ready-to-ship { background: var(--purple); }
-
-        /* Results */
-        .results {
-            display: none;
-        }
-
-        .results.active {
-            display: block;
-        }
-
-        .results-header {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 0.5rem;
-            font-size: 0.9rem;
-        }
-
+        .results { display: none; }
+        .results.active { display: block; }
+        .results-header { display: flex; justify-content: space-between; margin-bottom: 0.5rem; font-size: 0.9rem; }
         .stat-success { color: var(--success); }
         .stat-error { color: var(--error); }
 
@@ -454,48 +278,18 @@
             font-size: 0.85rem;
         }
 
-        .result-item:last-child {
-            border-bottom: none;
-        }
+        .result-item:last-child { border-bottom: none; }
 
-        .result-status {
-            padding: 0.2rem 0.6rem;
-            border-radius: 10px;
-            font-size: 0.75rem;
-        }
-
+        .result-status { padding: 0.2rem 0.6rem; border-radius: 10px; font-size: 0.75rem; }
         .result-pending { background: rgba(59,130,246,0.15); color: #3b82f6; }
         .result-success { background: var(--success-glow); color: var(--success); }
         .result-error { background: var(--error-glow); color: var(--error); }
 
-        /* Progress */
-        .progress-bar {
-            height: 4px;
-            background: var(--border);
-            border-radius: 2px;
-            margin-bottom: 0.75rem;
-            display: none;
-        }
+        .progress-bar { height: 4px; background: var(--border); border-radius: 2px; margin-bottom: 0.75rem; display: none; }
+        .progress-bar.active { display: block; }
+        .progress-fill { height: 100%; background: var(--accent); border-radius: 2px; transition: width 0.3s; width: 0%; }
 
-        .progress-bar.active {
-            display: block;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: var(--accent);
-            border-radius: 2px;
-            transition: width 0.3s;
-            width: 0%;
-        }
-
-        /* Manual Input */
-        .manual-input {
-            display: flex;
-            gap: 0.5rem;
-            margin-top: 0.75rem;
-        }
-
+        .manual-input { display: flex; gap: 0.5rem; margin-top: 0.75rem; }
         .manual-input input {
             flex: 1;
             background: var(--bg-input);
@@ -506,7 +300,6 @@
             font-family: 'JetBrains Mono', monospace;
             font-size: 0.9rem;
         }
-
         .manual-input button {
             background: var(--success);
             border: none;
@@ -518,8 +311,7 @@
         }
 
         .spinner {
-            width: 14px;
-            height: 14px;
+            width: 14px; height: 14px;
             border: 2px solid transparent;
             border-top-color: currentColor;
             border-radius: 50%;
@@ -527,11 +319,8 @@
             display: inline-block;
         }
 
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
+        @keyframes spin { to { transform: rotate(360deg); } }
 
-        /* Toast */
         .toast {
             position: fixed;
             top: 1rem;
@@ -547,12 +336,8 @@
             transition: opacity 0.3s;
             z-index: 100;
         }
+        .toast.show { opacity: 1; }
 
-        .toast.show {
-            opacity: 1;
-        }
-
-        /* Summary Box */
         .summary-box {
             background: var(--bg-input);
             border: 1px solid var(--border);
@@ -561,21 +346,9 @@
             margin-bottom: 0.75rem;
         }
 
-        .summary-row {
-            display: flex;
-            justify-content: space-between;
-            padding: 0.3rem 0;
-            font-size: 0.85rem;
-        }
-
-        .summary-label {
-            color: var(--text-dim);
-        }
-
-        .summary-value {
-            font-weight: 600;
-        }
-
+        .summary-row { display: flex; justify-content: space-between; padding: 0.3rem 0; font-size: 0.85rem; }
+        .summary-label { color: var(--text-dim); }
+        .summary-value { font-weight: 600; }
         .summary-value.status { color: var(--scanner); }
         .summary-value.courier { color: var(--pink); }
         .summary-value.count { color: var(--accent); }
@@ -594,25 +367,20 @@
         <div class="card">
             <h2 class="card-title">📌 اختر الحالة</h2>
             <div class="status-selector">
-                <button class="status-btn shipped active" onclick="selectStatus('shipped', 'Shipped', '🚚')">
-                    <span class="icon">🚚</span>
-                    Shipped
+                <button class="status-btn Shipped" onclick="selectStatus('Shipped', 'Shipped', '🚚')">
+                    <span class="icon">🚚</span>Shipped
                 </button>
-                <button class="status-btn delivered" onclick="selectStatus('delivered', 'Delivered', '✅')">
-                    <span class="icon">✅</span>
-                    Delivered
+                <button class="status-btn Delivered" onclick="selectStatus('Delivered', 'Delivered', '✅')">
+                    <span class="icon">✅</span>Delivered
                 </button>
-                <button class="status-btn returned" onclick="selectStatus('returned', 'Returned', '↩️')">
-                    <span class="icon">↩️</span>
-                    Returned
+                <button class="status-btn Returned" onclick="selectStatus('Returned', 'Returned', '↩️')">
+                    <span class="icon">↩️</span>Returned
                 </button>
-                <button class="status-btn cancelled" onclick="selectStatus('cancelled', 'Cancelled', '❌')">
-                    <span class="icon">❌</span>
-                    Cancelled
+                <button class="status-btn Cancelled" onclick="selectStatus('Cancelled', 'Cancelled', '❌')">
+                    <span class="icon">❌</span>Cancelled
                 </button>
-                <button class="status-btn ready-to-ship" onclick="selectStatus('ready-to-ship', 'Ready to Ship', '📦')">
-                    <span class="icon">📦</span>
-                    Ready to Ship
+                <button class="status-btn Ready" onclick="selectStatus('Ready', 'Ready', '📦')">
+                    <span class="icon">📦</span>Ready
                 </button>
             </div>
         </div>
@@ -621,17 +389,17 @@
         <div class="card" id="courierCard">
             <h2 class="card-title">🛵 اختر المندوب</h2>
             <div class="courier-selector">
-                <button class="courier-btn active" data-courier="Bosta" onclick="selectCourier(this)">Bosta</button>
+                <button class="courier-btn" data-courier="Bosta" onclick="selectCourier(this)">Bosta</button>
                 <button class="courier-btn" data-courier="3laa" onclick="selectCourier(this)">3laa</button>
                 <button class="courier-btn" data-courier="3bdo 3rafa" onclick="selectCourier(this)">3bdo 3rafa</button>
                 <button class="courier-btn" data-courier="Kareem" onclick="selectCourier(this)">Kareem</button>
                 <button class="courier-btn" data-courier="Mohamed Tarek" onclick="selectCourier(this)">Mohamed Tarek</button>
                 <button class="courier-btn" data-courier="Magdy" onclick="selectCourier(this)">Magdy</button>
                 <button class="courier-btn" data-courier="Abo Selim" onclick="selectCourier(this)">Abo Selim</button>
-				<button class="courier-btn" data-courier="Waleed" onclick="selectCourier(this)">Waleed</button>
-				<button class="courier-btn" data-courier="3bd Alrahman" onclick="selectCourier(this)">3bd Alrahman</button>
-				<button class="courier-btn" data-courier="Abo Eyad" onclick="selectCourier(this)">Abo Eyad</button>
-
+                <button class="courier-btn" data-courier="Waleed" onclick="selectCourier(this)">Waleed</button>
+                <button class="courier-btn" data-courier="3bd Alrahman" onclick="selectCourier(this)">3bd Alrahman</button>
+                <button class="courier-btn" data-courier="Sobhy" onclick="selectCourier(this)">Sobhy</button>
+                <button class="courier-btn" data-courier="Abo Yassin" onclick="selectCourier(this)">Abo Yassin</button>
             </div>
         </div>
 
@@ -640,10 +408,7 @@
             <h2 class="card-title">📷 ماسح الباركود</h2>
             <div id="reader"></div>
             <div class="scan-status" id="scanStatus">اضغط لبدء المسح</div>
-            <button class="scanner-btn" id="scannerBtn" onclick="toggleScanner()">
-                📷 بدء المسح
-            </button>
-            
+            <button class="scanner-btn" id="scannerBtn" onclick="toggleScanner()">📷 بدء المسح</button>
             <div class="manual-input">
                 <input type="text" id="manualInput" placeholder="امسح الباركود هنا..." autofocus>
                 <button onclick="addManualEntry()">+</button>
@@ -669,11 +434,11 @@
         <div class="summary-box">
             <div class="summary-row">
                 <span class="summary-label">الحالة:</span>
-                <span class="summary-value status" id="summaryStatus">🚚 Shipped</span>
+                <span class="summary-value status" id="summaryStatus">—</span>
             </div>
             <div class="summary-row" id="courierRow">
                 <span class="summary-label">المندوب:</span>
-                <span class="summary-value courier" id="summaryCourier">🛵 Bosta</span>
+                <span class="summary-value courier" id="summaryCourier">—</span>
             </div>
             <div class="summary-row">
                 <span class="summary-label">عدد الأوردرات:</span>
@@ -693,9 +458,7 @@
         </div>
 
         <!-- Action -->
-        <button class="btn-primary shipped" id="updateBtn" onclick="startUpdate()">
-            🚀 تحديث الكل
-        </button>
+        <button class="btn-primary" id="updateBtn" onclick="startUpdate()">🚀 تحديث الكل</button>
 
         <div class="progress-bar" id="progressBar">
             <div class="progress-fill" id="progressFill"></div>
@@ -725,11 +488,15 @@
         let lastCode = '';
         let lastTime = 0;
 
-        // Current selections
-        let currentSpecifier = 'shipped';
-        let currentStatusLabel = 'Shipped';
-        let currentIcon = '🚚';
-        let currentCourier = 'Bosta';
+        // No defaults
+        let currentSpecifier = '';
+        let currentStatusLabel = '';
+        let currentIcon = '';
+        let currentCourier = '';
+
+        function needsCourier(specifier) {
+            return specifier !== 'Ready' && specifier !== 'Cancelled';
+        }
 
         // Load saved data
         document.getElementById('apiToken').value = localStorage.getItem('api_token') || '';
@@ -757,31 +524,22 @@
             localStorage.setItem('api_token', e.target.value);
         });
 
-        // Manual input - auto-add when scanner gun finishes (no Enter needed)
+        // Manual input - auto-add when scanner gun finishes
         let inputTimeout = null;
         const scannerInput = document.getElementById('manualInput');
         
         scannerInput.addEventListener('input', (e) => {
-            // Clear previous timeout
-            if (inputTimeout) {
-                clearTimeout(inputTimeout);
-            }
+            if (inputTimeout) clearTimeout(inputTimeout);
             
-            // Wait 150ms after last character - if no more input, assume scan is complete
             inputTimeout = setTimeout(() => {
                 const code = scannerInput.value.trim();
-                if (code.length >= 3) { // Minimum barcode length
+                if (code.length >= 3) {
                     if (!scannedOrders.includes(code)) {
                         addOrder(code);
                         scannerInput.value = '';
                         showToast();
-                        
-                        // Vibrate if on mobile
-                        if (navigator.vibrate) {
-                            navigator.vibrate(100);
-                        }
+                        if (navigator.vibrate) navigator.vibrate(100);
                     } else {
-                        // Already exists
                         scannerInput.value = '';
                         document.getElementById('scanStatus').textContent = '⚠️ موجود بالفعل: ' + code;
                         setTimeout(() => {
@@ -793,28 +551,21 @@
             }, 150);
         });
 
-        // Also support Enter key as backup
         scannerInput.addEventListener('keypress', e => {
             if (e.key === 'Enter') {
                 e.preventDefault();
-                if (inputTimeout) {
-                    clearTimeout(inputTimeout);
-                }
+                if (inputTimeout) clearTimeout(inputTimeout);
                 addManualEntry();
             }
         });
 
-        // Keep focus on input field for scanner gun
         function focusInput() {
             document.getElementById('manualInput').focus();
         }
 
-        // Auto-focus on page load
         window.addEventListener('load', focusInput);
         
-        // Re-focus when clicking anywhere on the page (for scanner gun convenience)
         document.addEventListener('click', (e) => {
-            // Don't refocus if clicking on buttons or other inputs
             if (e.target.tagName !== 'BUTTON' && e.target.tagName !== 'INPUT') {
                 setTimeout(focusInput, 100);
             }
@@ -825,43 +576,33 @@
             currentStatusLabel = label;
             currentIcon = icon;
 
-            // Update buttons
-            document.querySelectorAll('.status-btn').forEach(btn => {
-                btn.classList.remove('active');
-            });
+            document.querySelectorAll('.status-btn').forEach(btn => btn.classList.remove('active'));
             document.querySelector(`.status-btn.${specifier}`).classList.add('active');
 
-            // Update summary
             document.getElementById('summaryStatus').textContent = `${icon} ${label}`;
 
-            // Update action button
             const btn = document.getElementById('updateBtn');
             btn.className = `btn-primary ${specifier}`;
 
-            // Hide/show courier section based on status
             const courierCard = document.getElementById('courierCard');
             const courierSummary = document.getElementById('courierRow');
             
-            if (specifier === 'ready-to-ship') {
-                courierCard.style.display = 'none';
-                courierSummary.style.display = 'none';
-            } else {
+            if (needsCourier(specifier)) {
                 courierCard.style.display = 'block';
                 courierSummary.style.display = 'flex';
+            } else {
+                courierCard.style.display = 'none';
+                courierSummary.style.display = 'none';
             }
 
-            // Save selection
             if (save) {
-                localStorage.setItem('selected_status', JSON.stringify({
-                    specifier, label, icon
-                }));
+                localStorage.setItem('selected_status', JSON.stringify({ specifier, label, icon }));
             }
         }
 
         function selectCourier(element, save = true) {
             let courier, btnElement;
             
-            // Handle both element click and load from storage
             if (typeof element === 'string') {
                 courier = element;
                 btnElement = document.querySelector(`.courier-btn[data-courier="${courier}"]`);
@@ -872,21 +613,12 @@
             
             currentCourier = courier;
 
-            // Update buttons
-            document.querySelectorAll('.courier-btn').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            if (btnElement) {
-                btnElement.classList.add('active');
-            }
+            document.querySelectorAll('.courier-btn').forEach(btn => btn.classList.remove('active'));
+            if (btnElement) btnElement.classList.add('active');
 
-            // Update summary
             document.getElementById('summaryCourier').textContent = `🛵 ${courier}`;
 
-            // Save selection
-            if (save) {
-                localStorage.setItem('selected_courier', courier);
-            }
+            if (save) localStorage.setItem('selected_courier', courier);
         }
 
         function toggleSettings() {
@@ -894,11 +626,8 @@
         }
 
         function toggleScanner() {
-            if (isScanning) {
-                stopScanner();
-            } else {
-                startScanner();
-            }
+            if (isScanning) stopScanner();
+            else startScanner();
         }
 
         function startScanner() {
@@ -949,10 +678,7 @@
 
         function onScanSuccess(code) {
             const now = Date.now();
-            
-            if (code === lastCode && now - lastTime < 2000) {
-                return;
-            }
+            if (code === lastCode && now - lastTime < 2000) return;
             
             lastCode = code;
             lastTime = now;
@@ -960,10 +686,7 @@
             if (!scannedOrders.includes(code)) {
                 addOrder(code);
                 showToast();
-                
-                if (navigator.vibrate) {
-                    navigator.vibrate(100);
-                }
+                if (navigator.vibrate) navigator.vibrate(100);
                 
                 document.getElementById('scanStatus').textContent = '✓ تم: ' + code;
                 document.getElementById('scanStatus').classList.add('success');
@@ -977,9 +700,7 @@
             }
         }
 
-        function onScanError(err) {
-            // Ignore
-        }
+        function onScanError(err) {}
 
         function addOrder(code) {
             scannedOrders.unshift(code);
@@ -1039,15 +760,12 @@
                 input.value = '';
                 showToast();
             } else if (scannedOrders.includes(code)) {
-                // Already exists - clear and show message
                 input.value = '';
                 document.getElementById('scanStatus').textContent = '⚠️ موجود بالفعل: ' + code;
                 setTimeout(() => {
                     document.getElementById('scanStatus').textContent = 'جاهز للمسح';
                 }, 1500);
             }
-            
-            // Always refocus for next scan
             input.focus();
         }
 
@@ -1065,23 +783,30 @@
                 toggleSettings();
                 return;
             }
+
+            if (!currentSpecifier) {
+                alert('اختر الحالة أولاً');
+                return;
+            }
+
+            if (needsCourier(currentSpecifier) && !currentCourier) {
+                alert('اختر المندوب أولاً');
+                return;
+            }
             
             if (scannedOrders.length === 0) {
                 alert('لا توجد أوردرات');
                 return;
             }
 
-            // Confirm action
             let confirmMsg;
-            if (currentSpecifier === 'ready-to-ship') {
-                confirmMsg = `هل تريد تحديث ${scannedOrders.length} أوردر؟\n\nالحالة: ${currentStatusLabel}\n(سيتم إزالة المندوب)`;
-            } else {
+            if (needsCourier(currentSpecifier)) {
                 confirmMsg = `هل تريد تحديث ${scannedOrders.length} أوردر؟\n\nالحالة: ${currentStatusLabel}\nالمندوب: ${currentCourier}`;
+            } else {
+                confirmMsg = `هل تريد تحديث ${scannedOrders.length} أوردر؟\n\nالحالة: ${currentStatusLabel}`;
             }
             
-            if (!confirm(confirmMsg)) {
-                return;
-            }
+            if (!confirm(confirmMsg)) return;
             
             const btn = document.getElementById('updateBtn');
             btn.disabled = true;
@@ -1104,14 +829,12 @@
                 const order = scannedOrders[i];
                 
                 try {
-                    // Build request body
                     const requestBody = {
                         itemId: order,
                         specifier: currentSpecifier
                     };
                     
-                    // Only add courier if NOT ready-to-ship
-                    if (currentSpecifier !== 'ready-to-ship') {
+                    if (needsCourier(currentSpecifier)) {
                         requestBody.additionalParameters = {
                             stringParameter: currentCourier
                         };
@@ -1146,14 +869,14 @@
             }
             
             btn.disabled = false;
-            btn.innerHTML = `🚀 تحديث الكل`;
+            btn.innerHTML = '🚀 تحديث الكل';
             
             if (errors === 0) {
                 let successMsg;
-                if (currentSpecifier === 'ready-to-ship') {
-                    successMsg = `✅ تم تحديث ${success} أوردر بنجاح!\n\nالحالة: ${currentStatusLabel}`;
-                } else {
+                if (needsCourier(currentSpecifier)) {
                     successMsg = `✅ تم تحديث ${success} أوردر بنجاح!\n\nالحالة: ${currentStatusLabel}\nالمندوب: ${currentCourier}`;
+                } else {
+                    successMsg = `✅ تم تحديث ${success} أوردر بنجاح!\n\nالحالة: ${currentStatusLabel}`;
                 }
                 alert(successMsg);
                 scannedOrders = [];
@@ -1173,7 +896,6 @@
             }
         }
 
-        // Initial summary count
         updateSummaryCount();
     </script>
 </body>

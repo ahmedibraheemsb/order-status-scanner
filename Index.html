@@ -88,11 +88,11 @@
         .status-btn.active { transform: scale(1.02); }
         .status-btn .icon { font-size: 1.1rem; display: block; margin-bottom: 0.2rem; }
 
-        .status-btn.Shipped.active { border-color: var(--scanner); background: rgba(0, 212, 255, 0.15); color: var(--scanner); }
-        .status-btn.Delivered.active { border-color: var(--success); background: var(--success-glow); color: var(--success); }
-        .status-btn.Returned.active { border-color: var(--orange); background: var(--orange-glow); color: var(--orange); }
-        .status-btn.Cancelled.active { border-color: var(--error); background: var(--error-glow); color: var(--error); }
-        .status-btn.Ready.active { border-color: var(--purple); background: var(--purple-glow); color: var(--purple); }
+        .status-btn.shipped.active { border-color: var(--scanner); background: rgba(0, 212, 255, 0.15); color: var(--scanner); }
+        .status-btn.delivered.active { border-color: var(--success); background: var(--success-glow); color: var(--success); }
+        .status-btn.returned.active { border-color: var(--orange); background: var(--orange-glow); color: var(--orange); }
+        .status-btn.cancelled.active { border-color: var(--error); background: var(--error-glow); color: var(--error); }
+        .status-btn.ready-to-ship.active { border-color: var(--purple); background: var(--purple-glow); color: var(--purple); }
 
         .courier-selector {
             display: grid;
@@ -251,11 +251,11 @@
 
         .btn-primary:hover { filter: brightness(1.1); }
         .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
-        .btn-primary.Shipped { background: var(--scanner); }
-        .btn-primary.Delivered { background: var(--success); }
-        .btn-primary.Returned { background: var(--orange); }
-        .btn-primary.Cancelled { background: var(--error); }
-        .btn-primary.Ready { background: var(--purple); }
+        .btn-primary.shipped { background: var(--scanner); }
+        .btn-primary.delivered { background: var(--success); }
+        .btn-primary.returned { background: var(--orange); }
+        .btn-primary.cancelled { background: var(--error); }
+        .btn-primary.ready-to-ship { background: var(--purple); }
 
         .results { display: none; }
         .results.active { display: block; }
@@ -367,20 +367,20 @@
         <div class="card">
             <h2 class="card-title">📌 اختر الحالة</h2>
             <div class="status-selector">
-                <button class="status-btn Shipped" onclick="selectStatus('Shipped', 'Shipped', '🚚')">
+                <button class="status-btn shipped" onclick="selectStatus('shipped', 'Shipped', '🚚')">
                     <span class="icon">🚚</span>Shipped
                 </button>
-                <button class="status-btn Delivered" onclick="selectStatus('Delivered', 'Delivered', '✅')">
+                <button class="status-btn delivered" onclick="selectStatus('delivered', 'Delivered', '✅')">
                     <span class="icon">✅</span>Delivered
                 </button>
-                <button class="status-btn Returned" onclick="selectStatus('Returned', 'Returned', '↩️')">
+                <button class="status-btn returned" onclick="selectStatus('returned', 'Returned', '↩️')">
                     <span class="icon">↩️</span>Returned
                 </button>
-                <button class="status-btn Cancelled" onclick="selectStatus('Cancelled', 'Cancelled', '❌')">
+                <button class="status-btn cancelled" onclick="selectStatus('cancelled', 'Cancelled', '❌')">
                     <span class="icon">❌</span>Cancelled
                 </button>
-                <button class="status-btn Ready" onclick="selectStatus('Ready', 'Ready', '📦')">
-                    <span class="icon">📦</span>Ready
+                <button class="status-btn ready-to-ship" onclick="selectStatus('ready-to-ship', 'Ready to Ship', '📦')">
+                    <span class="icon">📦</span>Ready to Ship
                 </button>
             </div>
         </div>
@@ -495,7 +495,7 @@
         let currentCourier = '';
 
         function needsCourier(specifier) {
-            return specifier !== 'Ready' && specifier !== 'Cancelled';
+            return specifier !== 'ready-to-ship' && specifier !== 'cancelled';
         }
 
         // Load saved data
@@ -526,36 +526,47 @@
 
         // Manual input - auto-add when scanner gun finishes
         let inputTimeout = null;
+        let lastInputTime = 0;
         const scannerInput = document.getElementById('manualInput');
+        
+        function autoAddCode() {
+            const code = scannerInput.value.trim();
+            if (code.length >= 3) {
+                if (!scannedOrders.includes(code)) {
+                    addOrder(code);
+                    scannerInput.value = '';
+                    showToast();
+                    if (navigator.vibrate) navigator.vibrate(100);
+                } else {
+                    scannerInput.value = '';
+                    document.getElementById('scanStatus').textContent = '⚠️ موجود بالفعل: ' + code;
+                    setTimeout(() => {
+                        document.getElementById('scanStatus').textContent = 'جاهز للمسح';
+                    }, 1500);
+                }
+            }
+            scannerInput.focus();
+        }
         
         scannerInput.addEventListener('input', (e) => {
             if (inputTimeout) clearTimeout(inputTimeout);
             
-            inputTimeout = setTimeout(() => {
-                const code = scannerInput.value.trim();
-                if (code.length >= 3) {
-                    if (!scannedOrders.includes(code)) {
-                        addOrder(code);
-                        scannerInput.value = '';
-                        showToast();
-                        if (navigator.vibrate) navigator.vibrate(100);
-                    } else {
-                        scannerInput.value = '';
-                        document.getElementById('scanStatus').textContent = '⚠️ موجود بالفعل: ' + code;
-                        setTimeout(() => {
-                            document.getElementById('scanStatus').textContent = 'جاهز للمسح';
-                        }, 1500);
-                    }
-                }
-                scannerInput.focus();
-            }, 150);
+            const now = Date.now();
+            const timeSinceLast = now - lastInputTime;
+            lastInputTime = now;
+            
+            // Scanner guns type fast (< 50ms between chars)
+            // Use shorter timeout for fast input, longer for manual typing
+            const delay = timeSinceLast < 80 ? 200 : 300;
+            
+            inputTimeout = setTimeout(autoAddCode, delay);
         });
 
         scannerInput.addEventListener('keypress', e => {
             if (e.key === 'Enter') {
                 e.preventDefault();
                 if (inputTimeout) clearTimeout(inputTimeout);
-                addManualEntry();
+                autoAddCode();
             }
         });
 

@@ -129,16 +129,9 @@
             color: var(--text-dim);
         }
 
-        .scan-status.success {
-            background: var(--success-glow);
-            color: var(--success);
-            animation: pulse 0.5s;
-        }
+        .scan-status.success { background: var(--success-glow); color: var(--success); animation: pulse 0.5s; }
 
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.02); }
-        }
+        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.02); } }
 
         .scanner-btn {
             width: 100%;
@@ -161,94 +154,33 @@
         .counter-text { font-size: 0.85rem; color: var(--text-dim); }
         .counter-text strong { color: var(--accent); font-size: 1rem; }
 
-        .clear-btn {
-            background: none;
-            border: 1px solid var(--border);
-            color: var(--text-dim);
-            padding: 0.4rem 0.8rem;
-            border-radius: 6px;
-            font-family: inherit;
-            font-size: 0.8rem;
-            cursor: pointer;
-        }
-
+        .clear-btn { background: none; border: 1px solid var(--border); color: var(--text-dim); padding: 0.4rem 0.8rem; border-radius: 6px; font-family: inherit; font-size: 0.8rem; cursor: pointer; }
         .clear-btn:hover { border-color: var(--error); color: var(--error); }
 
-        .scanned-list {
-            max-height: 150px;
-            overflow-y: auto;
-            border: 1px solid var(--border);
-            border-radius: 8px;
-        }
+        .scanned-list { max-height: 150px; overflow-y: auto; border: 1px solid var(--border); border-radius: 8px; }
 
-        .scanned-item {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0.65rem 0.85rem;
-            border-bottom: 1px solid var(--border);
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.9rem;
-        }
-
+        .scanned-item { display: flex; align-items: center; justify-content: space-between; padding: 0.65rem 0.85rem; border-bottom: 1px solid var(--border); font-family: 'JetBrains Mono', monospace; font-size: 0.9rem; }
         .scanned-item:last-child { border-bottom: none; }
         .scanned-item.new { animation: highlight 1s ease; }
 
-        @keyframes highlight {
-            0% { background: var(--success-glow); }
-            100% { background: transparent; }
-        }
+        @keyframes highlight { 0% { background: var(--success-glow); } 100% { background: transparent; } }
 
         .remove-btn { background: none; border: none; color: var(--text-dim); cursor: pointer; padding: 0.3rem; font-size: 1rem; }
         .remove-btn:hover { color: var(--error); }
 
         .empty-list { padding: 1.5rem; text-align: center; color: var(--text-dim); font-size: 0.85rem; }
 
-        .settings-toggle {
-            width: 100%;
-            background: none;
-            border: 1px solid var(--border);
-            color: var(--text-dim);
-            padding: 0.6rem;
-            border-radius: 8px;
-            font-family: inherit;
-            font-size: 0.85rem;
-            cursor: pointer;
-            margin-bottom: 0.75rem;
-        }
+        .settings-toggle { width: 100%; background: none; border: 1px solid var(--border); color: var(--text-dim); padding: 0.6rem; border-radius: 8px; font-family: inherit; font-size: 0.85rem; cursor: pointer; margin-bottom: 0.75rem; }
 
         .settings-content { display: none; margin-bottom: 1rem; }
         .settings-content.active { display: block; }
 
         .input-group { margin-bottom: 0.75rem; }
         .input-group label { display: block; font-size: 0.8rem; color: var(--text-dim); margin-bottom: 0.3rem; }
-        .input-group input {
-            width: 100%;
-            background: var(--bg-input);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 0.7rem;
-            color: var(--text);
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.85rem;
-        }
+        .input-group input { width: 100%; background: var(--bg-input); border: 1px solid var(--border); border-radius: 8px; padding: 0.7rem; color: var(--text); font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; }
         .input-group input:focus { outline: none; border-color: var(--accent); }
 
-        .btn-primary {
-            width: 100%;
-            padding: 1rem;
-            border-radius: 10px;
-            font-family: inherit;
-            font-size: 0.95rem;
-            font-weight: 600;
-            cursor: pointer;
-            border: none;
-            background: var(--accent);
-            color: white;
-            margin-bottom: 0.75rem;
-            transition: all 0.2s;
-        }
-
+        .btn-primary { width: 100%; padding: 1rem; border-radius: 10px; font-family: inherit; font-size: 0.95rem; font-weight: 600; cursor: pointer; border: none; background: var(--accent); color: white; margin-bottom: 0.75rem; transition: all 0.2s; }
         .btn-primary:hover { filter: brightness(1.1); }
         .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
         .btn-primary.Shipped { background: var(--scanner); }
@@ -263,23 +195,9 @@
         .stat-success { color: var(--success); }
         .stat-error { color: var(--error); }
 
-        .results-list {
-            max-height: 200px;
-            overflow-y: auto;
-            border: 1px solid var(--border);
-            border-radius: 8px;
-        }
-
-        .result-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 0.6rem 0.85rem;
-            border-bottom: 1px solid var(--border);
-            font-size: 0.85rem;
-        }
-
+        .results-list { max-height: 200px; overflow-y: auto; border: 1px solid var(--border); border-radius: 8px; }
+        .result-item { display: flex; justify-content: space-between; padding: 0.6rem 0.85rem; border-bottom: 1px solid var(--border); font-size: 0.85rem; }
         .result-item:last-child { border-bottom: none; }
-
         .result-status { padding: 0.2rem 0.6rem; border-radius: 10px; font-size: 0.75rem; }
         .result-pending { background: rgba(59,130,246,0.15); color: #3b82f6; }
         .result-success { background: var(--success-glow); color: var(--success); }
@@ -290,62 +208,16 @@
         .progress-fill { height: 100%; background: var(--accent); border-radius: 2px; transition: width 0.3s; width: 0%; }
 
         .manual-input { display: flex; gap: 0.5rem; margin-top: 0.75rem; }
-        .manual-input input {
-            flex: 1;
-            background: var(--bg-input);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 0.7rem;
-            color: var(--text);
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.9rem;
-        }
-        .manual-input button {
-            background: var(--success);
-            border: none;
-            border-radius: 8px;
-            padding: 0 1rem;
-            color: white;
-            font-size: 1.2rem;
-            cursor: pointer;
-        }
+        .manual-input input { flex: 1; background: var(--bg-input); border: 1px solid var(--border); border-radius: 8px; padding: 0.7rem; color: var(--text); font-family: 'JetBrains Mono', monospace; font-size: 0.9rem; }
+        .manual-input button { background: var(--success); border: none; border-radius: 8px; padding: 0 1rem; color: white; font-size: 1.2rem; cursor: pointer; }
 
-        .spinner {
-            width: 14px; height: 14px;
-            border: 2px solid transparent;
-            border-top-color: currentColor;
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-            display: inline-block;
-        }
-
+        .spinner { width: 14px; height: 14px; border: 2px solid transparent; border-top-color: currentColor; border-radius: 50%; animation: spin 0.8s linear infinite; display: inline-block; }
         @keyframes spin { to { transform: rotate(360deg); } }
 
-        .toast {
-            position: fixed;
-            top: 1rem;
-            left: 50%;
-            transform: translateX(-50%);
-            background: var(--success);
-            color: white;
-            padding: 0.6rem 1.2rem;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            opacity: 0;
-            transition: opacity 0.3s;
-            z-index: 100;
-        }
+        .toast { position: fixed; top: 1rem; left: 50%; transform: translateX(-50%); background: var(--success); color: white; padding: 0.6rem 1.2rem; border-radius: 20px; font-size: 0.85rem; font-weight: 600; opacity: 0; transition: opacity 0.3s; z-index: 100; }
         .toast.show { opacity: 1; }
 
-        .summary-box {
-            background: var(--bg-input);
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            padding: 0.75rem;
-            margin-bottom: 0.75rem;
-        }
-
+        .summary-box { background: var(--bg-input); border: 1px solid var(--border); border-radius: 10px; padding: 0.75rem; margin-bottom: 0.75rem; }
         .summary-row { display: flex; justify-content: space-between; padding: 0.3rem 0; font-size: 0.85rem; }
         .summary-label { color: var(--text-dim); }
         .summary-value { font-weight: 600; }
@@ -355,93 +227,20 @@
 
         /* Log Section */
         .log-section { margin-top: 1rem; }
-
-        .log-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 0.75rem;
-        }
-
-        .log-header h2 {
-            font-size: 0.95rem;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
+        .log-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; }
+        .log-header h2 { font-size: 0.95rem; font-weight: 600; display: flex; align-items: center; gap: 0.5rem; }
         .log-actions { display: flex; gap: 0.5rem; }
-
-        .log-btn {
-            background: none;
-            border: 1px solid var(--border);
-            color: var(--text-dim);
-            padding: 0.35rem 0.7rem;
-            border-radius: 6px;
-            font-family: inherit;
-            font-size: 0.75rem;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
+        .log-btn { background: none; border: 1px solid var(--border); color: var(--text-dim); padding: 0.35rem 0.7rem; border-radius: 6px; font-family: inherit; font-size: 0.75rem; cursor: pointer; transition: all 0.2s; }
         .log-btn:hover { border-color: var(--text-dim); color: var(--text); }
         .log-btn.export:hover { border-color: var(--success); color: var(--success); }
-        .log-btn.danger:hover { border-color: var(--error); color: var(--error); }
-
-        .log-empty {
-            text-align: center;
-            padding: 1.5rem;
-            color: var(--text-dim);
-            font-size: 0.85rem;
-            border: 1px solid var(--border);
-            border-radius: 8px;
-        }
-
-        .log-entry {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            margin-bottom: 0.5rem;
-            overflow: hidden;
-            transition: border-color 0.2s;
-        }
-
+        .log-empty { text-align: center; padding: 1.5rem; color: var(--text-dim); font-size: 0.85rem; border: 1px solid var(--border); border-radius: 8px; }
+        .log-entry { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; margin-bottom: 0.5rem; overflow: hidden; transition: border-color 0.2s; }
         .log-entry:hover { border-color: var(--text-dim); }
-
-        .log-entry-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0.7rem 0.85rem;
-            cursor: pointer;
-            gap: 0.5rem;
-        }
-
+        .log-entry-header { display: flex; justify-content: space-between; align-items: center; padding: 0.7rem 0.85rem; cursor: pointer; gap: 0.5rem; }
         .log-entry-info { flex: 1; min-width: 0; }
-
-        .log-entry-date {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.75rem;
-            color: var(--text-dim);
-            margin-bottom: 0.25rem;
-        }
-
-        .log-entry-summary {
-            font-size: 0.8rem;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.5rem;
-            align-items: center;
-        }
-
-        .log-tag {
-            padding: 0.15rem 0.5rem;
-            border-radius: 6px;
-            font-size: 0.7rem;
-            font-weight: 600;
-        }
-
+        .log-entry-date { font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: var(--text-dim); margin-bottom: 0.25rem; }
+        .log-entry-summary { font-size: 0.8rem; display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; }
+        .log-tag { padding: 0.15rem 0.5rem; border-radius: 6px; font-size: 0.7rem; font-weight: 600; }
         .log-tag.status-Shipped { background: rgba(0,212,255,0.15); color: var(--scanner); }
         .log-tag.status-Delivered { background: var(--success-glow); color: var(--success); }
         .log-tag.status-Returned { background: var(--orange-glow); color: var(--orange); }
@@ -449,65 +248,19 @@
         .log-tag.status-Ready { background: var(--purple-glow); color: var(--purple); }
         .log-tag.courier { background: var(--pink-glow); color: var(--pink); }
         .log-tag.count { background: var(--accent-glow); color: var(--accent); }
-
-        .log-entry-stats {
-            display: flex;
-            gap: 0.4rem;
-            font-size: 0.75rem;
-            flex-shrink: 0;
-        }
-
-        .log-toggle {
-            color: var(--text-dim);
-            font-size: 0.8rem;
-            flex-shrink: 0;
-            transition: transform 0.2s;
-        }
-
+        .log-entry-stats { display: flex; gap: 0.4rem; font-size: 0.75rem; flex-shrink: 0; }
+        .log-toggle { color: var(--text-dim); font-size: 0.8rem; flex-shrink: 0; transition: transform 0.2s; }
         .log-entry.open .log-toggle { transform: rotate(90deg); }
-
-        .log-entry-details {
-            display: none;
-            border-top: 1px solid var(--border);
-            max-height: 200px;
-            overflow-y: auto;
-        }
-
+        .log-entry-details { display: none; border-top: 1px solid var(--border); max-height: 200px; overflow-y: auto; }
         .log-entry.open .log-entry-details { display: block; }
-
-        .log-detail-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0.45rem 0.85rem;
-            border-bottom: 1px solid var(--border);
-            font-size: 0.8rem;
-        }
-
+        .log-detail-item { display: flex; justify-content: space-between; align-items: center; padding: 0.45rem 0.85rem; border-bottom: 1px solid var(--border); font-size: 0.8rem; }
         .log-detail-item:last-child { border-bottom: none; }
-
-        .log-detail-order {
-            font-family: 'JetBrains Mono', monospace;
-            font-weight: 600;
-        }
-
-        .log-detail-status {
-            padding: 0.15rem 0.5rem;
-            border-radius: 8px;
-            font-size: 0.7rem;
-        }
-
+        .log-detail-order { font-family: 'JetBrains Mono', monospace; font-weight: 600; }
+        .log-detail-status { padding: 0.15rem 0.5rem; border-radius: 8px; font-size: 0.7rem; }
         .log-detail-success { background: var(--success-glow); color: var(--success); }
         .log-detail-error { background: var(--error-glow); color: var(--error); }
-
         .log-list { max-height: 400px; overflow-y: auto; }
-
-        .log-sync-status {
-            font-size: 0.7rem;
-            padding: 0.2rem 0.5rem;
-            border-radius: 6px;
-            font-weight: 600;
-        }
+        .log-sync-status { font-size: 0.7rem; padding: 0.2rem 0.5rem; border-radius: 6px; font-weight: 600; }
         .log-sync-status.synced { color: var(--success); background: var(--success-glow); }
         .log-sync-status.local { color: var(--orange); background: var(--orange-glow); }
         .log-sync-status.loading { color: var(--scanner); background: rgba(0,212,255,0.15); }
@@ -651,7 +404,6 @@
                 <div class="log-actions">
                     <button class="log-btn" onclick="syncFromCloud()" title="جلب من السيرفر">🔄</button>
                     <button class="log-btn export" onclick="exportLogCSV()">📥 CSV</button>
-                    <button class="log-btn danger" onclick="clearLog()">🗑️ مسح</button>
                 </div>
             </div>
             <div class="log-list" id="logList">
@@ -670,7 +422,6 @@
         let lastCode = '';
         let lastTime = 0;
 
-        // No defaults
         let currentSpecifier = '';
         let currentStatusLabel = '';
         let currentIcon = '';
@@ -685,36 +436,19 @@
         document.getElementById('logWorkerUrl').value = localStorage.getItem('log_worker_url') || '';
         document.getElementById('logWorkerSecret').value = localStorage.getItem('log_worker_secret') || '';
         const saved = localStorage.getItem('scanned_orders');
-        if (saved) {
-            scannedOrders = JSON.parse(saved);
-            renderList();
-        }
+        if (saved) { scannedOrders = JSON.parse(saved); renderList(); }
 
-        // Load saved status
         const savedStatus = localStorage.getItem('selected_status');
-        if (savedStatus) {
-            const status = JSON.parse(savedStatus);
-            selectStatus(status.specifier, status.label, status.icon, false);
-        }
+        if (savedStatus) { const s = JSON.parse(savedStatus); selectStatus(s.specifier, s.label, s.icon, false); }
 
-        // Load saved courier
         const savedCourier = localStorage.getItem('selected_courier');
-        if (savedCourier) {
-            selectCourier(savedCourier, false);
-        }
+        if (savedCourier) { selectCourier(savedCourier, false); }
 
-        // Save on change
-        document.getElementById('apiToken').addEventListener('change', e => {
-            localStorage.setItem('api_token', e.target.value);
-        });
-        document.getElementById('logWorkerUrl').addEventListener('change', e => {
-            localStorage.setItem('log_worker_url', e.target.value);
-        });
-        document.getElementById('logWorkerSecret').addEventListener('change', e => {
-            localStorage.setItem('log_worker_secret', e.target.value);
-        });
+        document.getElementById('apiToken').addEventListener('change', e => localStorage.setItem('api_token', e.target.value));
+        document.getElementById('logWorkerUrl').addEventListener('change', e => localStorage.setItem('log_worker_url', e.target.value));
+        document.getElementById('logWorkerSecret').addEventListener('change', e => localStorage.setItem('log_worker_secret', e.target.value));
 
-        // Manual input - auto-add when scanner gun finishes
+        // Scanner gun auto-add
         let inputTimeout = null;
         let lastInputTime = 0;
         const scannerInput = document.getElementById('manualInput');
@@ -730,299 +464,127 @@
                 } else {
                     scannerInput.value = '';
                     document.getElementById('scanStatus').textContent = '⚠️ موجود بالفعل: ' + code;
-                    setTimeout(() => {
-                        document.getElementById('scanStatus').textContent = 'جاهز للمسح';
-                    }, 1500);
+                    setTimeout(() => { document.getElementById('scanStatus').textContent = 'جاهز للمسح'; }, 1500);
                 }
             }
             scannerInput.focus();
         }
         
-        scannerInput.addEventListener('input', (e) => {
+        scannerInput.addEventListener('input', () => {
             if (inputTimeout) clearTimeout(inputTimeout);
-            
             const now = Date.now();
-            const timeSinceLast = now - lastInputTime;
+            const gap = now - lastInputTime;
             lastInputTime = now;
-            
-            // Scanner guns type fast (< 50ms between chars)
-            // Use shorter timeout for fast input, longer for manual typing
-            const delay = timeSinceLast < 80 ? 200 : 300;
-            
+            const delay = gap < 80 ? 200 : 300;
             inputTimeout = setTimeout(autoAddCode, delay);
         });
 
         scannerInput.addEventListener('keypress', e => {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                if (inputTimeout) clearTimeout(inputTimeout);
-                autoAddCode();
-            }
+            if (e.key === 'Enter') { e.preventDefault(); if (inputTimeout) clearTimeout(inputTimeout); autoAddCode(); }
         });
 
-        function focusInput() {
-            document.getElementById('manualInput').focus();
-        }
-
+        function focusInput() { document.getElementById('manualInput').focus(); }
         window.addEventListener('load', focusInput);
-        
-        document.addEventListener('click', (e) => {
-            if (e.target.tagName !== 'BUTTON' && e.target.tagName !== 'INPUT') {
-                setTimeout(focusInput, 100);
-            }
-        });
+        document.addEventListener('click', e => { if (e.target.tagName !== 'BUTTON' && e.target.tagName !== 'INPUT') setTimeout(focusInput, 100); });
 
         function selectStatus(specifier, label, icon, save = true) {
-            currentSpecifier = specifier;
-            currentStatusLabel = label;
-            currentIcon = icon;
-
+            currentSpecifier = specifier; currentStatusLabel = label; currentIcon = icon;
             document.querySelectorAll('.status-btn').forEach(btn => btn.classList.remove('active'));
-            document.querySelector(`.status-btn.${specifier}`).classList.add('active');
-
+            const statusBtn = document.querySelector(`.status-btn.${specifier}`);
+            if (statusBtn) statusBtn.classList.add('active');
             document.getElementById('summaryStatus').textContent = `${icon} ${label}`;
-
-            const btn = document.getElementById('updateBtn');
-            btn.className = `btn-primary ${specifier}`;
-
-            const courierCard = document.getElementById('courierCard');
-            const courierSummary = document.getElementById('courierRow');
-            
-            if (needsCourier(specifier)) {
-                courierCard.style.display = 'block';
-                courierSummary.style.display = 'flex';
-            } else {
-                courierCard.style.display = 'none';
-                courierSummary.style.display = 'none';
-            }
-
-            if (save) {
-                localStorage.setItem('selected_status', JSON.stringify({ specifier, label, icon }));
-            }
+            document.getElementById('updateBtn').className = `btn-primary ${specifier}`;
+            const show = needsCourier(specifier);
+            document.getElementById('courierCard').style.display = show ? 'block' : 'none';
+            document.getElementById('courierRow').style.display = show ? 'flex' : 'none';
+            if (save) localStorage.setItem('selected_status', JSON.stringify({ specifier, label, icon }));
         }
 
         function selectCourier(element, save = true) {
             let courier, btnElement;
-            
-            if (typeof element === 'string') {
-                courier = element;
-                btnElement = document.querySelector(`.courier-btn[data-courier="${courier}"]`);
-            } else {
-                btnElement = element;
-                courier = element.getAttribute('data-courier');
-            }
-            
+            if (typeof element === 'string') { courier = element; btnElement = document.querySelector(`.courier-btn[data-courier="${courier}"]`); }
+            else { btnElement = element; courier = element.getAttribute('data-courier'); }
             currentCourier = courier;
-
             document.querySelectorAll('.courier-btn').forEach(btn => btn.classList.remove('active'));
             if (btnElement) btnElement.classList.add('active');
-
             document.getElementById('summaryCourier').textContent = `🛵 ${courier}`;
-
             if (save) localStorage.setItem('selected_courier', courier);
         }
 
-        function toggleSettings() {
-            document.getElementById('settings').classList.toggle('active');
-        }
-
-        function toggleScanner() {
-            if (isScanning) stopScanner();
-            else startScanner();
-        }
+        function toggleSettings() { document.getElementById('settings').classList.toggle('active'); }
+        function toggleScanner() { if (isScanning) stopScanner(); else startScanner(); }
 
         function startScanner() {
             const btn = document.getElementById('scannerBtn');
             const status = document.getElementById('scanStatus');
-            
             scanner = new Html5Qrcode("reader");
-            
-            scanner.start(
-                { facingMode: "environment" },
-                {
-                    fps: 10,
-                    qrbox: { width: 250, height: 100 },
-                    aspectRatio: 1.5,
-                    formatsToSupport: [
-                        Html5QrcodeSupportedFormats.CODE_128,
-                        Html5QrcodeSupportedFormats.CODE_39,
-                        Html5QrcodeSupportedFormats.EAN_13,
-                        Html5QrcodeSupportedFormats.EAN_8,
-                        Html5QrcodeSupportedFormats.UPC_A,
-                        Html5QrcodeSupportedFormats.UPC_E,
-                        Html5QrcodeSupportedFormats.QR_CODE
-                    ]
-                },
-                onScanSuccess,
-                onScanError
-            ).then(() => {
-                isScanning = true;
-                btn.textContent = '⏹️ إيقاف المسح';
-                btn.classList.add('stop');
-                status.textContent = 'جاري المسح... وجّه الكاميرا للباركود';
-            }).catch(err => {
-                status.textContent = 'خطأ: ' + err;
-            });
+            scanner.start({ facingMode: "environment" }, {
+                fps: 10, qrbox: { width: 250, height: 100 }, aspectRatio: 1.5,
+                formatsToSupport: [Html5QrcodeSupportedFormats.CODE_128, Html5QrcodeSupportedFormats.CODE_39, Html5QrcodeSupportedFormats.EAN_13, Html5QrcodeSupportedFormats.EAN_8, Html5QrcodeSupportedFormats.UPC_A, Html5QrcodeSupportedFormats.UPC_E, Html5QrcodeSupportedFormats.QR_CODE]
+            }, onScanSuccess, () => {}).then(() => {
+                isScanning = true; btn.textContent = '⏹️ إيقاف المسح'; btn.classList.add('stop'); status.textContent = 'جاري المسح... وجّه الكاميرا للباركود';
+            }).catch(err => { status.textContent = 'خطأ: ' + err; });
         }
 
         function stopScanner() {
-            if (scanner) {
-                scanner.stop().then(() => {
-                    scanner.clear();
-                    isScanning = false;
-                    document.getElementById('scannerBtn').textContent = '📷 بدء المسح';
-                    document.getElementById('scannerBtn').classList.remove('stop');
-                    document.getElementById('scanStatus').textContent = 'تم الإيقاف';
-                });
-            }
+            if (scanner) scanner.stop().then(() => { scanner.clear(); isScanning = false; document.getElementById('scannerBtn').textContent = '📷 بدء المسح'; document.getElementById('scannerBtn').classList.remove('stop'); document.getElementById('scanStatus').textContent = 'تم الإيقاف'; });
         }
 
         function onScanSuccess(code) {
             const now = Date.now();
             if (code === lastCode && now - lastTime < 2000) return;
-            
-            lastCode = code;
-            lastTime = now;
-            
+            lastCode = code; lastTime = now;
             if (!scannedOrders.includes(code)) {
-                addOrder(code);
-                showToast();
-                if (navigator.vibrate) navigator.vibrate(100);
-                
+                addOrder(code); showToast(); if (navigator.vibrate) navigator.vibrate(100);
                 document.getElementById('scanStatus').textContent = '✓ تم: ' + code;
                 document.getElementById('scanStatus').classList.add('success');
-                
-                setTimeout(() => {
-                    document.getElementById('scanStatus').textContent = 'جاري المسح...';
-                    document.getElementById('scanStatus').classList.remove('success');
-                }, 1500);
-            } else {
-                document.getElementById('scanStatus').textContent = '⚠️ موجود بالفعل: ' + code;
-            }
+                setTimeout(() => { document.getElementById('scanStatus').textContent = 'جاري المسح...'; document.getElementById('scanStatus').classList.remove('success'); }, 1500);
+            } else { document.getElementById('scanStatus').textContent = '⚠️ موجود بالفعل: ' + code; }
         }
 
-        function onScanError(err) {}
-
-        function addOrder(code) {
-            scannedOrders.unshift(code);
-            saveOrders();
-            renderList(true);
-            updateSummaryCount();
-        }
-
-        function removeOrder(code) {
-            scannedOrders = scannedOrders.filter(o => o !== code);
-            saveOrders();
-            renderList();
-            updateSummaryCount();
-        }
-
-        function clearList() {
-            if (confirm('مسح كل الأوردرات؟')) {
-                scannedOrders = [];
-                saveOrders();
-                renderList();
-                updateSummaryCount();
-            }
-        }
-
-        function saveOrders() {
-            localStorage.setItem('scanned_orders', JSON.stringify(scannedOrders));
-        }
-
-        function updateSummaryCount() {
-            document.getElementById('count').textContent = scannedOrders.length;
-            document.getElementById('summaryCount').textContent = scannedOrders.length;
-        }
+        function addOrder(code) { scannedOrders.unshift(code); saveOrders(); renderList(true); updateSummaryCount(); }
+        function removeOrder(code) { scannedOrders = scannedOrders.filter(o => o !== code); saveOrders(); renderList(); updateSummaryCount(); }
+        function clearList() { if (confirm('مسح كل الأوردرات؟')) { scannedOrders = []; saveOrders(); renderList(); updateSummaryCount(); } }
+        function saveOrders() { localStorage.setItem('scanned_orders', JSON.stringify(scannedOrders)); }
+        function updateSummaryCount() { document.getElementById('count').textContent = scannedOrders.length; document.getElementById('summaryCount').textContent = scannedOrders.length; }
 
         function renderList(isNew = false) {
             const list = document.getElementById('scannedList');
             document.getElementById('count').textContent = scannedOrders.length;
-            
-            if (scannedOrders.length === 0) {
-                list.innerHTML = '<div class="empty-list">لم يتم مسح أي باركود بعد</div>';
-                return;
-            }
-            
-            list.innerHTML = scannedOrders.map((order, i) => `
-                <div class="scanned-item ${i === 0 && isNew ? 'new' : ''}">
-                    <span>${order}</span>
-                    <button class="remove-btn" onclick="removeOrder('${order}')">✕</button>
-                </div>
-            `).join('');
+            if (scannedOrders.length === 0) { list.innerHTML = '<div class="empty-list">لم يتم مسح أي باركود بعد</div>'; return; }
+            list.innerHTML = scannedOrders.map((order, i) => `<div class="scanned-item ${i === 0 && isNew ? 'new' : ''}"><span>${order}</span><button class="remove-btn" onclick="removeOrder('${order}')">✕</button></div>`).join('');
         }
 
         function addManualEntry() {
             const input = document.getElementById('manualInput');
             const code = input.value.trim();
-            
-            if (code && !scannedOrders.includes(code)) {
-                addOrder(code);
-                input.value = '';
-                showToast();
-            } else if (scannedOrders.includes(code)) {
-                input.value = '';
-                document.getElementById('scanStatus').textContent = '⚠️ موجود بالفعل: ' + code;
-                setTimeout(() => {
-                    document.getElementById('scanStatus').textContent = 'جاهز للمسح';
-                }, 1500);
-            }
+            if (code && !scannedOrders.includes(code)) { addOrder(code); input.value = ''; showToast(); }
+            else if (scannedOrders.includes(code)) { input.value = ''; document.getElementById('scanStatus').textContent = '⚠️ موجود بالفعل: ' + code; setTimeout(() => { document.getElementById('scanStatus').textContent = 'جاهز للمسح'; }, 1500); }
             input.focus();
         }
 
-        function showToast() {
-            const toast = document.getElementById('toast');
-            toast.classList.add('show');
-            setTimeout(() => toast.classList.remove('show'), 1000);
-        }
+        function showToast() { const t = document.getElementById('toast'); t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 1000); }
 
         async function startUpdate() {
             const token = document.getElementById('apiToken').value.trim();
-            
-            if (!token) {
-                alert('أدخل API Token في الإعدادات');
-                toggleSettings();
-                return;
-            }
+            if (!token) { alert('أدخل API Token في الإعدادات'); toggleSettings(); return; }
+            if (!currentSpecifier) { alert('اختر الحالة أولاً'); return; }
+            if (needsCourier(currentSpecifier) && !currentCourier) { alert('اختر المندوب أولاً'); return; }
+            if (scannedOrders.length === 0) { alert('لا توجد أوردرات'); return; }
 
-            if (!currentSpecifier) {
-                alert('اختر الحالة أولاً');
-                return;
-            }
-
-            if (needsCourier(currentSpecifier) && !currentCourier) {
-                alert('اختر المندوب أولاً');
-                return;
-            }
-            
-            if (scannedOrders.length === 0) {
-                alert('لا توجد أوردرات');
-                return;
-            }
-
-            let confirmMsg;
-            if (needsCourier(currentSpecifier)) {
-                confirmMsg = `هل تريد تحديث ${scannedOrders.length} أوردر؟\n\nالحالة: ${currentStatusLabel}\nالمندوب: ${currentCourier}`;
-            } else {
-                confirmMsg = `هل تريد تحديث ${scannedOrders.length} أوردر؟\n\nالحالة: ${currentStatusLabel}`;
-            }
-            
+            let confirmMsg = needsCourier(currentSpecifier)
+                ? `هل تريد تحديث ${scannedOrders.length} أوردر؟\n\nالحالة: ${currentStatusLabel}\nالمندوب: ${currentCourier}`
+                : `هل تريد تحديث ${scannedOrders.length} أوردر؟\n\nالحالة: ${currentStatusLabel}`;
             if (!confirm(confirmMsg)) return;
             
             const btn = document.getElementById('updateBtn');
             btn.disabled = true;
             btn.innerHTML = '<span class="spinner"></span> جاري التحديث...';
-            
             document.getElementById('progressBar').classList.add('active');
             document.getElementById('results').classList.add('active');
             
             const resultsList = document.getElementById('resultsList');
-            resultsList.innerHTML = scannedOrders.map(order => `
-                <div class="result-item" data-order="${order}">
-                    <span>${order}</span>
-                    <span class="result-status result-pending">⏳</span>
-                </div>
-            `).join('');
+            resultsList.innerHTML = scannedOrders.map(order => `<div class="result-item" data-order="${order}"><span>${order}</span><span class="result-status result-pending">⏳</span></div>`).join('');
             
             let success = 0, errors = 0;
             const orderResults = [];
@@ -1030,59 +592,33 @@
             for (let i = 0; i < scannedOrders.length; i++) {
                 const order = scannedOrders[i];
                 let orderStatus = 'error';
-                
                 try {
-                    const requestBody = {
-                        itemId: order,
-                        specifier: currentSpecifier
-                    };
-                    
-                    if (needsCourier(currentSpecifier)) {
-                        requestBody.additionalParameters = {
-                            stringParameter: currentCourier
-                        };
-                    }
+                    const requestBody = { itemId: order, specifier: currentSpecifier };
+                    if (needsCourier(currentSpecifier)) requestBody.additionalParameters = { stringParameter: currentCourier };
                     
                     const response = await fetch(FLOW_API_URL, {
                         method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Authorization': `bearer ${token}`
-                        },
+                        headers: { 'Content-Type': 'application/json', 'Authorization': `bearer ${token}` },
                         body: JSON.stringify(requestBody)
                     });
-                    
-                    if (response.ok) {
-                        updateResult(order, 'success', '✓');
-                        success++;
-                        orderStatus = 'success';
-                    } else {
-                        updateResult(order, 'error', '✗');
-                        errors++;
-                    }
-                } catch (e) {
-                    updateResult(order, 'error', '✗');
-                    errors++;
-                }
+                    if (response.ok) { updateResult(order, 'success', '✓'); success++; orderStatus = 'success'; }
+                    else { updateResult(order, 'error', '✗'); errors++; }
+                } catch (e) { updateResult(order, 'error', '✗'); errors++; }
                 
                 orderResults.push({ order, status: orderStatus });
-                
                 document.getElementById('progressFill').style.width = `${((i+1)/scannedOrders.length)*100}%`;
                 document.getElementById('successCount').textContent = success;
                 document.getElementById('errorCount').textContent = errors;
-                
                 await new Promise(r => setTimeout(r, 300));
             }
             
-            // Save to log
             saveLogEntry({
                 date: new Date().toISOString(),
                 status: currentStatusLabel,
                 statusSpecifier: currentSpecifier,
                 courier: needsCourier(currentSpecifier) ? currentCourier : null,
                 totalOrders: scannedOrders.length,
-                success,
-                errors,
+                success, errors,
                 orders: orderResults
             });
             
@@ -1090,28 +626,17 @@
             btn.innerHTML = '🚀 تحديث الكل';
             
             if (errors === 0) {
-                let successMsg;
-                if (needsCourier(currentSpecifier)) {
-                    successMsg = `✅ تم تحديث ${success} أوردر بنجاح!\n\nالحالة: ${currentStatusLabel}\nالمندوب: ${currentCourier}`;
-                } else {
-                    successMsg = `✅ تم تحديث ${success} أوردر بنجاح!\n\nالحالة: ${currentStatusLabel}`;
-                }
-                alert(successMsg);
-                scannedOrders = [];
-                saveOrders();
-                renderList();
-                updateSummaryCount();
-            } else {
-                alert(`تم: ${success} ناجح، ${errors} فشل`);
-            }
+                let msg = needsCourier(currentSpecifier)
+                    ? `✅ تم تحديث ${success} أوردر بنجاح!\n\nالحالة: ${currentStatusLabel}\nالمندوب: ${currentCourier}`
+                    : `✅ تم تحديث ${success} أوردر بنجاح!\n\nالحالة: ${currentStatusLabel}`;
+                alert(msg);
+                scannedOrders = []; saveOrders(); renderList(); updateSummaryCount();
+            } else { alert(`تم: ${success} ناجح، ${errors} فشل`); }
         }
 
         function updateResult(order, status, text) {
             const item = document.querySelector(`[data-order="${order}"] .result-status`);
-            if (item) {
-                item.className = `result-status result-${status}`;
-                item.textContent = text;
-            }
+            if (item) { item.className = `result-status result-${status}`; item.textContent = text; }
         }
 
         updateSummaryCount();
@@ -1119,16 +644,10 @@
         // === LOG FUNCTIONS (localStorage + KV sync) ===
 
         function getLogConfig() {
-            return {
-                url: document.getElementById('logWorkerUrl').value.trim(),
-                secret: document.getElementById('logWorkerSecret').value.trim()
-            };
+            return { url: document.getElementById('logWorkerUrl').value.trim(), secret: document.getElementById('logWorkerSecret').value.trim() };
         }
 
-        function hasLogWorker() {
-            const { url, secret } = getLogConfig();
-            return url && secret;
-        }
+        function hasLogWorker() { const { url, secret } = getLogConfig(); return url && secret; }
 
         function updateSyncStatus(status) {
             const el = document.getElementById('logSyncStatus');
@@ -1138,135 +657,76 @@
             else if (status === 'loading') el.textContent = '⏳ جاري...';
         }
 
-        function getLog() {
-            try {
-                return JSON.parse(localStorage.getItem('update_log') || '[]');
-            } catch { return []; }
-        }
+        function getLog() { try { return JSON.parse(localStorage.getItem('update_log') || '[]'); } catch { return []; } }
 
         async function saveLogEntry(entry) {
-            // Always save locally first
             const log = getLog();
             log.unshift(entry);
             localStorage.setItem('update_log', JSON.stringify(log));
             renderLog(log);
 
-            // Then sync to KV if configured
             if (hasLogWorker()) {
                 try {
                     updateSyncStatus('loading');
                     const { url, secret } = getLogConfig();
                     const res = await fetch(`${url}/log`, {
                         method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Authorization': `Bearer ${secret}`
-                        },
+                        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${secret}` },
                         body: JSON.stringify(entry)
                     });
                     if (res.ok) {
+                        const data = await res.json();
+                        if (data.entry && data.entry.orders) {
+                            const localLog = getLog();
+                            if (localLog.length > 0 && localLog[0].date === entry.date) {
+                                localLog[0] = data.entry;
+                                localStorage.setItem('update_log', JSON.stringify(localLog));
+                                renderLog(localLog);
+                            }
+                        }
                         updateSyncStatus('synced');
-                    } else {
-                        updateSyncStatus('local');
-                    }
-                } catch {
-                    updateSyncStatus('local');
-                }
+                    } else { updateSyncStatus('local'); }
+                } catch { updateSyncStatus('local'); }
             }
         }
 
         async function syncFromCloud() {
-            if (!hasLogWorker()) {
-                alert('أدخل Log Worker URL و Secret في الإعدادات');
-                document.getElementById('settings').classList.add('active');
-                return;
-            }
-
+            if (!hasLogWorker()) { alert('أدخل Log Worker URL و Secret في الإعدادات'); document.getElementById('settings').classList.add('active'); return; }
             try {
                 updateSyncStatus('loading');
                 const { url, secret } = getLogConfig();
-                const res = await fetch(`${url}/log`, {
-                    method: 'GET',
-                    headers: { 'Authorization': `Bearer ${secret}` }
-                });
-
+                const res = await fetch(`${url}/log`, { method: 'GET', headers: { 'Authorization': `Bearer ${secret}` } });
                 if (!res.ok) throw new Error('فشل الاتصال');
-
                 const data = await res.json();
-                const cloudLog = data.log || [];
-
-                // Merge: combine cloud + local, deduplicate by date
-                const localLog = getLog();
-                const merged = mergeAndDedupe(localLog, cloudLog);
-
+                const merged = mergeAndDedupe(getLog(), data.log || []);
                 localStorage.setItem('update_log', JSON.stringify(merged));
                 renderLog(merged);
                 updateSyncStatus('synced');
-            } catch (err) {
-                updateSyncStatus('local');
-                alert('فشل جلب السجل: ' + err.message);
-            }
+            } catch (err) { updateSyncStatus('local'); alert('فشل جلب السجل: ' + err.message); }
         }
 
         function mergeAndDedupe(localLog, cloudLog) {
-            const seen = new Set();
-            const merged = [];
-
-            // Use date as unique key
+            const seen = new Set(); const merged = [];
             for (const entry of [...localLog, ...cloudLog]) {
-                const key = entry.date;
-                if (!seen.has(key)) {
-                    seen.add(key);
-                    merged.push(entry);
-                }
+                if (!seen.has(entry.date)) { seen.add(entry.date); merged.push(entry); }
             }
-
-            // Sort by date descending (newest first)
             merged.sort((a, b) => new Date(b.date) - new Date(a.date));
             return merged;
         }
 
-        async function clearLog() {
-            if (!confirm('مسح سجل العمليات بالكامل؟')) return;
-            
-            localStorage.removeItem('update_log');
-
-            // Also clear from KV if configured
-            if (hasLogWorker()) {
-                try {
-                    const { url, secret } = getLogConfig();
-                    await fetch(`${url}/log`, {
-                        method: 'DELETE',
-                        headers: { 'Authorization': `Bearer ${secret}` }
-                    });
-                } catch { /* silent fail */ }
-            }
-
-            renderLog([]);
-            updateSyncStatus('local');
-        }
-
-        function toggleLogEntry(el) {
-            el.closest('.log-entry').classList.toggle('open');
-        }
+        function toggleLogEntry(el) { el.closest('.log-entry').classList.toggle('open'); }
 
         function formatDate(iso) {
             const d = new Date(iso);
-            const date = d.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' });
-            const time = d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: true });
-            return `${date} — ${time}`;
+            return `${d.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' })} — ${d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: true })}`;
         }
 
         function renderLog(log) {
             if (!log) log = getLog();
             const container = document.getElementById('logList');
+            if (log.length === 0) { container.innerHTML = '<div class="log-empty">لا توجد عمليات مسجلة</div>'; return; }
 
-            if (log.length === 0) {
-                container.innerHTML = '<div class="log-empty">لا توجد عمليات مسجلة</div>';
-                return;
-            }
-
-            container.innerHTML = log.map((entry, i) => `
+            container.innerHTML = log.map(entry => `
                 <div class="log-entry">
                     <div class="log-entry-header" onclick="toggleLogEntry(this)">
                         <div class="log-entry-info">
@@ -1286,7 +746,7 @@
                     <div class="log-entry-details">
                         ${entry.orders.map(o => `
                             <div class="log-detail-item">
-                                <span class="log-detail-order">${o.order}</span>
+                                <span class="log-detail-order">${o.orderName || ''} <span style="color:var(--text-dim);font-size:0.7rem">${o.order}</span></span>
                                 <span class="log-detail-status log-detail-${o.status}">${o.status === 'success' ? '✓ ناجح' : '✗ فشل'}</span>
                             </div>
                         `).join('')}
@@ -1297,47 +757,26 @@
 
         function exportLogCSV() {
             const log = getLog();
-            if (log.length === 0) {
-                alert('السجل فارغ');
-                return;
-            }
-
+            if (log.length === 0) { alert('السجل فارغ'); return; }
             const BOM = '\uFEFF';
-            const headers = ['التاريخ', 'الوقت', 'الحالة', 'المندوب', 'رقم الأوردر', 'النتيجة'];
+            const headers = ['التاريخ', 'الوقت', 'الحالة', 'المندوب', 'رقم الأوردر', 'Order ID', 'النتيجة'];
             const rows = [headers.join(',')];
-
             for (const entry of log) {
                 const d = new Date(entry.date);
                 const date = d.toLocaleDateString('en-GB');
                 const time = d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
-
                 for (const o of entry.orders) {
-                    rows.push([
-                        date,
-                        time,
-                        entry.status,
-                        entry.courier || '—',
-                        o.order,
-                        o.status === 'success' ? 'ناجح' : 'فشل'
-                    ].join(','));
+                    rows.push([date, time, entry.status, entry.courier || '—', o.orderName || '—', `="${o.order}"`, o.status === 'success' ? 'ناجح' : 'فشل'].join(','));
                 }
             }
-
-            const csv = BOM + rows.join('\n');
-            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const blob = new Blob([BOM + rows.join('\n')], { type: 'text/csv;charset=utf-8;' });
             const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `order-log-${new Date().toISOString().slice(0,10)}.csv`;
-            a.click();
+            const a = document.createElement('a'); a.href = url; a.download = `order-log-${new Date().toISOString().slice(0,10)}.csv`; a.click();
             URL.revokeObjectURL(url);
         }
 
-        // Initial render + auto-sync from cloud if configured
         renderLog();
-        if (hasLogWorker()) {
-            syncFromCloud();
-        }
+        if (hasLogWorker()) syncFromCloud();
     </script>
 </body>
 </html>

@@ -88,11 +88,11 @@
         .status-btn.active { transform: scale(1.02); }
         .status-btn .icon { font-size: 1.1rem; display: block; margin-bottom: 0.2rem; }
 
-        .status-btn.shipped.active { border-color: var(--scanner); background: rgba(0, 212, 255, 0.15); color: var(--scanner); }
-        .status-btn.delivered.active { border-color: var(--success); background: var(--success-glow); color: var(--success); }
-        .status-btn.returned.active { border-color: var(--orange); background: var(--orange-glow); color: var(--orange); }
-        .status-btn.cancelled.active { border-color: var(--error); background: var(--error-glow); color: var(--error); }
-        .status-btn.ready-to-ship.active { border-color: var(--purple); background: var(--purple-glow); color: var(--purple); }
+        .status-btn.Shipped.active { border-color: var(--scanner); background: rgba(0, 212, 255, 0.15); color: var(--scanner); }
+        .status-btn.Delivered.active { border-color: var(--success); background: var(--success-glow); color: var(--success); }
+        .status-btn.Returned.active { border-color: var(--orange); background: var(--orange-glow); color: var(--orange); }
+        .status-btn.Cancelled.active { border-color: var(--error); background: var(--error-glow); color: var(--error); }
+        .status-btn.Ready.active { border-color: var(--purple); background: var(--purple-glow); color: var(--purple); }
 
         .courier-selector {
             display: grid;
@@ -251,11 +251,11 @@
 
         .btn-primary:hover { filter: brightness(1.1); }
         .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
-        .btn-primary.shipped { background: var(--scanner); }
-        .btn-primary.delivered { background: var(--success); }
-        .btn-primary.returned { background: var(--orange); }
-        .btn-primary.cancelled { background: var(--error); }
-        .btn-primary.ready-to-ship { background: var(--purple); }
+        .btn-primary.Shipped { background: var(--scanner); }
+        .btn-primary.Delivered { background: var(--success); }
+        .btn-primary.Returned { background: var(--orange); }
+        .btn-primary.Cancelled { background: var(--error); }
+        .btn-primary.Ready { background: var(--purple); }
 
         .results { display: none; }
         .results.active { display: block; }
@@ -442,11 +442,11 @@
             font-weight: 600;
         }
 
-        .log-tag.status-shipped { background: rgba(0,212,255,0.15); color: var(--scanner); }
-        .log-tag.status-delivered { background: var(--success-glow); color: var(--success); }
-        .log-tag.status-returned { background: var(--orange-glow); color: var(--orange); }
-        .log-tag.status-cancelled { background: var(--error-glow); color: var(--error); }
-        .log-tag.status-ready-to-ship { background: var(--purple-glow); color: var(--purple); }
+        .log-tag.status-Shipped { background: rgba(0,212,255,0.15); color: var(--scanner); }
+        .log-tag.status-Delivered { background: var(--success-glow); color: var(--success); }
+        .log-tag.status-Returned { background: var(--orange-glow); color: var(--orange); }
+        .log-tag.status-Cancelled { background: var(--error-glow); color: var(--error); }
+        .log-tag.status-Ready { background: var(--purple-glow); color: var(--purple); }
         .log-tag.courier { background: var(--pink-glow); color: var(--pink); }
         .log-tag.count { background: var(--accent-glow); color: var(--accent); }
 
@@ -526,20 +526,20 @@
         <div class="card">
             <h2 class="card-title">📌 اختر الحالة</h2>
             <div class="status-selector">
-                <button class="status-btn shipped" onclick="selectStatus('shipped', 'Shipped', '🚚')">
+                <button class="status-btn Shipped" onclick="selectStatus('Shipped', 'Shipped', '🚚')">
                     <span class="icon">🚚</span>Shipped
                 </button>
-                <button class="status-btn delivered" onclick="selectStatus('delivered', 'Delivered', '✅')">
+                <button class="status-btn Delivered" onclick="selectStatus('Delivered', 'Delivered', '✅')">
                     <span class="icon">✅</span>Delivered
                 </button>
-                <button class="status-btn returned" onclick="selectStatus('returned', 'Returned', '↩️')">
+                <button class="status-btn Returned" onclick="selectStatus('Returned', 'Returned', '↩️')">
                     <span class="icon">↩️</span>Returned
                 </button>
-                <button class="status-btn cancelled" onclick="selectStatus('cancelled', 'Cancelled', '❌')">
+                <button class="status-btn Cancelled" onclick="selectStatus('Cancelled', 'Cancelled', '❌')">
                     <span class="icon">❌</span>Cancelled
                 </button>
-                <button class="status-btn ready-to-ship" onclick="selectStatus('ready-to-ship', 'Ready to Ship', '📦')">
-                    <span class="icon">📦</span>Ready to Ship
+                <button class="status-btn Ready" onclick="selectStatus('Ready', 'Ready', '📦')">
+                    <span class="icon">📦</span>Ready
                 </button>
             </div>
         </div>
@@ -677,7 +677,7 @@
         let currentCourier = '';
 
         function needsCourier(specifier) {
-            return specifier !== 'ready-to-ship' && specifier !== 'cancelled';
+            return specifier !== 'Ready' && specifier !== 'Cancelled';
         }
 
         // Load saved data

@@ -264,6 +264,10 @@
         .log-sync-status.synced { color: var(--success); background: var(--success-glow); }
         .log-sync-status.local { color: var(--orange); background: var(--orange-glow); }
         .log-sync-status.loading { color: var(--scanner); background: rgba(0,212,255,0.15); }
+
+        .log-check { width: 16px; height: 16px; accent-color: var(--accent); cursor: pointer; flex-shrink: 0; margin-left: 0.4rem; }
+        .log-btn.export-selected { display: none; }
+        .log-btn.export-selected.visible { display: inline-block; }
     </style>
 </head>
 <body>
@@ -403,7 +407,8 @@
                 <h2>📜 سجل العمليات <span class="log-sync-status local" id="logSyncStatus">محلي</span></h2>
                 <div class="log-actions">
                     <button class="log-btn" onclick="syncFromCloud()" title="جلب من السيرفر">🔄</button>
-                    <button class="log-btn export" onclick="exportLogCSV()">📥 CSV</button>
+                    <button class="log-btn export-selected" id="exportSelectedBtn" onclick="exportLogCSV(true)">📥 تصدير المحدد</button>
+                    <button class="log-btn export" onclick="exportLogCSV(false)">📥 تصدير الكل</button>
                 </div>
             </div>
             <div class="log-list" id="logList">
@@ -485,7 +490,6 @@
 
         function focusInput() { document.getElementById('manualInput').focus(); }
         window.addEventListener('load', focusInput);
-        document.addEventListener('click', e => { if (e.target.tagName !== 'BUTTON' && e.target.tagName !== 'INPUT') setTimeout(focusInput, 100); });
 
         function selectStatus(specifier, label, icon, save = true) {
             currentSpecifier = specifier; currentStatusLabel = label; currentIcon = icon;
@@ -542,7 +546,25 @@
             } else { document.getElementById('scanStatus').textContent = '⚠️ موجود بالفعل: ' + code; }
         }
 
-        function addOrder(code) { scannedOrders.unshift(code); saveOrders(); renderList(true); updateSummaryCount(); }
+        // Order Name cache: orderId -> orderName
+        const orderNameMap = {};
+
+        function resolveNameInBackground(orderId) {
+            if (!hasLogWorker()) return;
+            const { url, secret } = getLogConfig();
+            fetch(`${url}/resolve`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${secret}` },
+                body: JSON.stringify({ orderIds: [orderId] })
+            }).then(r => r.json()).then(data => {
+                if (data.success && data.names) {
+                    Object.assign(orderNameMap, data.names);
+                    renderList();
+                }
+            }).catch(() => {});
+        }
+
+        function addOrder(code) { scannedOrders.unshift(code); saveOrders(); renderList(true); updateSummaryCount(); resolveNameInBackground(code); }
         function removeOrder(code) { scannedOrders = scannedOrders.filter(o => o !== code); saveOrders(); renderList(); updateSummaryCount(); }
         function clearList() { if (confirm('مسح كل الأوردرات؟')) { scannedOrders = []; saveOrders(); renderList(); updateSummaryCount(); } }
         function saveOrders() { localStorage.setItem('scanned_orders', JSON.stringify(scannedOrders)); }
@@ -552,7 +574,11 @@
             const list = document.getElementById('scannedList');
             document.getElementById('count').textContent = scannedOrders.length;
             if (scannedOrders.length === 0) { list.innerHTML = '<div class="empty-list">لم يتم مسح أي باركود بعد</div>'; return; }
-            list.innerHTML = scannedOrders.map((order, i) => `<div class="scanned-item ${i === 0 && isNew ? 'new' : ''}"><span>${order}</span><button class="remove-btn" onclick="removeOrder('${order}')">✕</button></div>`).join('');
+            list.innerHTML = scannedOrders.map((order, i) => {
+                const name = orderNameMap[order];
+                const display = name ? `${name} <span style="color:var(--text-dim);font-size:0.75rem">${order}</span>` : order;
+                return `<div class="scanned-item ${i === 0 && isNew ? 'new' : ''}"><span>${display}</span><button class="remove-btn" onclick="removeOrder('${order}')">✕</button></div>`;
+            }).join('');
         }
 
         function addManualEntry() {
@@ -584,7 +610,11 @@
             document.getElementById('results').classList.add('active');
             
             const resultsList = document.getElementById('resultsList');
-            resultsList.innerHTML = scannedOrders.map(order => `<div class="result-item" data-order="${order}"><span>${order}</span><span class="result-status result-pending">⏳</span></div>`).join('');
+            resultsList.innerHTML = scannedOrders.map(order => {
+                const name = orderNameMap[order];
+                const display = name ? `${name} <span style="color:var(--text-dim);font-size:0.75rem">${order}</span>` : order;
+                return `<div class="result-item" data-order="${order}"><span>${display}</span><span class="result-status result-pending">⏳</span></div>`;
+            }).join('');
             
             let success = 0, errors = 0;
             const orderResults = [];
@@ -721,15 +751,21 @@
             return `${d.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' })} — ${d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: true })}`;
         }
 
+        function onLogCheckChange() {
+            const anyChecked = document.querySelectorAll('.log-check:checked').length > 0;
+            document.getElementById('exportSelectedBtn').classList.toggle('visible', anyChecked);
+        }
+
         function renderLog(log) {
             if (!log) log = getLog();
             const container = document.getElementById('logList');
             if (log.length === 0) { container.innerHTML = '<div class="log-empty">لا توجد عمليات مسجلة</div>'; return; }
 
-            container.innerHTML = log.map(entry => `
+            container.innerHTML = log.map((entry, i) => `
                 <div class="log-entry">
-                    <div class="log-entry-header" onclick="toggleLogEntry(this)">
-                        <div class="log-entry-info">
+                    <div class="log-entry-header">
+                        <input type="checkbox" class="log-check" data-log-index="${i}" onchange="onLogCheckChange()">
+                        <div class="log-entry-info" onclick="toggleLogEntry(this)">
                             <div class="log-entry-date">${formatDate(entry.date)}</div>
                             <div class="log-entry-summary">
                                 <span class="log-tag status-${entry.statusSpecifier}">${entry.status}</span>
@@ -741,7 +777,7 @@
                             <span class="stat-success">✓${entry.success}</span>
                             <span class="stat-error">✗${entry.errors}</span>
                         </div>
-                        <span class="log-toggle">▶</span>
+                        <span class="log-toggle" onclick="toggleLogEntry(this)">▶</span>
                     </div>
                     <div class="log-entry-details">
                         ${entry.orders.map(o => `
@@ -753,11 +789,22 @@
                     </div>
                 </div>
             `).join('');
+            document.getElementById('exportSelectedBtn').classList.remove('visible');
         }
 
-        function exportLogCSV() {
-            const log = getLog();
-            if (log.length === 0) { alert('السجل فارغ'); return; }
+        function exportLogCSV(selectedOnly) {
+            const fullLog = getLog();
+            if (fullLog.length === 0) { alert('السجل فارغ'); return; }
+
+            let log;
+            if (selectedOnly) {
+                const checkedIndexes = [...document.querySelectorAll('.log-check:checked')].map(cb => parseInt(cb.dataset.logIndex));
+                if (checkedIndexes.length === 0) { alert('اختر عمليات أولاً'); return; }
+                log = checkedIndexes.map(i => fullLog[i]).filter(Boolean);
+            } else {
+                log = fullLog;
+            }
+
             const BOM = '\uFEFF';
             const headers = ['التاريخ', 'الوقت', 'الحالة', 'المندوب', 'رقم الأوردر', 'Order ID', 'النتيجة'];
             const rows = [headers.join(',')];

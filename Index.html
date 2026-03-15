@@ -352,6 +352,165 @@
         .summary-value.status { color: var(--scanner); }
         .summary-value.courier { color: var(--pink); }
         .summary-value.count { color: var(--accent); }
+
+        /* Log Section */
+        .log-section { margin-top: 1rem; }
+
+        .log-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.75rem;
+        }
+
+        .log-header h2 {
+            font-size: 0.95rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .log-actions { display: flex; gap: 0.5rem; }
+
+        .log-btn {
+            background: none;
+            border: 1px solid var(--border);
+            color: var(--text-dim);
+            padding: 0.35rem 0.7rem;
+            border-radius: 6px;
+            font-family: inherit;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .log-btn:hover { border-color: var(--text-dim); color: var(--text); }
+        .log-btn.export:hover { border-color: var(--success); color: var(--success); }
+        .log-btn.danger:hover { border-color: var(--error); color: var(--error); }
+
+        .log-empty {
+            text-align: center;
+            padding: 1.5rem;
+            color: var(--text-dim);
+            font-size: 0.85rem;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+        }
+
+        .log-entry {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            margin-bottom: 0.5rem;
+            overflow: hidden;
+            transition: border-color 0.2s;
+        }
+
+        .log-entry:hover { border-color: var(--text-dim); }
+
+        .log-entry-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.7rem 0.85rem;
+            cursor: pointer;
+            gap: 0.5rem;
+        }
+
+        .log-entry-info { flex: 1; min-width: 0; }
+
+        .log-entry-date {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            color: var(--text-dim);
+            margin-bottom: 0.25rem;
+        }
+
+        .log-entry-summary {
+            font-size: 0.8rem;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .log-tag {
+            padding: 0.15rem 0.5rem;
+            border-radius: 6px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+
+        .log-tag.status-shipped { background: rgba(0,212,255,0.15); color: var(--scanner); }
+        .log-tag.status-delivered { background: var(--success-glow); color: var(--success); }
+        .log-tag.status-returned { background: var(--orange-glow); color: var(--orange); }
+        .log-tag.status-cancelled { background: var(--error-glow); color: var(--error); }
+        .log-tag.status-ready-to-ship { background: var(--purple-glow); color: var(--purple); }
+        .log-tag.courier { background: var(--pink-glow); color: var(--pink); }
+        .log-tag.count { background: var(--accent-glow); color: var(--accent); }
+
+        .log-entry-stats {
+            display: flex;
+            gap: 0.4rem;
+            font-size: 0.75rem;
+            flex-shrink: 0;
+        }
+
+        .log-toggle {
+            color: var(--text-dim);
+            font-size: 0.8rem;
+            flex-shrink: 0;
+            transition: transform 0.2s;
+        }
+
+        .log-entry.open .log-toggle { transform: rotate(90deg); }
+
+        .log-entry-details {
+            display: none;
+            border-top: 1px solid var(--border);
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .log-entry.open .log-entry-details { display: block; }
+
+        .log-detail-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.45rem 0.85rem;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.8rem;
+        }
+
+        .log-detail-item:last-child { border-bottom: none; }
+
+        .log-detail-order {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 600;
+        }
+
+        .log-detail-status {
+            padding: 0.15rem 0.5rem;
+            border-radius: 8px;
+            font-size: 0.7rem;
+        }
+
+        .log-detail-success { background: var(--success-glow); color: var(--success); }
+        .log-detail-error { background: var(--error-glow); color: var(--error); }
+
+        .log-list { max-height: 400px; overflow-y: auto; }
+
+        .log-sync-status {
+            font-size: 0.7rem;
+            padding: 0.2rem 0.5rem;
+            border-radius: 6px;
+            font-weight: 600;
+        }
+        .log-sync-status.synced { color: var(--success); background: var(--success-glow); }
+        .log-sync-status.local { color: var(--orange); background: var(--orange-glow); }
+        .log-sync-status.loading { color: var(--scanner); background: rgba(0,212,255,0.15); }
     </style>
 </head>
 <body>
@@ -454,6 +613,14 @@
                     <label>Flow Companion API Token</label>
                     <input type="password" id="apiToken" placeholder="أدخل الـ Token">
                 </div>
+                <div class="input-group">
+                    <label>Log Worker URL</label>
+                    <input type="text" id="logWorkerUrl" placeholder="https://log-worker.xxxxx.workers.dev">
+                </div>
+                <div class="input-group">
+                    <label>Log Worker Secret</label>
+                    <input type="password" id="logWorkerSecret" placeholder="WORKER_SECRET">
+                </div>
             </div>
         </div>
 
@@ -475,6 +642,21 @@
                 </span>
             </div>
             <div class="results-list" id="resultsList"></div>
+        </div>
+
+        <!-- Log Section -->
+        <div class="log-section">
+            <div class="log-header">
+                <h2>📜 سجل العمليات <span class="log-sync-status local" id="logSyncStatus">محلي</span></h2>
+                <div class="log-actions">
+                    <button class="log-btn" onclick="syncFromCloud()" title="جلب من السيرفر">🔄</button>
+                    <button class="log-btn export" onclick="exportLogCSV()">📥 CSV</button>
+                    <button class="log-btn danger" onclick="clearLog()">🗑️ مسح</button>
+                </div>
+            </div>
+            <div class="log-list" id="logList">
+                <div class="log-empty">لا توجد عمليات مسجلة</div>
+            </div>
         </div>
     </div>
 
@@ -500,6 +682,8 @@
 
         // Load saved data
         document.getElementById('apiToken').value = localStorage.getItem('api_token') || '';
+        document.getElementById('logWorkerUrl').value = localStorage.getItem('log_worker_url') || '';
+        document.getElementById('logWorkerSecret').value = localStorage.getItem('log_worker_secret') || '';
         const saved = localStorage.getItem('scanned_orders');
         if (saved) {
             scannedOrders = JSON.parse(saved);
@@ -522,6 +706,12 @@
         // Save on change
         document.getElementById('apiToken').addEventListener('change', e => {
             localStorage.setItem('api_token', e.target.value);
+        });
+        document.getElementById('logWorkerUrl').addEventListener('change', e => {
+            localStorage.setItem('log_worker_url', e.target.value);
+        });
+        document.getElementById('logWorkerSecret').addEventListener('change', e => {
+            localStorage.setItem('log_worker_secret', e.target.value);
         });
 
         // Manual input - auto-add when scanner gun finishes
@@ -835,9 +1025,11 @@
             `).join('');
             
             let success = 0, errors = 0;
+            const orderResults = [];
             
             for (let i = 0; i < scannedOrders.length; i++) {
                 const order = scannedOrders[i];
+                let orderStatus = 'error';
                 
                 try {
                     const requestBody = {
@@ -863,6 +1055,7 @@
                     if (response.ok) {
                         updateResult(order, 'success', '✓');
                         success++;
+                        orderStatus = 'success';
                     } else {
                         updateResult(order, 'error', '✗');
                         errors++;
@@ -872,12 +1065,26 @@
                     errors++;
                 }
                 
+                orderResults.push({ order, status: orderStatus });
+                
                 document.getElementById('progressFill').style.width = `${((i+1)/scannedOrders.length)*100}%`;
                 document.getElementById('successCount').textContent = success;
                 document.getElementById('errorCount').textContent = errors;
                 
                 await new Promise(r => setTimeout(r, 300));
             }
+            
+            // Save to log
+            saveLogEntry({
+                date: new Date().toISOString(),
+                status: currentStatusLabel,
+                statusSpecifier: currentSpecifier,
+                courier: needsCourier(currentSpecifier) ? currentCourier : null,
+                totalOrders: scannedOrders.length,
+                success,
+                errors,
+                orders: orderResults
+            });
             
             btn.disabled = false;
             btn.innerHTML = '🚀 تحديث الكل';
@@ -908,6 +1115,229 @@
         }
 
         updateSummaryCount();
+
+        // === LOG FUNCTIONS (localStorage + KV sync) ===
+
+        function getLogConfig() {
+            return {
+                url: document.getElementById('logWorkerUrl').value.trim(),
+                secret: document.getElementById('logWorkerSecret').value.trim()
+            };
+        }
+
+        function hasLogWorker() {
+            const { url, secret } = getLogConfig();
+            return url && secret;
+        }
+
+        function updateSyncStatus(status) {
+            const el = document.getElementById('logSyncStatus');
+            el.className = `log-sync-status ${status}`;
+            if (status === 'synced') el.textContent = '☁️ متزامن';
+            else if (status === 'local') el.textContent = '💾 محلي';
+            else if (status === 'loading') el.textContent = '⏳ جاري...';
+        }
+
+        function getLog() {
+            try {
+                return JSON.parse(localStorage.getItem('update_log') || '[]');
+            } catch { return []; }
+        }
+
+        async function saveLogEntry(entry) {
+            // Always save locally first
+            const log = getLog();
+            log.unshift(entry);
+            localStorage.setItem('update_log', JSON.stringify(log));
+            renderLog(log);
+
+            // Then sync to KV if configured
+            if (hasLogWorker()) {
+                try {
+                    updateSyncStatus('loading');
+                    const { url, secret } = getLogConfig();
+                    const res = await fetch(`${url}/log`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${secret}`
+                        },
+                        body: JSON.stringify(entry)
+                    });
+                    if (res.ok) {
+                        updateSyncStatus('synced');
+                    } else {
+                        updateSyncStatus('local');
+                    }
+                } catch {
+                    updateSyncStatus('local');
+                }
+            }
+        }
+
+        async function syncFromCloud() {
+            if (!hasLogWorker()) {
+                alert('أدخل Log Worker URL و Secret في الإعدادات');
+                document.getElementById('settings').classList.add('active');
+                return;
+            }
+
+            try {
+                updateSyncStatus('loading');
+                const { url, secret } = getLogConfig();
+                const res = await fetch(`${url}/log`, {
+                    method: 'GET',
+                    headers: { 'Authorization': `Bearer ${secret}` }
+                });
+
+                if (!res.ok) throw new Error('فشل الاتصال');
+
+                const data = await res.json();
+                const cloudLog = data.log || [];
+
+                // Merge: combine cloud + local, deduplicate by date
+                const localLog = getLog();
+                const merged = mergeAndDedupe(localLog, cloudLog);
+
+                localStorage.setItem('update_log', JSON.stringify(merged));
+                renderLog(merged);
+                updateSyncStatus('synced');
+            } catch (err) {
+                updateSyncStatus('local');
+                alert('فشل جلب السجل: ' + err.message);
+            }
+        }
+
+        function mergeAndDedupe(localLog, cloudLog) {
+            const seen = new Set();
+            const merged = [];
+
+            // Use date as unique key
+            for (const entry of [...localLog, ...cloudLog]) {
+                const key = entry.date;
+                if (!seen.has(key)) {
+                    seen.add(key);
+                    merged.push(entry);
+                }
+            }
+
+            // Sort by date descending (newest first)
+            merged.sort((a, b) => new Date(b.date) - new Date(a.date));
+            return merged;
+        }
+
+        async function clearLog() {
+            if (!confirm('مسح سجل العمليات بالكامل؟')) return;
+            
+            localStorage.removeItem('update_log');
+
+            // Also clear from KV if configured
+            if (hasLogWorker()) {
+                try {
+                    const { url, secret } = getLogConfig();
+                    await fetch(`${url}/log`, {
+                        method: 'DELETE',
+                        headers: { 'Authorization': `Bearer ${secret}` }
+                    });
+                } catch { /* silent fail */ }
+            }
+
+            renderLog([]);
+            updateSyncStatus('local');
+        }
+
+        function toggleLogEntry(el) {
+            el.closest('.log-entry').classList.toggle('open');
+        }
+
+        function formatDate(iso) {
+            const d = new Date(iso);
+            const date = d.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' });
+            const time = d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: true });
+            return `${date} — ${time}`;
+        }
+
+        function renderLog(log) {
+            if (!log) log = getLog();
+            const container = document.getElementById('logList');
+
+            if (log.length === 0) {
+                container.innerHTML = '<div class="log-empty">لا توجد عمليات مسجلة</div>';
+                return;
+            }
+
+            container.innerHTML = log.map((entry, i) => `
+                <div class="log-entry">
+                    <div class="log-entry-header" onclick="toggleLogEntry(this)">
+                        <div class="log-entry-info">
+                            <div class="log-entry-date">${formatDate(entry.date)}</div>
+                            <div class="log-entry-summary">
+                                <span class="log-tag status-${entry.statusSpecifier}">${entry.status}</span>
+                                ${entry.courier ? `<span class="log-tag courier">${entry.courier}</span>` : ''}
+                                <span class="log-tag count">${entry.totalOrders} أوردر</span>
+                            </div>
+                        </div>
+                        <div class="log-entry-stats">
+                            <span class="stat-success">✓${entry.success}</span>
+                            <span class="stat-error">✗${entry.errors}</span>
+                        </div>
+                        <span class="log-toggle">▶</span>
+                    </div>
+                    <div class="log-entry-details">
+                        ${entry.orders.map(o => `
+                            <div class="log-detail-item">
+                                <span class="log-detail-order">${o.order}</span>
+                                <span class="log-detail-status log-detail-${o.status}">${o.status === 'success' ? '✓ ناجح' : '✗ فشل'}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function exportLogCSV() {
+            const log = getLog();
+            if (log.length === 0) {
+                alert('السجل فارغ');
+                return;
+            }
+
+            const BOM = '\uFEFF';
+            const headers = ['التاريخ', 'الوقت', 'الحالة', 'المندوب', 'رقم الأوردر', 'النتيجة'];
+            const rows = [headers.join(',')];
+
+            for (const entry of log) {
+                const d = new Date(entry.date);
+                const date = d.toLocaleDateString('en-GB');
+                const time = d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
+
+                for (const o of entry.orders) {
+                    rows.push([
+                        date,
+                        time,
+                        entry.status,
+                        entry.courier || '—',
+                        o.order,
+                        o.status === 'success' ? 'ناجح' : 'فشل'
+                    ].join(','));
+                }
+            }
+
+            const csv = BOM + rows.join('\n');
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `order-log-${new Date().toISOString().slice(0,10)}.csv`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // Initial render + auto-sync from cloud if configured
+        renderLog();
+        if (hasLogWorker()) {
+            syncFromCloud();
+        }
     </script>
 </body>
 </html>

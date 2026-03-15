@@ -490,6 +490,13 @@
 
         function focusInput() { document.getElementById('manualInput').focus(); }
         window.addEventListener('load', focusInput);
+        // Re-focus scanner input when clicking empty areas (for scanner gun convenience)
+        document.addEventListener('click', e => {
+            const tag = e.target.tagName;
+            if (tag !== 'BUTTON' && tag !== 'INPUT' && tag !== 'LABEL' && tag !== 'SPAN' && !e.target.closest('.log-entry') && !e.target.closest('.results') && !e.target.closest('.settings-content')) {
+                setTimeout(focusInput, 150);
+            }
+        });
 
         function selectStatus(specifier, label, icon, save = true) {
             currentSpecifier = specifier; currentStatusLabel = label; currentIcon = icon;
@@ -577,8 +584,12 @@
             list.innerHTML = scannedOrders.map((order, i) => {
                 const name = orderNameMap[order];
                 const display = name ? `${name} <span style="color:var(--text-dim);font-size:0.75rem">${order}</span>` : order;
-                return `<div class="scanned-item ${i === 0 && isNew ? 'new' : ''}"><span>${display}</span><button class="remove-btn" onclick="removeOrder('${order}')">✕</button></div>`;
+                return `<div class="scanned-item ${i === 0 && isNew ? 'new' : ''}"><span>${display}</span><button class="remove-btn" data-remove="${order}">✕</button></div>`;
             }).join('');
+            // Attach event listeners
+            list.querySelectorAll('.remove-btn[data-remove]').forEach(btn => {
+                btn.addEventListener('click', () => removeOrder(btn.dataset.remove));
+            });
         }
 
         function addManualEntry() {

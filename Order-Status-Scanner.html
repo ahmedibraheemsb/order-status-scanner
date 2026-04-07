@@ -2,713 +2,1040 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Order Status Updater</title>
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --bg: #0c0c0d;
-            --bg-card: #161618;
-            --bg-input: #1e1e21;
-            --border: #2a2a2e;
-            --text: #f5f5f5;
-            --text-dim: #8b8b8f;
-            --accent: #f43f5e;
-            --accent-glow: rgba(244, 63, 94, 0.15);
-            --success: #22c55e;
-            --success-glow: rgba(34, 197, 94, 0.15);
-            --error: #ef4444;
-            --error-glow: rgba(239, 68, 68, 0.15);
-            --scanner: #00d4ff;
-            --orange: #f59e0b;
-            --orange-glow: rgba(245, 158, 11, 0.15);
-            --blue: #3b82f6;
-            --blue-glow: rgba(59, 130, 246, 0.15);
-            --purple: #8b5cf6;
-            --purple-glow: rgba(139, 92, 246, 0.15);
-            --pink: #ec4899;
-            --pink-glow: rgba(236, 72, 153, 0.15);
-        }
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --bg:           #f5f6fa;
+            --surface:      #ffffff;
+            --border:       #e2e5ed;
+            --border-light: #eef0f5;
+            --text:         #1a1d27;
+            --text-sub:     #6b7280;
+            --text-muted:   #9ca3af;
+            --radius:       10px;
+            --shadow:       0 1px 3px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.04);
+            --shadow-md:    0 4px 12px rgba(0,0,0,.08);
+
+            --primary:      #0284c7;
+            --primary-h:    #0369a1;
+            --primary-bg:   #f0f9ff;
+            --primary-b:    #bae6fd;
+
+            --success:      #16a34a;
+            --success-bg:   #f0fdf4;
+            --success-b:    #bbf7d0;
+            --error:        #dc2626;
+            --error-bg:     #fef2f2;
+            --error-b:      #fecaca;
+            --orange:       #d97706;
+            --orange-bg:    #fffbeb;
+            --orange-b:     #fde68a;
+            --purple:       #7c3aed;
+            --purple-bg:    #f5f3ff;
+            --purple-b:     #ddd6fe;
+            --pink:         #db2777;
+            --pink-bg:      #fdf2f8;
+            --pink-b:       #fbcfe8;
+            --accent:       #f43f5e;
+
+            --amber:        #C9925B;
+            --amber-dark:   #A0714A;
+            --amber-bg:     #FDF6EE;
+            --amber-b:      #E8C49A;
+        }
 
         body {
             font-family: 'IBM Plex Sans Arabic', sans-serif;
             background: var(--bg);
             color: var(--text);
             min-height: 100vh;
-            padding: 1rem;
+            padding: 24px 16px;
+            font-size: 14px;
+            transition: background 0.4s ease;
         }
 
-        .container { max-width: 500px; margin: 0 auto; }
+        body.field-s1 { background: #eaf4ff; }
+        body.field-s2 { background: #fdf5ec; }
 
-        .header { text-align: center; margin-bottom: 1.5rem; }
-        .header h1 { font-size: 1.4rem; font-weight: 700; margin-bottom: 0.3rem; }
-        .header p { color: var(--text-dim); font-size: 0.85rem; }
+        .wrapper { max-width: 1100px; margin: 0 auto; display: flex; flex-direction: column; gap: 16px; }
 
+        /* ── Top border strip ── */
+        .page-border { position: fixed; top: 0; left: 0; right: 0; height: 3px; z-index: 50; background: var(--border); transition: background 0.4s; }
+        body.field-s1 .page-border { background: var(--primary); }
+        body.field-s2 .page-border { background: var(--amber); }
+
+        /* ── Header ── */
+        .header {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: var(--radius); padding: 16px 20px;
+            box-shadow: var(--shadow);
+            display: flex; align-items: center; justify-content: space-between; gap: 12px;
+        }
+        .header-left { display: flex; align-items: center; gap: 12px; }
+        .header-icon { width: 40px; height: 40px; background: var(--primary-bg); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+        .header-title h1 { font-size: 17px; font-weight: 700; }
+        .header-title p  { font-size: 12px; color: var(--text-sub); margin-top: 2px; }
+
+        /* ── Tabs ── */
+        .tabs-card {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: var(--radius); padding: 10px 14px;
+            box-shadow: var(--shadow);
+        }
+        .tabs { display: flex; gap: 4px; background: var(--bg); border-radius: 8px; padding: 3px; }
+        .tab-btn {
+            flex: 1; padding: 8px 16px; border-radius: 6px; border: none;
+            font-size: 13px; font-weight: 500; cursor: pointer;
+            background: none; color: var(--text-sub);
+            transition: all 0.15s; font-family: inherit;
+        }
+        .tab-btn.active { background: var(--surface); color: var(--text); box-shadow: var(--shadow); font-weight: 600; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        /* ── Card ── */
         .card {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 1rem;
-            margin-bottom: 1rem;
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden;
         }
+        body.field-s2 .card { border-color: var(--amber-b); }
 
-        .card-title {
-            font-size: 0.95rem;
-            font-weight: 600;
-            margin-bottom: 0.75rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
+        .card-header {
+            padding: 12px 18px; border-bottom: 1px solid var(--border-light);
+            display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
         }
+        .card-header h2 { font-size: 13px; font-weight: 600; color: var(--text); display: flex; align-items: center; gap: 6px; }
+        .card-body { padding: 16px 18px; }
 
-        .status-selector {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 0.5rem;
-            margin-bottom: 0.5rem;
+        /* ── Layout grids ── */
+        .scanner-tab-content { display: flex; flex-direction: column; gap: 14px; }
+        .top-row   { display: grid; grid-template-columns: 230px 1fr; gap: 14px; align-items: start; }
+        .mid-row   { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; align-items: start; }
+        .bottom-row { display: grid; grid-template-columns: 1fr 360px; gap: 14px; align-items: start; }
+
+        /* ── Field Selector ── */
+        .field-selector { display: flex; flex-direction: column; gap: 8px; }
+        .field-btn {
+            padding: 1rem 1rem; border-radius: 10px; font-family: inherit;
+            cursor: pointer; border: 2px solid var(--border); background: var(--bg);
+            color: var(--text-sub); transition: all 0.2s;
+            display: flex; flex-direction: column; align-items: center; gap: 3px;
         }
+        .field-btn .field-main { font-size: 1rem; font-weight: 700; line-height: 1.2; }
+        .field-btn .field-tag  { font-size: 0.6rem; font-weight: 500; opacity: 0.55; font-family: 'JetBrains Mono', monospace; }
+        .field-btn:hover { border-color: #9ca3af; }
+        .field-btn.active.s1 { border-color: var(--primary); background: var(--primary-bg); color: var(--primary); box-shadow: 0 0 0 3px rgba(2,132,199,0.1); }
+        .field-btn.active.s1 .field-tag { opacity: 0.7; }
+        .field-btn.active.s2 { border-color: var(--amber); background: var(--amber-bg); color: var(--amber-dark); box-shadow: 0 0 0 3px rgba(201,146,91,0.12); }
+        .field-btn.active.s2 .field-main { color: var(--amber); }
+        .field-btn.active.s2 .field-tag  { opacity: 0.7; color: var(--amber); }
 
+        /* ── Status Selector ── */
+        .status-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
         .status-btn {
-            padding: 0.6rem 0.3rem;
-            border-radius: 10px;
-            font-family: inherit;
-            font-size: 0.7rem;
-            font-weight: 600;
-            cursor: pointer;
-            border: 2px solid var(--border);
-            background: var(--bg-input);
-            color: var(--text-dim);
-            transition: all 0.2s;
-            text-align: center;
+            padding: 0.65rem 0.3rem; border-radius: 9px; font-family: inherit;
+            font-size: 0.72rem; font-weight: 600; cursor: pointer;
+            border: 2px solid var(--border); background: var(--bg);
+            color: var(--text-sub); transition: all 0.15s; text-align: center;
         }
+        .status-btn:hover { border-color: #9ca3af; background: white; }
+        .status-btn.active { transform: scale(1.03); }
+        .status-btn .icon  { font-size: 1.15rem; display: block; margin-bottom: 3px; }
+        .status-btn.Shipped.active   { border-color: var(--primary);  background: var(--primary-bg);  color: var(--primary); }
+        .status-btn.Delivered.active { border-color: var(--success);  background: var(--success-bg);  color: var(--success); }
+        .status-btn.Returned.active  { border-color: var(--orange);   background: var(--orange-bg);   color: var(--orange); }
+        .status-btn.Cancelled.active { border-color: var(--error);    background: var(--error-bg);    color: var(--error); }
+        .status-btn.Ready.active     { border-color: var(--purple);   background: var(--purple-bg);   color: var(--purple); }
 
-        .status-btn:hover { border-color: var(--text-dim); }
-        .status-btn.active { transform: scale(1.02); }
-        .status-btn .icon { font-size: 1.1rem; display: block; margin-bottom: 0.2rem; }
-
-        .status-btn.Shipped.active { border-color: var(--scanner); background: rgba(0, 212, 255, 0.15); color: var(--scanner); }
-        .status-btn.Delivered.active { border-color: var(--success); background: var(--success-glow); color: var(--success); }
-        .status-btn.Returned.active { border-color: var(--orange); background: var(--orange-glow); color: var(--orange); }
-        .status-btn.Cancelled.active { border-color: var(--error); background: var(--error-glow); color: var(--error); }
-        .status-btn.Ready.active { border-color: var(--purple); background: var(--purple-glow); color: var(--purple); }
-
-        .courier-selector {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 0.5rem;
-        }
-
+        /* ── Courier Selector ── */
+        .courier-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
         .courier-btn {
-            padding: 0.7rem 0.5rem;
-            border-radius: 8px;
-            font-family: inherit;
-            font-size: 0.85rem;
+            padding: 0.55rem 0.4rem; border-radius: 7px; font-family: inherit;
+            font-size: 0.78rem; font-weight: 500; cursor: pointer;
+            border: 1.5px solid var(--border); background: var(--bg);
+            color: var(--text-sub); transition: all 0.15s; text-align: center;
+        }
+        .courier-btn:hover  { border-color: var(--pink); color: var(--pink); background: var(--pink-bg); }
+        .courier-btn.active { border-color: var(--pink); background: var(--pink-bg); color: var(--pink); font-weight: 600; }
+        .courier-loading { padding: 0.75rem; color: var(--text-muted); font-size: 0.8rem; }
+
+        /* ── Scanner Input ── */
+        .scanner-row { position: relative; }
+        .scanner-icon { position: absolute; right: 0.85rem; top: 50%; transform: translateY(-50%); font-size: 1rem; pointer-events: none; }
+        .scanner-input {
+            width: 100%; padding: 10px 14px 10px 2.8rem;
+            border: 2px solid var(--border); border-radius: 8px;
+            font-size: 14px; color: var(--text); background: white;
+            transition: border-color 0.15s; font-family: 'JetBrains Mono', monospace;
+            direction: ltr;
+        }
+        .scanner-input:focus { outline: none; border-color: var(--primary); }
+        .scanner-input::placeholder { color: var(--text-muted); font-size: 13px; font-family: 'IBM Plex Sans Arabic', sans-serif; }
+
+        /* ── Manual Input Row ── */
+        .manual-row { display: flex; gap: 8px; align-items: center; position: relative; }
+        .manual-icon { position: absolute; right: 0.85rem; top: 50%; transform: translateY(-50%); font-family: 'JetBrains Mono', monospace; font-size: 1rem; color: var(--text-muted); pointer-events: none; font-weight: 700; }
+        .manual-input {
+            flex: 1; padding: 10px 14px 10px 2.2rem;
+            border: 1.5px solid var(--border); border-radius: 8px;
+            font-size: 14px; color: var(--text); background: white;
+            font-family: 'JetBrains Mono', monospace; direction: ltr; outline: none;
+            transition: border-color 0.15s;
+        }
+        .manual-input:focus { border-color: var(--orange); }
+        .manual-input::placeholder { color: var(--text-muted); font-size: 12px; font-family: 'IBM Plex Sans Arabic', sans-serif; }
+        .manual-btn {
+            background: var(--primary); color: white; border: none;
+            padding: 10px 16px; border-radius: 8px; font-family: inherit;
+            font-size: 13px; font-weight: 600; cursor: pointer; white-space: nowrap;
+            transition: background 0.15s;
+        }
+        .manual-btn:hover:not(:disabled) { background: var(--primary-h); }
+        .manual-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        .input-hint { font-size: 11px; color: var(--text-muted); margin-top: 5px; }
+        .input-divider { border: none; border-top: 1px solid var(--border-light); margin: 10px 0; }
+
+        /* Scan feedback */
+        .scan-feedback {
+            display: none; font-size: 12px; padding: 6px 10px;
+            border-radius: 7px; margin-top: 8px; text-align: center;
             font-weight: 500;
-            cursor: pointer;
-            border: 2px solid var(--border);
-            background: var(--bg-input);
-            color: var(--text-dim);
-            transition: all 0.2s;
-            text-align: center;
         }
 
-        .courier-btn:hover { border-color: var(--text-dim); }
-        .courier-btn.active { border-color: var(--pink); background: var(--pink-glow); color: var(--pink); }
-
-        #reader { width: 100%; border-radius: 10px; overflow: hidden; }
-
-        .scan-status {
-            text-align: center;
-            padding: 0.6rem;
-            border-radius: 8px;
-            font-size: 0.85rem;
-            margin-top: 0.75rem;
-            background: var(--bg-input);
-            color: var(--text-dim);
+        /* ── Scanned Table ── */
+        .scanned-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        .scanned-table thead th {
+            text-align: right; padding: 8px 12px;
+            background: var(--bg); border-bottom: 1.5px solid var(--border);
+            font-size: 11px; font-weight: 700; color: var(--text-sub);
+            text-transform: uppercase; letter-spacing: 0.04em; white-space: nowrap;
         }
-
-        .scan-status.success { background: var(--success-glow); color: var(--success); animation: pulse 0.5s; }
-
-        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.02); } }
-
-        .scanner-btn {
-            width: 100%;
-            padding: 0.85rem;
-            border-radius: 10px;
-            font-family: inherit;
-            font-size: 0.95rem;
-            font-weight: 600;
-            cursor: pointer;
-            border: 2px solid var(--scanner);
-            background: rgba(0, 212, 255, 0.1);
-            color: var(--scanner);
-            margin-top: 0.75rem;
-            transition: all 0.2s;
+        .scanned-table thead th.col-del { width: 32px; }
+        .scanned-table thead th.col-num { width: 28px; text-align: center; }
+        .scanned-table thead th.col-id  { direction: ltr; text-align: left; }
+        .scanned-table thead th.col-s1, .scanned-table thead th.col-s2 { min-width: 110px; }
+        .scanned-table tbody tr { border-bottom: 1px solid var(--border-light); transition: background 0.1s; }
+        .scanned-table tbody tr:last-child { border-bottom: none; }
+        .scanned-table tbody tr:hover { background: #fafbfd; }
+        .scanned-table tbody tr.row-new { animation: rowHighlight 1s ease; }
+        @keyframes rowHighlight { 0% { background: #dcfce7; } 100% { background: transparent; } }
+        .scanned-table tbody td { padding: 9px 12px; vertical-align: middle; }
+        .scanned-table tbody td.col-num { text-align: center; color: var(--text-muted); font-size: 11px; }
+        .scanned-table tbody td.col-order { font-weight: 700; color: var(--primary); font-size: 13px; white-space: nowrap; }
+        .scanned-table tbody td.col-id { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text-muted); direction: ltr; text-align: left; }
+        .scanned-table tbody td.col-del { text-align: center; }
+        /* ── Status Pills in table ── */
+        .status-pill {
+            display: inline-block; padding: 2px 8px; border-radius: 5px;
+            font-size: 11px; font-weight: 600; white-space: nowrap;
         }
+        /* Named status colors */
+        .status-pill.s-Shipped    { background: #f0f9ff; color: #0284c7; border: 1px solid #bae6fd; }
+        .status-pill.s-Delivered  { background: #f0fdf4; color: #16a34a; border: 1px solid #bbf7d0; }
+        .status-pill.s-Returned   { background: #fffbeb; color: #d97706; border: 1px solid #fde68a; }
+        .status-pill.s-Cancelled  { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
+        .status-pill.s-Ready      { background: #f5f3ff; color: #7c3aed; border: 1px solid #ddd6fe; }
+        /* Neutral for all others (Confirmed, etc.) */
+        .status-pill.s-neutral    { background: #f3f4f6; color: #6b7280; border: 1px solid #e5e7eb; }
+        .status-empty { color: var(--text-muted); font-size: 11px; }
+        .empty-state { text-align: center; padding: 28px; color: var(--text-muted); font-size: 13px; }
+        .empty-state .empty-icon { font-size: 28px; margin-bottom: 8px; }
 
-        .scanner-btn.stop { background: var(--error); border-color: var(--error); color: white; }
+        /* ── Summary + Action sidebar ── */
+        .summary-banner {
+            padding: 14px 16px; text-align: center; font-size: 14px; font-weight: 700;
+            background: var(--bg); color: var(--text-muted); letter-spacing: 0.02em;
+            border-bottom: 1px solid var(--border-light); transition: all 0.3s;
+        }
+        .summary-banner.s1 { background: var(--primary-bg); color: var(--primary); }
+        .summary-banner.s2 { background: var(--amber-bg); color: var(--amber-dark); }
 
-        .counter-bar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem; }
-        .counter-text { font-size: 0.85rem; color: var(--text-dim); }
-        .counter-text strong { color: var(--accent); font-size: 1rem; }
+        .summary-rows { padding: 10px 16px; }
+        .summary-row { display: flex; justify-content: space-between; align-items: center; padding: 7px 0; border-bottom: 1px solid var(--border-light); font-size: 13px; }
+        .summary-row:last-child { border-bottom: none; }
+        .summary-label { color: var(--text-sub); }
+        .summary-val { font-weight: 600; font-family: 'JetBrains Mono', monospace; font-size: 12px; }
+        .summary-val.courier { color: var(--pink); font-family: 'IBM Plex Sans Arabic', sans-serif; }
+        .summary-val.count   { color: var(--accent); font-size: 1.1rem; }
 
-        .clear-btn { background: none; border: 1px solid var(--border); color: var(--text-dim); padding: 0.4rem 0.8rem; border-radius: 6px; font-family: inherit; font-size: 0.8rem; cursor: pointer; }
-        .clear-btn:hover { border-color: var(--error); color: var(--error); }
+        .sidebar-actions { padding: 12px 16px; display: flex; flex-direction: column; gap: 8px; border-top: 1px solid var(--border-light); }
 
-        .scanned-list { max-height: 150px; overflow-y: auto; border: 1px solid var(--border); border-radius: 8px; }
+        .btn-update {
+            width: 100%; padding: 12px; border-radius: 9px; font-family: inherit;
+            font-size: 14px; font-weight: 700; cursor: pointer; border: none;
+            background: var(--accent); color: white; transition: all 0.15s;
+            box-shadow: var(--shadow-md);
+        }
+        .btn-update:hover { filter: brightness(1.06); }
+        .btn-update:disabled { opacity: 0.5; cursor: not-allowed; }
+        .btn-update.Shipped   { background: var(--primary); }
+        .btn-update.Delivered { background: var(--success); }
+        .btn-update.Returned  { background: var(--orange); }
+        .btn-update.Cancelled { background: var(--error); }
+        .btn-update.Ready     { background: var(--purple); }
 
-        .scanned-item { display: flex; align-items: center; justify-content: space-between; padding: 0.65rem 0.85rem; border-bottom: 1px solid var(--border); font-family: 'JetBrains Mono', monospace; font-size: 0.9rem; }
-        .scanned-item:last-child { border-bottom: none; }
-        .scanned-item.new { animation: highlight 1s ease; }
+        .progress-wrap { height: 4px; background: var(--border-light); border-radius: 4px; overflow: hidden; display: none; }
+        .progress-wrap.active { display: block; }
+        .progress-bar  { height: 100%; background: var(--primary); border-radius: 4px; transition: width 0.3s; width: 0%; }
 
-        @keyframes highlight { 0% { background: var(--success-glow); } 100% { background: transparent; } }
-
-        .remove-btn { background: none; border: none; color: var(--text-dim); cursor: pointer; padding: 0.3rem; font-size: 1rem; }
-        .remove-btn:hover { color: var(--error); }
-
-        .empty-list { padding: 1.5rem; text-align: center; color: var(--text-dim); font-size: 0.85rem; }
-
-        .settings-toggle { width: 100%; background: none; border: 1px solid var(--border); color: var(--text-dim); padding: 0.6rem; border-radius: 8px; font-family: inherit; font-size: 0.85rem; cursor: pointer; margin-bottom: 0.75rem; }
-
-        .settings-content { display: none; margin-bottom: 1rem; }
-        .settings-content.active { display: block; }
-
-        .input-group { margin-bottom: 0.75rem; }
-        .input-group label { display: block; font-size: 0.8rem; color: var(--text-dim); margin-bottom: 0.3rem; }
-        .input-group input { width: 100%; background: var(--bg-input); border: 1px solid var(--border); border-radius: 8px; padding: 0.7rem; color: var(--text); font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; }
-        .input-group input:focus { outline: none; border-color: var(--accent); }
-
-        .btn-primary { width: 100%; padding: 1rem; border-radius: 10px; font-family: inherit; font-size: 0.95rem; font-weight: 600; cursor: pointer; border: none; background: var(--accent); color: white; margin-bottom: 0.75rem; transition: all 0.2s; }
-        .btn-primary:hover { filter: brightness(1.1); }
-        .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
-        .btn-primary.Shipped { background: var(--scanner); }
-        .btn-primary.Delivered { background: var(--success); }
-        .btn-primary.Returned { background: var(--orange); }
-        .btn-primary.Cancelled { background: var(--error); }
-        .btn-primary.Ready { background: var(--purple); }
-
+        /* ── Results ── */
         .results { display: none; }
         .results.active { display: block; }
-        .results-header { display: flex; justify-content: space-between; margin-bottom: 0.5rem; font-size: 0.9rem; }
-        .stat-success { color: var(--success); }
-        .stat-error { color: var(--error); }
-
-        .results-list { max-height: 200px; overflow-y: auto; border: 1px solid var(--border); border-radius: 8px; }
-        .result-item { display: flex; justify-content: space-between; padding: 0.6rem 0.85rem; border-bottom: 1px solid var(--border); font-size: 0.85rem; }
+        .results-header { display: flex; justify-content: space-between; font-size: 12px; font-weight: 600; margin-bottom: 6px; }
+        .stat-ok  { color: var(--success); }
+        .stat-err { color: var(--error); }
+        .results-list { max-height: 160px; overflow-y: auto; border: 1px solid var(--border); border-radius: 8px; background: var(--bg); }
+        .result-item { display: flex; justify-content: space-between; align-items: center; padding: 6px 12px; border-bottom: 1px solid var(--border-light); font-size: 12px; }
         .result-item:last-child { border-bottom: none; }
-        .result-status { padding: 0.2rem 0.6rem; border-radius: 10px; font-size: 0.75rem; }
-        .result-pending { background: rgba(59,130,246,0.15); color: #3b82f6; }
-        .result-success { background: var(--success-glow); color: var(--success); }
-        .result-error { background: var(--error-glow); color: var(--error); }
+        .result-badge { padding: 2px 8px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+        .result-pending { background: #eff6ff; color: #2563eb; }
+        .result-success { background: var(--success-bg); color: var(--success); }
+        .result-error   { background: var(--error-bg);   color: var(--error); }
 
-        .progress-bar { height: 4px; background: var(--border); border-radius: 2px; margin-bottom: 0.75rem; display: none; }
-        .progress-bar.active { display: block; }
-        .progress-fill { height: 100%; background: var(--accent); border-radius: 2px; transition: width 0.3s; width: 0%; }
+        /* ── Btn small ── */
+        .btn-sm {
+            display: inline-flex; align-items: center; gap: 5px;
+            padding: 6px 12px; border-radius: 7px; font-size: 12px; font-weight: 600;
+            border: 1px solid var(--border); background: var(--surface); color: var(--text-sub);
+            cursor: pointer; font-family: inherit; transition: all 0.15s; white-space: nowrap;
+        }
+        .btn-sm:hover { background: var(--bg); border-color: #9ca3af; color: var(--text); }
+        .btn-sm.danger { color: var(--error); border-color: var(--error-b); }
+        .btn-sm.danger:hover { background: var(--error-bg); }
 
-        .manual-input { display: flex; gap: 0.5rem; margin-top: 0.75rem; }
-        .manual-input input { flex: 1; background: var(--bg-input); border: 1px solid var(--border); border-radius: 8px; padding: 0.7rem; color: var(--text); font-family: 'JetBrains Mono', monospace; font-size: 0.9rem; }
-        .manual-input button { background: var(--success); border: none; border-radius: 8px; padding: 0 1rem; color: white; font-size: 1.2rem; cursor: pointer; }
+        /* ── Log Section (tab) ── */
+        .log-entry { border: 1px solid var(--border); border-radius: 8px; overflow: hidden; margin-bottom: 8px; }
+        .log-entry-header { background: var(--bg); padding: 9px 14px; display: flex; align-items: center; justify-content: space-between; font-size: 12px; color: var(--text-sub); gap: 10px; flex-wrap: wrap; cursor: pointer; }
+        .log-entry-header strong { color: var(--text); font-size: 13px; }
+        .log-entry-details { display: none; border-top: 1px solid var(--border-light); max-height: 200px; overflow-y: auto; background: white; }
+        .log-entry.open .log-entry-details { display: block; }
+        .log-toggle { transition: transform 0.2s; font-size: 10px; }
+        .log-entry.open .log-toggle { transform: rotate(90deg); }
+        .log-detail-item { display: flex; justify-content: space-between; align-items: center; padding: 6px 14px; border-bottom: 1px solid var(--border-light); font-size: 12px; }
+        .log-detail-item:last-child { border-bottom: none; }
+        .log-detail-order { font-family: 'JetBrains Mono', monospace; font-weight: 600; }
+        .log-detail-status { padding: 2px 8px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+        .log-detail-success { background: var(--success-bg); color: var(--success); }
+        .log-detail-error   { background: var(--error-bg);   color: var(--error); }
+        .log-tag { padding: 2px 8px; border-radius: 5px; font-size: 11px; font-weight: 600; }
+        .log-tag.s1 { background: var(--primary-bg); color: var(--primary); border: 1px solid var(--primary-b); }
+        .log-tag.s2 { background: var(--amber-bg); color: var(--amber-dark); border: 1px solid var(--amber-b); }
+        .log-tag.status-Shipped   { background: var(--primary-bg); color: var(--primary); border: 1px solid var(--primary-b); }
+        .log-tag.status-Delivered { background: var(--success-bg); color: var(--success); border: 1px solid var(--success-b); }
+        .log-tag.status-Returned  { background: var(--orange-bg);  color: var(--orange);  border: 1px solid var(--orange-b); }
+        .log-tag.status-Cancelled { background: var(--error-bg);   color: var(--error);   border: 1px solid var(--error-b); }
+        .log-tag.status-Ready     { background: var(--purple-bg);  color: var(--purple);  border: 1px solid var(--purple-b); }
+        .log-tag.courier          { background: var(--pink-bg);    color: var(--pink);    border: 1px solid var(--pink-b); }
+        .log-tag.count            { background: #fef2f2; color: var(--accent); border: 1px solid #fecaca; }
+        .log-sync-status { font-size: 11px; padding: 2px 7px; border-radius: 5px; font-weight: 600; }
+        .log-sync-status.synced  { color: var(--success); background: var(--success-bg); border: 1px solid var(--success-b); }
+        .log-sync-status.local   { color: var(--orange);  background: var(--orange-bg);  border: 1px solid var(--orange-b); }
+        .log-sync-status.loading { color: var(--primary); background: var(--primary-bg); border: 1px solid var(--primary-b); }
+        .log-empty { text-align: center; padding: 32px; color: var(--text-muted); font-size: 13px; }
+        .log-check { width: 14px; height: 14px; accent-color: var(--accent); cursor: pointer; flex-shrink: 0; margin-left: 6px; }
+        .export-selected-btn { display: none; }
+        .export-selected-btn.visible { display: inline-flex; }
+
+        /* ── Modal ── */
+        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.3); z-index: 200; align-items: center; justify-content: center; padding: 1rem; }
+        .modal-overlay.active { display: flex; }
+        .modal { background: var(--surface); border-radius: 14px; padding: 22px; width: 100%; max-width: 420px; box-shadow: 0 20px 60px rgba(0,0,0,0.15); animation: modalIn 0.2s ease; }
+        @keyframes modalIn { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; }
+        .modal-title  { font-size: 15px; font-weight: 700; }
+        .modal-close  { background: none; border: none; font-size: 1.2rem; cursor: pointer; color: var(--text-muted); }
+        .modal-close:hover { color: var(--error); }
+        .form-group { margin-bottom: 14px; }
+        .form-group label { display: block; font-size: 11px; font-weight: 700; color: var(--text-sub); margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.05em; }
+        .form-group input { width: 100%; background: var(--bg); border: 1.5px solid var(--border); border-radius: 8px; padding: 10px 14px; color: var(--text); font-family: 'JetBrains Mono', monospace; font-size: 13px; outline: none; transition: border-color 0.15s; direction: ltr; }
+        .form-group input:focus { border-color: var(--primary); }
+        .modal-footer { display: flex; gap: 8px; margin-top: 18px; }
+        .modal-cancel { flex: 1; padding: 10px; border-radius: 8px; font-family: inherit; font-size: 13px; font-weight: 600; cursor: pointer; border: 1.5px solid var(--border); background: var(--bg); color: var(--text-sub); }
+        .modal-save   { flex: 1; padding: 10px; border-radius: 8px; font-family: inherit; font-size: 13px; font-weight: 600; cursor: pointer; border: none; background: var(--primary); color: white; }
+        .modal-save:hover { background: var(--primary-h); }
+
+        /* ── Toast ── */
+        .toast-container { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 300; display: flex; flex-direction: column; gap: 6px; align-items: center; }
+        .toast { background: #1a1d27; color: white; padding: 9px 18px; border-radius: 8px; font-size: 12px; box-shadow: var(--shadow-md); animation: slideUp 0.2s ease; white-space: nowrap; font-weight: 500; }
+        .toast.success { background: var(--success); }
+        .toast.error   { background: var(--error); }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
 
         .spinner { width: 14px; height: 14px; border: 2px solid transparent; border-top-color: currentColor; border-radius: 50%; animation: spin 0.8s linear infinite; display: inline-block; }
         @keyframes spin { to { transform: rotate(360deg); } }
-
-        .toast { position: fixed; top: 1rem; left: 50%; transform: translateX(-50%); background: var(--success); color: white; padding: 0.6rem 1.2rem; border-radius: 20px; font-size: 0.85rem; font-weight: 600; opacity: 0; transition: opacity 0.3s; z-index: 100; }
-        .toast.show { opacity: 1; }
-
-        .summary-box { background: var(--bg-input); border: 1px solid var(--border); border-radius: 10px; padding: 0.75rem; margin-bottom: 0.75rem; }
-        .summary-row { display: flex; justify-content: space-between; padding: 0.3rem 0; font-size: 0.85rem; }
-        .summary-label { color: var(--text-dim); }
-        .summary-value { font-weight: 600; }
-        .summary-value.status { color: var(--scanner); }
-        .summary-value.courier { color: var(--pink); }
-        .summary-value.count { color: var(--accent); }
-
-        /* Log Section */
-        .log-section { margin-top: 1rem; }
-        .log-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; }
-        .log-header h2 { font-size: 0.95rem; font-weight: 600; display: flex; align-items: center; gap: 0.5rem; }
-        .log-actions { display: flex; gap: 0.5rem; }
-        .log-btn { background: none; border: 1px solid var(--border); color: var(--text-dim); padding: 0.35rem 0.7rem; border-radius: 6px; font-family: inherit; font-size: 0.75rem; cursor: pointer; transition: all 0.2s; }
-        .log-btn:hover { border-color: var(--text-dim); color: var(--text); }
-        .log-btn.export:hover { border-color: var(--success); color: var(--success); }
-        .log-empty { text-align: center; padding: 1.5rem; color: var(--text-dim); font-size: 0.85rem; border: 1px solid var(--border); border-radius: 8px; }
-        .log-entry { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; margin-bottom: 0.5rem; overflow: hidden; transition: border-color 0.2s; }
-        .log-entry:hover { border-color: var(--text-dim); }
-        .log-entry-header { display: flex; justify-content: space-between; align-items: center; padding: 0.7rem 0.85rem; cursor: pointer; gap: 0.5rem; }
-        .log-entry-info { flex: 1; min-width: 0; }
-        .log-entry-date { font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: var(--text-dim); margin-bottom: 0.25rem; }
-        .log-entry-summary { font-size: 0.8rem; display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; }
-        .log-tag { padding: 0.15rem 0.5rem; border-radius: 6px; font-size: 0.7rem; font-weight: 600; }
-        .log-tag.status-Shipped { background: rgba(0,212,255,0.15); color: var(--scanner); }
-        .log-tag.status-Delivered { background: var(--success-glow); color: var(--success); }
-        .log-tag.status-Returned { background: var(--orange-glow); color: var(--orange); }
-        .log-tag.status-Cancelled { background: var(--error-glow); color: var(--error); }
-        .log-tag.status-Ready { background: var(--purple-glow); color: var(--purple); }
-        .log-tag.courier { background: var(--pink-glow); color: var(--pink); }
-        .log-tag.count { background: var(--accent-glow); color: var(--accent); }
-        .log-entry-stats { display: flex; gap: 0.4rem; font-size: 0.75rem; flex-shrink: 0; }
-        .log-toggle { color: var(--text-dim); font-size: 0.8rem; flex-shrink: 0; transition: transform 0.2s; }
-        .log-entry.open .log-toggle { transform: rotate(90deg); }
-        .log-entry-details { display: none; border-top: 1px solid var(--border); max-height: 200px; overflow-y: auto; }
-        .log-entry.open .log-entry-details { display: block; }
-        .log-detail-item { display: flex; justify-content: space-between; align-items: center; padding: 0.45rem 0.85rem; border-bottom: 1px solid var(--border); font-size: 0.8rem; }
-        .log-detail-item:last-child { border-bottom: none; }
-        .log-detail-order { font-family: 'JetBrains Mono', monospace; font-weight: 600; }
-        .log-detail-status { padding: 0.15rem 0.5rem; border-radius: 8px; font-size: 0.7rem; }
-        .log-detail-success { background: var(--success-glow); color: var(--success); }
-        .log-detail-error { background: var(--error-glow); color: var(--error); }
-        .log-list { max-height: 400px; overflow-y: auto; }
-        .log-sync-status { font-size: 0.7rem; padding: 0.2rem 0.5rem; border-radius: 6px; font-weight: 600; }
-        .log-sync-status.synced { color: var(--success); background: var(--success-glow); }
-        .log-sync-status.local { color: var(--orange); background: var(--orange-glow); }
-        .log-sync-status.loading { color: var(--scanner); background: rgba(0,212,255,0.15); }
-
-        .log-check { width: 16px; height: 16px; accent-color: var(--accent); cursor: pointer; flex-shrink: 0; margin-left: 0.4rem; }
-        .log-btn.export-selected { display: none; }
-        .log-btn.export-selected.visible { display: inline-block; }
     </style>
 </head>
 <body>
-    <div class="toast" id="toast">✓ تم المسح</div>
+    <div class="page-border"></div>
+    <div class="toast-container" id="toastContainer"></div>
 
-    <div class="container">
-        <header class="header">
-            <h1>📦 Order Status Updater</h1>
-            <p>تحديث حالة الأوردرات</p>
-        </header>
-
-        <!-- Status Selector -->
-        <div class="card">
-            <h2 class="card-title">📌 اختر الحالة</h2>
-            <div class="status-selector">
-                <button class="status-btn Shipped" onclick="selectStatus('Shipped', 'Shipped', '🚚')">
-                    <span class="icon">🚚</span>Shipped
-                </button>
-                <button class="status-btn Delivered" onclick="selectStatus('Delivered', 'Delivered', '✅')">
-                    <span class="icon">✅</span>Delivered
-                </button>
-                <button class="status-btn Returned" onclick="selectStatus('Returned', 'Returned', '↩️')">
-                    <span class="icon">↩️</span>Returned
-                </button>
-                <button class="status-btn Cancelled" onclick="selectStatus('Cancelled', 'Cancelled', '❌')">
-                    <span class="icon">❌</span>Cancelled
-                </button>
-                <button class="status-btn Ready" onclick="selectStatus('Ready', 'Ready', '📦')">
-                    <span class="icon">📦</span>Ready
-                </button>
+    <!-- Settings Modal -->
+    <div class="modal-overlay" id="settingsModal">
+        <div class="modal">
+            <div class="modal-header">
+                <span class="modal-title">⚙️ الإعدادات</span>
+                <button class="modal-close" onclick="closeSettings()">✕</button>
             </div>
-        </div>
-
-        <!-- Courier Selector -->
-        <div class="card" id="courierCard">
-            <h2 class="card-title">🛵 اختر المندوب</h2>
-            <div class="courier-selector">
-                <button class="courier-btn" data-courier="Bosta" onclick="selectCourier(this)">Bosta</button>
-                <button class="courier-btn" data-courier="3laa" onclick="selectCourier(this)">3laa</button>
-                <button class="courier-btn" data-courier="3bdo 3rafa" onclick="selectCourier(this)">3bdo 3rafa</button>
-                <button class="courier-btn" data-courier="Kareem" onclick="selectCourier(this)">Kareem</button>
-                <button class="courier-btn" data-courier="Mohamed Tarek" onclick="selectCourier(this)">Mohamed Tarek</button>
-                <button class="courier-btn" data-courier="Magdy" onclick="selectCourier(this)">Magdy</button>
-                <button class="courier-btn" data-courier="Marwan" onclick="selectCourier(this)">Marwan</button>
-                <button class="courier-btn" data-courier="Abo Selim" onclick="selectCourier(this)">Abo Selim</button>
-                <button class="courier-btn" data-courier="Waleed" onclick="selectCourier(this)">Waleed</button>
-                <button class="courier-btn" data-courier="3bd Alrahman" onclick="selectCourier(this)">3bd Alrahman</button>
-                <button class="courier-btn" data-courier="Sobhy" onclick="selectCourier(this)">Sobhy</button>
-                <button class="courier-btn" data-courier="Abo Yassin" onclick="selectCourier(this)">Abo Yassin</button>
-                <button class="courier-btn" data-courier="3bdo S3eed" onclick="selectCourier(this)">3bdo S3eed</button>
-                <button class="courier-btn" data-courier="Aly Yousry" onclick="selectCourier(this)">Aly Yousry</button>
+            <div class="form-group">
+                <label>Flow Companion API Token</label>
+                <input type="password" id="apiToken" placeholder="أدخل الـ Token">
             </div>
-        </div>
-
-        <!-- Scanner -->
-        <div class="card">
-            <h2 class="card-title">📷 ماسح الباركود</h2>
-            <div id="reader"></div>
-            <div class="scan-status" id="scanStatus">اضغط لبدء المسح</div>
-            <button class="scanner-btn" id="scannerBtn" onclick="toggleScanner()">📷 بدء المسح</button>
-            <div class="manual-input">
-                <input type="text" id="manualInput" placeholder="امسح الباركود هنا..." autofocus>
-                <button onclick="addManualEntry()">+</button>
+            <div class="form-group">
+                <label>Log Worker URL</label>
+                <input type="text" id="logWorkerUrl" placeholder="https://...workers.dev">
             </div>
-            <p style="font-size: 0.75rem; color: var(--text-dim); margin-top: 0.5rem; text-align: center;">
-                💡 Scanner Gun: امسح وسيتم الإضافة تلقائياً
-            </p>
-        </div>
-
-        <!-- Scanned List -->
-        <div class="card">
-            <h2 class="card-title">📋 الأوردرات</h2>
-            <div class="counter-bar">
-                <span class="counter-text">العدد: <strong id="count">0</strong></span>
-                <button class="clear-btn" onclick="clearList()">مسح الكل</button>
+            <div class="form-group" style="margin-bottom:0">
+                <label>Log Worker Secret</label>
+                <input type="password" id="logWorkerSecret" placeholder="WORKER_SECRET">
             </div>
-            <div class="scanned-list" id="scannedList">
-                <div class="empty-list">لم يتم مسح أي باركود بعد</div>
-            </div>
-        </div>
-
-        <!-- Summary -->
-        <div class="summary-box">
-            <div class="summary-row">
-                <span class="summary-label">الحالة:</span>
-                <span class="summary-value status" id="summaryStatus">—</span>
-            </div>
-            <div class="summary-row" id="courierRow">
-                <span class="summary-label">المندوب:</span>
-                <span class="summary-value courier" id="summaryCourier">—</span>
-            </div>
-            <div class="summary-row">
-                <span class="summary-label">عدد الأوردرات:</span>
-                <span class="summary-value count" id="summaryCount">0</span>
-            </div>
-        </div>
-
-        <!-- Settings -->
-        <button class="settings-toggle" onclick="toggleSettings()">⚙️ الإعدادات</button>
-        <div class="settings-content" id="settings">
-            <div class="card">
-                <div class="input-group">
-                    <label>Flow Companion API Token</label>
-                    <input type="password" id="apiToken" placeholder="أدخل الـ Token">
-                </div>
-                <div class="input-group">
-                    <label>Log Worker URL</label>
-                    <input type="text" id="logWorkerUrl" placeholder="https://log-worker.xxxxx.workers.dev">
-                </div>
-                <div class="input-group">
-                    <label>Log Worker Secret</label>
-                    <input type="password" id="logWorkerSecret" placeholder="WORKER_SECRET">
-                </div>
-            </div>
-        </div>
-
-        <!-- Action -->
-        <button class="btn-primary" id="updateBtn" onclick="startUpdate()">🚀 تحديث الكل</button>
-
-        <div class="progress-bar" id="progressBar">
-            <div class="progress-fill" id="progressFill"></div>
-        </div>
-
-        <!-- Results -->
-        <div class="results" id="results">
-            <div class="results-header">
-                <span>النتائج</span>
-                <span>
-                    <span class="stat-success">✓ <span id="successCount">0</span></span>
-                    &nbsp;
-                    <span class="stat-error">✗ <span id="errorCount">0</span></span>
-                </span>
-            </div>
-            <div class="results-list" id="resultsList"></div>
-        </div>
-
-        <!-- Log Section -->
-        <div class="log-section">
-            <div class="log-header">
-                <h2>📜 سجل العمليات <span class="log-sync-status local" id="logSyncStatus">محلي</span></h2>
-                <div class="log-actions">
-                    <button class="log-btn" onclick="syncFromCloud()" title="جلب من السيرفر">🔄</button>
-                    <button class="log-btn export-selected" id="exportSelectedBtn" onclick="exportLogCSV(true)">📥 تصدير المحدد</button>
-                    <button class="log-btn export" onclick="exportLogCSV(false)">📥 تصدير الكل</button>
-                </div>
-            </div>
-            <div class="log-list" id="logList">
-                <div class="log-empty">لا توجد عمليات مسجلة</div>
+            <div class="modal-footer">
+                <button class="modal-cancel" onclick="closeSettings()">إلغاء</button>
+                <button class="modal-save"   onclick="saveSettings()">حفظ</button>
             </div>
         </div>
     </div>
 
-    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+    <div class="wrapper">
+
+        <!-- Header -->
+        <div class="header">
+            <div class="header-left">
+                <div class="header-icon">📦</div>
+                <div class="header-title">
+                    <h1>Order Status Updater</h1>
+                    <p>تحديث حالة الأوردرات</p>
+                </div>
+            </div>
+            <button class="btn-sm" onclick="openSettings()">⚙️ الإعدادات</button>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs-card">
+            <div class="tabs">
+                <button class="tab-btn active" onclick="switchTab('scanner', this)">📦 تحديث الأوردرات</button>
+                <button class="tab-btn" onclick="switchTab('log', this)">📜 سجل التحديثات السابقة</button>
+            </div>
+        </div>
+
+        <!-- ══ TAB: Scanner ══ -->
+        <div id="tab-scanner" class="tab-content active">
+            <div class="scanner-tab-content">
+
+                <!-- Row 1: Field + Status + Summary (RTL: Field appears right, Summary left) -->
+                <div style="display:grid;grid-template-columns:220px 1fr 280px;gap:14px;align-items:start;">
+
+                    <!-- Field Selector (rightmost in RTL) -->
+                    <div class="card">
+                        <div class="card-header"><h2>🔀 نوع التحديث</h2></div>
+                        <div class="card-body">
+                            <div class="field-selector">
+                                <button class="field-btn s1" id="fieldBtnS1" onclick="selectField('S1')">
+                                    <span class="field-main">توصيل عادي</span>
+                                    <span class="field-tag">S1</span>
+                                </button>
+                                <button class="field-btn s2" id="fieldBtnS2" onclick="selectField('S2')">
+                                    <span class="field-main">استبدال / استرجاع</span>
+                                    <span class="field-tag">S2</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Status Selector (middle) -->
+                    <div class="card">
+                        <div class="card-header"><h2>📌 الحالة</h2></div>
+                        <div class="card-body">
+                            <div class="status-grid" id="statusSelector"></div>
+                        </div>
+                    </div>
+
+                    <!-- Summary + Action (leftmost in RTL) -->
+                    <div class="card" style="overflow:hidden;">
+                        <div class="summary-banner" id="summaryFieldBanner">— اختر نوع التحديث —</div>
+                        <div class="summary-rows">
+                            <div class="summary-row">
+                                <span class="summary-label">الحالة</span>
+                                <span class="summary-val" id="summaryStatus">—</span>
+                            </div>
+                            <div class="summary-row" id="courierRow" style="display:none">
+                                <span class="summary-label">المندوب</span>
+                                <span class="summary-val courier" id="summaryCourier">—</span>
+                            </div>
+                            <div class="summary-row">
+                                <span class="summary-label">الأوردرات</span>
+                                <span class="summary-val count" id="summaryCount">0</span>
+                            </div>
+                        </div>
+                        <div class="sidebar-actions">
+                            <button class="btn-update" id="updateBtn" onclick="startUpdate()">🚀 تحديث الكل</button>
+                            <div class="progress-wrap" id="progressBar">
+                                <div class="progress-bar" id="progressFill" style="width:0%"></div>
+                            </div>
+                            <div class="results" id="results">
+                                <div class="results-header">
+                                    <span>النتائج</span>
+                                    <span>
+                                        <span class="stat-ok">✓ <span id="successCount">0</span></span>
+                                        &nbsp;
+                                        <span class="stat-err">✗ <span id="errorCount">0</span></span>
+                                    </span>
+                                </div>
+                                <div class="results-list" id="resultsList"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Row 2: Courier -->
+                <div class="card" id="courierCard" style="display:none">
+                    <div class="card-header"><h2>🛵 المندوب</h2></div>
+                    <div class="card-body">
+                        <div class="courier-grid" id="courierSelector">
+                            <div class="courier-loading">⏳ جاري التحميل...</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Row 3: Input (full width) -->
+                <div class="card">
+                    <div class="card-header"><h2>🔫 إدخال الأوردرات</h2></div>
+                    <div class="card-body">
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+                            <!-- Scanner Gun -->
+                            <div>
+                                <div class="scanner-row">
+                                    <span class="scanner-icon">🔫</span>
+                                    <input type="text" id="scannerGunInput" class="scanner-input"
+                                        placeholder="امسح الباركود هنا..." autofocus autocomplete="off">
+                                </div>
+                                <p class="input-hint" style="text-align:center;">💡 Scanner Gun: امسح وسيتم الإضافة تلقائياً</p>
+                            </div>
+                            <!-- Manual -->
+                            <div>
+                                <div class="manual-row">
+                                    <span class="manual-icon">#</span>
+                                    <input type="text" id="manualOrderInput" class="manual-input"
+                                        placeholder="رقم الأوردر يدوياً..."
+                                        autocomplete="off" spellcheck="false" inputmode="numeric">
+                                    <button class="manual-btn" id="manualOrderBtn" onclick="handleManualOrderAdd()">إضافة</button>
+                                </div>
+                                <p class="input-hint">💡 أدخل الرقم مع أو بدون #</p>
+                            </div>
+                        </div>
+                        <div class="scan-feedback" id="scanStatus"></div>
+                    </div>
+                </div>
+
+                <!-- Row 4: Orders only -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2>📋 الأوردرات</h2>
+                        <div style="display:flex;align-items:center;gap:10px;">
+                            <span class="counter-badge" id="count">0</span>
+                            <button class="btn-sm danger" onclick="clearList()">مسح الكل</button>
+                        </div>
+                    </div>
+                    <div style="overflow-x:auto;">
+                        <div id="scannedList">
+                            <div class="empty-state" style="padding:32px;">
+                                <div class="empty-icon">📋</div>
+                                <div>لم يتم مسح أي باركود بعد</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div><!-- /tab-scanner -->
+
+        <!-- ══ TAB: Log ══ -->
+        <div id="tab-log" class="tab-content">
+            <div class="card">
+                <div class="card-header">
+                    <h2>📜 سجل التحديثات السابقة <span class="log-sync-status local" id="logSyncStatus">محلي</span></h2>
+                    <div style="display:flex;gap:6px;">
+                        <button class="btn-sm" onclick="syncFromCloud()">🔄 تحديث</button>
+                        <button class="export-selected-btn btn-sm" id="exportSelectedBtn" onclick="exportLogCSV(true)">📥 تصدير المحدد</button>
+                        <button class="btn-sm" onclick="exportLogCSV(false)">📥 تصدير الكل</button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div id="logList">
+                        <div class="log-empty">لا توجد عمليات مسجلة</div>
+                    </div>
+                </div>
+            </div>
+        </div><!-- /tab-log -->
+
+    </div><!-- /wrapper -->
+
     <script>
         const FLOW_API_URL = 'https://flow-companion.mivicle.app/rest/1/flow/start/order';
-        
-        let scanner = null;
-        let isScanning = false;
-        let scannedOrders = [];
-        let lastCode = '';
-        let lastTime = 0;
 
+        const STATUSES = {
+            S1: [
+                { specifier: 'Shipped',   label: 'Shipped',   icon: '🚚' },
+                { specifier: 'Delivered', label: 'Delivered', icon: '✅' },
+                { specifier: 'Returned',  label: 'Returned',  icon: '↩️' },
+                { specifier: 'Cancelled', label: 'Cancelled', icon: '❌' },
+                { specifier: 'Ready',     label: 'Ready',     icon: '📦' },
+            ],
+            S2: [
+                { specifier: 'Ready_S2',    label: 'Ready',    icon: '📦' },
+                { specifier: 'Shipped_S2',  label: 'Shipped',  icon: '🚚' },
+                { specifier: 'Returned_S2', label: 'Returned', icon: '↩️' },
+            ],
+        };
+
+        const COURIER_SPECIFIERS = new Set([
+            'Shipped', 'Delivered', 'Returned',
+            'Shipped_S2', 'Returned_S2',
+        ]);
+
+        let scannedOrders    = [];
+        let currentField     = '';
         let currentSpecifier = '';
         let currentStatusLabel = '';
-        let currentIcon = '';
-        let currentCourier = '';
+        let currentCourier   = '';
+        const orderNameMap   = {};
+        const orderStatusMap = {}; // orderId → { s1, s2 }
 
-        function needsCourier(specifier) {
-            return specifier !== 'Ready' && specifier !== 'Cancelled';
+        const STATUS_COLOR_MAP = {
+            'Shipped':   's-Shipped',
+            'Delivered': 's-Delivered',
+            'Returned':  's-Returned',
+            'Cancelled': 's-Cancelled',
+            'Ready':     's-Ready',
+        };
+
+        function needsCourier(s) { return COURIER_SPECIFIERS.has(s); }
+
+        function statusPillClass(value) {
+            if (!value) return null;
+            // Strip _S2 suffix for lookup
+            const base = value.replace(/_S2$/, '');
+            return STATUS_COLOR_MAP[base] || 's-neutral';
         }
 
-        // Load saved data
-        document.getElementById('apiToken').value = localStorage.getItem('api_token') || '';
-        document.getElementById('logWorkerUrl').value = localStorage.getItem('log_worker_url') || '';
-        document.getElementById('logWorkerSecret').value = localStorage.getItem('log_worker_secret') || '';
+        function statusPill(value) {
+            if (!value) return '<span class="status-empty">—</span>';
+            const cls = statusPillClass(value);
+            return `<span class="status-pill ${cls}">${value}</span>`;
+        }
+
+        // ── Tabs ────────────────────────────────────────────────────
+        function switchTab(tab, btn) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById(`tab-${tab}`).classList.add('active');
+            btn.classList.add('active');
+            if (tab === 'log') syncFromCloud();
+        }
+
+        // ── Settings ─────────────────────────────────────────────────
+        function openSettings() {
+            document.getElementById('apiToken').value        = localStorage.getItem('api_token') || '';
+            document.getElementById('logWorkerUrl').value    = localStorage.getItem('log_worker_url') || '';
+            document.getElementById('logWorkerSecret').value = localStorage.getItem('log_worker_secret') || '';
+            document.getElementById('settingsModal').classList.add('active');
+        }
+        function closeSettings() {
+            document.getElementById('settingsModal').classList.remove('active');
+            scannerGunInput.focus();
+        }
+        function saveSettings() {
+            localStorage.setItem('api_token',         document.getElementById('apiToken').value.trim());
+            localStorage.setItem('log_worker_url',    document.getElementById('logWorkerUrl').value.trim());
+            localStorage.setItem('log_worker_secret', document.getElementById('logWorkerSecret').value.trim());
+            closeSettings();
+            showToast('تم حفظ الإعدادات', 'success');
+            if (currentField) loadCouriers();
+        }
+        document.getElementById('settingsModal').addEventListener('click', e => {
+            if (e.target === document.getElementById('settingsModal')) closeSettings();
+        });
+
+        // ── Restore state ────────────────────────────────────────────
         const saved = localStorage.getItem('scanned_orders');
         if (saved) { scannedOrders = JSON.parse(saved); renderList(); }
+
+        const savedField = localStorage.getItem('selected_field');
+        if (savedField) selectField(savedField, false);
 
         const savedStatus = localStorage.getItem('selected_status');
         if (savedStatus) { const s = JSON.parse(savedStatus); selectStatus(s.specifier, s.label, s.icon, false); }
 
         const savedCourier = localStorage.getItem('selected_courier');
-        if (savedCourier) { selectCourier(savedCourier, false); }
+        if (savedCourier) selectCourier(savedCourier, false);
 
-        document.getElementById('apiToken').addEventListener('change', e => localStorage.setItem('api_token', e.target.value));
-        document.getElementById('logWorkerUrl').addEventListener('change', e => localStorage.setItem('log_worker_url', e.target.value));
-        document.getElementById('logWorkerSecret').addEventListener('change', e => localStorage.setItem('log_worker_secret', e.target.value));
+        // ── Scanner Gun ──────────────────────────────────────────────
+        const scannerGunInput = document.getElementById('scannerGunInput');
+        let inputTimeout = null, lastInputTime = 0;
 
-        // Scanner gun auto-add
-        let inputTimeout = null;
-        let lastInputTime = 0;
-        const scannerInput = document.getElementById('manualInput');
-        
-        function autoAddCode() {
-            const code = scannerInput.value.trim();
+        function processScannedCode(code) {
             if (code.length >= 3) {
                 if (!scannedOrders.includes(code)) {
-                    addOrder(code);
-                    scannerInput.value = '';
-                    showToast();
+                    addOrder(code); showToast('✓ تم المسح', 'success');
                     if (navigator.vibrate) navigator.vibrate(100);
-                } else {
-                    scannerInput.value = '';
-                    document.getElementById('scanStatus').textContent = '⚠️ موجود بالفعل: ' + code;
-                    setTimeout(() => { document.getElementById('scanStatus').textContent = 'جاهز للمسح'; }, 1500);
-                }
+                } else { showScanStatus('⚠️ موجود بالفعل: ' + code); }
             }
-            scannerInput.focus();
+            scannerGunInput.focus();
         }
-        
-        scannerInput.addEventListener('input', () => {
+
+        scannerGunInput.addEventListener('input', () => {
             if (inputTimeout) clearTimeout(inputTimeout);
-            const now = Date.now();
-            const gap = now - lastInputTime;
+            const now = Date.now(), gap = now - lastInputTime;
             lastInputTime = now;
-            const delay = gap < 80 ? 200 : 300;
-            inputTimeout = setTimeout(autoAddCode, delay);
+            const val = scannerGunInput.value.trim();
+            scannerGunInput.value = '';
+            if (!val) return;
+            inputTimeout = setTimeout(() => processScannedCode(val), gap < 80 ? 150 : 400);
         });
 
-        scannerInput.addEventListener('keypress', e => {
-            if (e.key === 'Enter') { e.preventDefault(); if (inputTimeout) clearTimeout(inputTimeout); autoAddCode(); }
+        scannerGunInput.addEventListener('keypress', e => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                if (inputTimeout) clearTimeout(inputTimeout);
+                const val = scannerGunInput.value.trim();
+                scannerGunInput.value = '';
+                if (val) processScannedCode(val);
+            }
         });
 
-        function focusInput() { document.getElementById('manualInput').focus(); }
+        // ── Manual Order Add ─────────────────────────────────────────
+        document.getElementById('manualOrderInput').addEventListener('keypress', e => {
+            if (e.key === 'Enter') { e.preventDefault(); handleManualOrderAdd(); }
+        });
+
+        async function handleManualOrderAdd() {
+            const input  = document.getElementById('manualOrderInput');
+            const btn    = document.getElementById('manualOrderBtn');
+            const raw    = input.value.trim().replace(/^#/, '');
+            if (!raw) { input.focus(); return; }
+
+            const url    = localStorage.getItem('log_worker_url') || '';
+            const secret = localStorage.getItem('log_worker_secret') || '';
+            if (!url || !secret) { alert('أدخل Log Worker URL و Secret في الإعدادات'); openSettings(); return; }
+
+            btn.disabled = true; btn.innerHTML = '<span class="spinner"></span>';
+            input.disabled = true;
+
+            try {
+                const res  = await fetch(`${url}/resolveByName`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${secret}` },
+                    body: JSON.stringify({ orderName: '#' + raw })
+                });
+                const data = await res.json();
+                if (!data.success) {
+                    showScanStatus(data.notFound ? `⚠️ #${raw} غير موجود` : '⚠️ خطأ في الاستعلام');
+                } else {
+                    if (scannedOrders.includes(data.orderId)) {
+                        showScanStatus(`⚠️ موجود بالفعل: ${data.orderName}`);
+                    } else {
+                        orderNameMap[data.orderId] = data.orderName;
+                        addOrder(data.orderId);
+                        showToast(`✓ تمت إضافة ${data.orderName}`, 'success');
+                    }
+                }
+            } catch { showScanStatus('⚠️ خطأ في الاتصال'); }
+
+            input.value = ''; btn.disabled = false; btn.textContent = 'إضافة';
+            input.disabled = false; scannerGunInput.focus();
+        }
+
+        function showScanStatus(msg) {
+            const el = document.getElementById('scanStatus');
+            el.textContent = msg;
+            el.style.display = 'block';
+            el.style.background = '#fffbeb';
+            el.style.color      = '#d97706';
+            el.style.border     = '1px solid #fde68a';
+            clearTimeout(el._t);
+            el._t = setTimeout(() => { el.style.display = 'none'; }, 2500);
+        }
+
+        function focusInput() { scannerGunInput.focus(); }
         window.addEventListener('load', focusInput);
-        // Re-focus scanner input when clicking empty areas (for scanner gun convenience)
         document.addEventListener('click', e => {
             const tag = e.target.tagName;
-            if (tag !== 'BUTTON' && tag !== 'INPUT' && tag !== 'LABEL' && tag !== 'SPAN' && !e.target.closest('.log-entry') && !e.target.closest('.results') && !e.target.closest('.settings-content')) {
-                setTimeout(focusInput, 150);
+            if (tag !== 'BUTTON' && tag !== 'INPUT' && !e.target.closest('.log-entry')
+                && !e.target.closest('.results') && !e.target.closest('.modal')) {
+                if (document.getElementById('tab-scanner').classList.contains('active')) {
+                    setTimeout(focusInput, 150);
+                }
             }
         });
 
+        // ── Field Selection ──────────────────────────────────────────
+        function selectField(field, save = true) {
+            currentField = field;
+            document.getElementById('fieldBtnS1').classList.toggle('active', field === 'S1');
+            document.getElementById('fieldBtnS2').classList.toggle('active', field === 'S2');
+            document.body.classList.remove('field-s1', 'field-s2');
+            document.body.classList.add(`field-${field.toLowerCase()}`);
+
+            const banner = document.getElementById('summaryFieldBanner');
+            banner.textContent = field === 'S1' ? 'S1 — توصيل عادي' : 'S2 — استبدال / استرجاع';
+            banner.className   = `summary-banner ${field.toLowerCase()}`;
+
+            renderStatusButtons(field);
+            currentSpecifier = ''; currentStatusLabel = '';
+            document.getElementById('summaryStatus').textContent = '—';
+            document.getElementById('summaryStatus').className   = 'summary-val';
+            document.getElementById('updateBtn').className = 'btn-update';
+            document.getElementById('courierCard').style.display = 'none';
+            document.getElementById('courierRow').style.display  = 'none';
+
+            loadCouriers();
+            if (save) { localStorage.setItem('selected_field', field); localStorage.removeItem('selected_status'); }
+        }
+
+        function renderStatusButtons(field) {
+            document.getElementById('statusSelector').innerHTML = (STATUSES[field] || []).map(s =>
+                `<button class="status-btn ${s.label}" onclick="selectStatus('${s.specifier}','${s.label}','${s.icon}')">
+                    <span class="icon">${s.icon}</span>${s.label}
+                </button>`
+            ).join('');
+        }
+
+        // ── Couriers ─────────────────────────────────────────────────
+        async function loadCouriers() {
+            const url    = localStorage.getItem('log_worker_url') || '';
+            const secret = localStorage.getItem('log_worker_secret') || '';
+            const sel    = document.getElementById('courierSelector');
+            sel.innerHTML = '<div class="courier-loading">⏳ جاري التحميل...</div>';
+            if (!url || !secret) { sel.innerHTML = '<div class="courier-loading" style="color:var(--error)">⚠️ أدخل Worker URL في الإعدادات</div>'; return; }
+            try {
+                const res  = await fetch(`${url}/courier-values`, { headers: { 'Authorization': `Bearer ${secret}` } });
+                const data = await res.json();
+                if (data.success && data.values?.length) {
+                    sel.innerHTML = data.values.map(n =>
+                        `<button class="courier-btn" data-courier="${n}" onclick="selectCourier(this)">${n}</button>`
+                    ).join('');
+                } else { sel.innerHTML = '<div class="courier-loading" style="color:var(--error)">⚠️ لا توجد بيانات مناديب</div>'; }
+            } catch { sel.innerHTML = '<div class="courier-loading" style="color:var(--error)">⚠️ خطأ في الاتصال</div>'; }
+            if (currentCourier) selectCourier(currentCourier, false);
+        }
+
+        // ── Status Selection ─────────────────────────────────────────
         function selectStatus(specifier, label, icon, save = true) {
-            currentSpecifier = specifier; currentStatusLabel = label; currentIcon = icon;
-            document.querySelectorAll('.status-btn').forEach(btn => btn.classList.remove('active'));
-            const statusBtn = document.querySelector(`.status-btn.${specifier}`);
-            if (statusBtn) statusBtn.classList.add('active');
+            if (!currentField) { alert('اختر نوع التحديث أولاً'); return; }
+            currentSpecifier = specifier; currentStatusLabel = label;
+            document.querySelectorAll('.status-btn').forEach(b => b.classList.remove('active'));
+            const btn = document.querySelector(`.status-btn.${label}`);
+            if (btn) btn.classList.add('active');
             document.getElementById('summaryStatus').textContent = `${icon} ${label}`;
-            document.getElementById('updateBtn').className = `btn-primary ${specifier}`;
+            document.getElementById('summaryStatus').className   = 'summary-val';
+            document.getElementById('updateBtn').className = `btn-update ${label}`;
             const show = needsCourier(specifier);
-            document.getElementById('courierCard').style.display = show ? 'block' : 'none';
-            document.getElementById('courierRow').style.display = show ? 'flex' : 'none';
+            document.getElementById('courierCard').style.display = show ? '' : 'none';
+            document.getElementById('courierRow').style.display  = show ? 'flex' : 'none';
             if (save) localStorage.setItem('selected_status', JSON.stringify({ specifier, label, icon }));
         }
 
+        // ── Courier Selection ────────────────────────────────────────
         function selectCourier(element, save = true) {
-            let courier, btnElement;
-            if (typeof element === 'string') { courier = element; btnElement = document.querySelector(`.courier-btn[data-courier="${courier}"]`); }
-            else { btnElement = element; courier = element.getAttribute('data-courier'); }
+            let courier, btnEl;
+            if (typeof element === 'string') { courier = element; btnEl = document.querySelector(`.courier-btn[data-courier="${courier}"]`); }
+            else { btnEl = element; courier = element.getAttribute('data-courier'); }
             currentCourier = courier;
-            document.querySelectorAll('.courier-btn').forEach(btn => btn.classList.remove('active'));
-            if (btnElement) btnElement.classList.add('active');
+            document.querySelectorAll('.courier-btn').forEach(b => b.classList.remove('active'));
+            if (btnEl) btnEl.classList.add('active');
             document.getElementById('summaryCourier').textContent = `🛵 ${courier}`;
             if (save) localStorage.setItem('selected_courier', courier);
         }
 
-        function toggleSettings() { document.getElementById('settings').classList.toggle('active'); }
-        function toggleScanner() { if (isScanning) stopScanner(); else startScanner(); }
-
-        function startScanner() {
-            const btn = document.getElementById('scannerBtn');
-            const status = document.getElementById('scanStatus');
-            scanner = new Html5Qrcode("reader");
-            scanner.start({ facingMode: "environment" }, {
-                fps: 10, qrbox: { width: 250, height: 100 }, aspectRatio: 1.5,
-                formatsToSupport: [Html5QrcodeSupportedFormats.CODE_128, Html5QrcodeSupportedFormats.CODE_39, Html5QrcodeSupportedFormats.EAN_13, Html5QrcodeSupportedFormats.EAN_8, Html5QrcodeSupportedFormats.UPC_A, Html5QrcodeSupportedFormats.UPC_E, Html5QrcodeSupportedFormats.QR_CODE]
-            }, onScanSuccess, () => {}).then(() => {
-                isScanning = true; btn.textContent = '⏹️ إيقاف المسح'; btn.classList.add('stop'); status.textContent = 'جاري المسح... وجّه الكاميرا للباركود';
-            }).catch(err => { status.textContent = 'خطأ: ' + err; });
-        }
-
-        function stopScanner() {
-            if (scanner) scanner.stop().then(() => { scanner.clear(); isScanning = false; document.getElementById('scannerBtn').textContent = '📷 بدء المسح'; document.getElementById('scannerBtn').classList.remove('stop'); document.getElementById('scanStatus').textContent = 'تم الإيقاف'; });
-        }
-
-        function onScanSuccess(code) {
-            const now = Date.now();
-            if (code === lastCode && now - lastTime < 2000) return;
-            lastCode = code; lastTime = now;
-            if (!scannedOrders.includes(code)) {
-                addOrder(code); showToast(); if (navigator.vibrate) navigator.vibrate(100);
-                document.getElementById('scanStatus').textContent = '✓ تم: ' + code;
-                document.getElementById('scanStatus').classList.add('success');
-                setTimeout(() => { document.getElementById('scanStatus').textContent = 'جاري المسح...'; document.getElementById('scanStatus').classList.remove('success'); }, 1500);
-            } else { document.getElementById('scanStatus').textContent = '⚠️ موجود بالفعل: ' + code; }
-        }
-
-        // Order Name cache: orderId -> orderName
-        const orderNameMap = {};
-
+        // ── Order List ───────────────────────────────────────────────
         function resolveNameInBackground(orderId) {
-            if (!hasLogWorker()) return;
-            const { url, secret } = getLogConfig();
-            fetch(`${url}/resolve`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${secret}` },
-                body: JSON.stringify({ orderIds: [orderId] })
-            }).then(r => r.json()).then(data => {
-                if (data.success && data.names) {
-                    Object.assign(orderNameMap, data.names);
-                    renderList();
+            const url    = localStorage.getItem('log_worker_url') || '';
+            const secret = localStorage.getItem('log_worker_secret') || '';
+            if (!url || !secret) return;
+
+            // Fetch name + statuses in parallel
+            Promise.all([
+                fetch(`${url}/resolve`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${secret}` },
+                    body: JSON.stringify({ orderIds: [orderId] })
+                }).then(r => r.json()).catch(() => null),
+
+                fetch(`${url}/order-statuses`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${secret}` },
+                    body: JSON.stringify({ orderIds: [orderId] })
+                }).then(r => r.json()).catch(() => null),
+            ]).then(([nameData, statusData]) => {
+                let changed = false;
+                if (nameData?.success && nameData.names && Object.keys(nameData.names).length > 0) {
+                    Object.assign(orderNameMap, nameData.names);
+                    changed = true;
                 }
-            }).catch(() => {});
+                if (statusData?.success && statusData.statuses) {
+                    Object.assign(orderStatusMap, statusData.statuses);
+                    changed = true;
+                }
+                if (changed) renderList();
+            });
         }
 
-        function addOrder(code) { scannedOrders.unshift(code); saveOrders(); renderList(true); updateSummaryCount(); resolveNameInBackground(code); }
+        function addOrder(code)    { scannedOrders.unshift(code); saveOrders(); renderList(true); updateSummaryCount(); resolveNameInBackground(code); }
         function removeOrder(code) { scannedOrders = scannedOrders.filter(o => o !== code); saveOrders(); renderList(); updateSummaryCount(); }
-        function clearList() { if (confirm('مسح كل الأوردرات؟')) { scannedOrders = []; saveOrders(); renderList(); updateSummaryCount(); } }
-        function saveOrders() { localStorage.setItem('scanned_orders', JSON.stringify(scannedOrders)); }
-        function updateSummaryCount() { document.getElementById('count').textContent = scannedOrders.length; document.getElementById('summaryCount').textContent = scannedOrders.length; }
+        function clearList()       { if (confirm('مسح كل الأوردرات؟')) { scannedOrders = []; saveOrders(); renderList(); updateSummaryCount(); } }
+        function saveOrders()      { localStorage.setItem('scanned_orders', JSON.stringify(scannedOrders)); }
+        function updateSummaryCount() {
+            const n = scannedOrders.length;
+            document.getElementById('count').textContent        = n;
+            document.getElementById('summaryCount').textContent = n;
+        }
 
         function renderList(isNew = false) {
-            const list = document.getElementById('scannedList');
+            const container = document.getElementById('scannedList');
             document.getElementById('count').textContent = scannedOrders.length;
-            if (scannedOrders.length === 0) { list.innerHTML = '<div class="empty-list">لم يتم مسح أي باركود بعد</div>'; return; }
-            list.innerHTML = scannedOrders.map((order, i) => {
-                const name = orderNameMap[order];
-                const display = name ? `${name} <span style="color:var(--text-dim);font-size:0.75rem">${order}</span>` : order;
-                return `<div class="scanned-item ${i === 0 && isNew ? 'new' : ''}"><span>${display}</span><button class="remove-btn" data-remove="${order}">✕</button></div>`;
-            }).join('');
-            // Attach event listeners
-            list.querySelectorAll('.remove-btn[data-remove]').forEach(btn => {
+            if (!scannedOrders.length) {
+                container.innerHTML = '<div class="empty-state" style="padding:32px;"><div class="empty-icon">📋</div><div>لم يتم مسح أي باركود بعد</div></div>';
+                return;
+            }
+            container.innerHTML = `
+                <table class="scanned-table">
+                    <thead>
+                        <tr>
+                            <th class="col-del"></th>
+                            <th class="col-num">#</th>
+                            <th>رقم الأوردر</th>
+                            <th class="col-id">Order ID</th>
+                            <th class="col-s1">الحالة الأساسية</th>
+                            <th class="col-s2">استبدال / استرجاع</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${scannedOrders.map((order, i) => {
+                            const name     = orderNameMap[order];
+                            const statuses = orderStatusMap[order];
+                            const s1 = statuses?.s1 || null;
+                            const s2 = statuses?.s2 || null;
+                            return `<tr class="${i === 0 && isNew ? 'row-new' : ''}">
+                                <td class="col-del"><button class="chip-del" data-remove="${order}">×</button></td>
+                                <td class="col-num">${i + 1}</td>
+                                <td class="col-order">${name || '—'}</td>
+                                <td class="col-id">${order}</td>
+                                <td>${statusPill(s1)}</td>
+                                <td>${statusPill(s2)}</td>
+                            </tr>`;
+                        }).join('')}
+                    </tbody>
+                </table>`;
+            container.querySelectorAll('.chip-del[data-remove]').forEach(btn => {
                 btn.addEventListener('click', () => removeOrder(btn.dataset.remove));
             });
         }
 
-        function addManualEntry() {
-            const input = document.getElementById('manualInput');
-            const code = input.value.trim();
-            if (code && !scannedOrders.includes(code)) { addOrder(code); input.value = ''; showToast(); }
-            else if (scannedOrders.includes(code)) { input.value = ''; document.getElementById('scanStatus').textContent = '⚠️ موجود بالفعل: ' + code; setTimeout(() => { document.getElementById('scanStatus').textContent = 'جاهز للمسح'; }, 1500); }
-            input.focus();
-        }
-
-        function showToast() { const t = document.getElementById('toast'); t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 1000); }
-
+        // ── Update ───────────────────────────────────────────────────
         async function startUpdate() {
-            const token = document.getElementById('apiToken').value.trim();
-            if (!token) { alert('أدخل API Token في الإعدادات'); toggleSettings(); return; }
+            const token = localStorage.getItem('api_token') || '';
+            if (!token)            { alert('أدخل API Token في الإعدادات'); openSettings(); return; }
+            if (!currentField)     { alert('اختر نوع التحديث أولاً'); return; }
             if (!currentSpecifier) { alert('اختر الحالة أولاً'); return; }
             if (needsCourier(currentSpecifier) && !currentCourier) { alert('اختر المندوب أولاً'); return; }
-            if (scannedOrders.length === 0) { alert('لا توجد أوردرات'); return; }
+            if (!scannedOrders.length) { alert('لا توجد أوردرات'); return; }
 
-            let confirmMsg = needsCourier(currentSpecifier)
-                ? `هل تريد تحديث ${scannedOrders.length} أوردر؟\n\nالحالة: ${currentStatusLabel}\nالمندوب: ${currentCourier}`
-                : `هل تريد تحديث ${scannedOrders.length} أوردر؟\n\nالحالة: ${currentStatusLabel}`;
+            const fieldLabel = currentField === 'S1' ? 'S1 — توصيل عادي' : 'S2 — استبدال / استرجاع';
+            const confirmMsg = needsCourier(currentSpecifier)
+                ? `تحديث ${scannedOrders.length} أوردر؟\n\nالنوع: ${fieldLabel}\nالحالة: ${currentStatusLabel}\nالمندوب: ${currentCourier}`
+                : `تحديث ${scannedOrders.length} أوردر؟\n\nالنوع: ${fieldLabel}\nالحالة: ${currentStatusLabel}`;
             if (!confirm(confirmMsg)) return;
-            
+
             const btn = document.getElementById('updateBtn');
-            btn.disabled = true;
-            btn.innerHTML = '<span class="spinner"></span> جاري التحديث...';
+            btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> جاري التحديث...';
             document.getElementById('progressBar').classList.add('active');
             document.getElementById('results').classList.add('active');
-            
-            const resultsList = document.getElementById('resultsList');
-            resultsList.innerHTML = scannedOrders.map(order => {
+
+            document.getElementById('resultsList').innerHTML = scannedOrders.map(order => {
                 const name = orderNameMap[order];
-                const display = name ? `${name} <span style="color:var(--text-dim);font-size:0.75rem">${order}</span>` : order;
-                return `<div class="result-item" data-order="${order}"><span>${display}</span><span class="result-status result-pending">⏳</span></div>`;
+                const display = name ? `${name} <span style="color:var(--text-muted);font-size:11px">${order}</span>` : order;
+                return `<div class="result-item" data-order="${order}"><span>${display}</span><span class="result-badge result-pending">⏳</span></div>`;
             }).join('');
-            
+
             let success = 0, errors = 0;
             const orderResults = [];
-            
+
             for (let i = 0; i < scannedOrders.length; i++) {
                 const order = scannedOrders[i];
                 let orderStatus = 'error';
                 try {
-                    const requestBody = { itemId: order, specifier: currentSpecifier };
-                    if (needsCourier(currentSpecifier)) requestBody.additionalParameters = { stringParameter: currentCourier };
-                    
-                    const response = await fetch(FLOW_API_URL, {
+                    const body = { itemId: order, specifier: currentSpecifier };
+                    if (needsCourier(currentSpecifier)) body.additionalParameters = { stringParameter: currentCourier };
+                    const res = await fetch(FLOW_API_URL, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json', 'Authorization': `bearer ${token}` },
-                        body: JSON.stringify(requestBody)
+                        body: JSON.stringify(body)
                     });
-                    if (response.ok) { updateResult(order, 'success', '✓'); success++; orderStatus = 'success'; }
+                    if (res.ok) { updateResult(order, 'success', '✓'); success++; orderStatus = 'success'; }
                     else { updateResult(order, 'error', '✗'); errors++; }
-                } catch (e) { updateResult(order, 'error', '✗'); errors++; }
-                
+                } catch { updateResult(order, 'error', '✗'); errors++; }
+
                 orderResults.push({ order, status: orderStatus });
                 document.getElementById('progressFill').style.width = `${((i+1)/scannedOrders.length)*100}%`;
-                document.getElementById('successCount').textContent = success;
-                document.getElementById('errorCount').textContent = errors;
+                document.getElementById('successCount').textContent  = success;
+                document.getElementById('errorCount').textContent    = errors;
                 await new Promise(r => setTimeout(r, 300));
             }
-            
+
             saveLogEntry({
-                date: new Date().toISOString(),
-                status: currentStatusLabel,
-                statusSpecifier: currentSpecifier,
+                date: new Date().toISOString(), field: currentField,
+                status: currentStatusLabel, statusSpecifier: currentSpecifier,
                 courier: needsCourier(currentSpecifier) ? currentCourier : null,
-                totalOrders: scannedOrders.length,
-                success, errors,
-                orders: orderResults
+                totalOrders: scannedOrders.length, success, errors, orders: orderResults
             });
-            
-            btn.disabled = false;
-            btn.innerHTML = '🚀 تحديث الكل';
-            
+
+            btn.disabled = false; btn.innerHTML = '🚀 تحديث الكل';
+
             if (errors === 0) {
-                let msg = needsCourier(currentSpecifier)
-                    ? `✅ تم تحديث ${success} أوردر بنجاح!\n\nالحالة: ${currentStatusLabel}\nالمندوب: ${currentCourier}`
-                    : `✅ تم تحديث ${success} أوردر بنجاح!\n\nالحالة: ${currentStatusLabel}`;
-                alert(msg);
+                showToast(`✅ تم تحديث ${success} أوردر بنجاح!`, 'success');
                 scannedOrders = []; saveOrders(); renderList(); updateSummaryCount();
-            } else { alert(`تم: ${success} ناجح، ${errors} فشل`); }
+            } else { showToast(`تم: ${success} ناجح، ${errors} فشل`, 'error'); }
         }
 
         function updateResult(order, status, text) {
-            const item = document.querySelector(`[data-order="${order}"] .result-status`);
-            if (item) { item.className = `result-status result-${status}`; item.textContent = text; }
+            const item = document.querySelector(`[data-order="${order}"] .result-badge`);
+            if (item) { item.className = `result-badge result-${status}`; item.textContent = text; }
         }
 
         updateSummaryCount();
 
-        // === LOG FUNCTIONS (localStorage + KV sync) ===
-
-        function getLogConfig() {
-            return { url: document.getElementById('logWorkerUrl').value.trim(), secret: document.getElementById('logWorkerSecret').value.trim() };
+        // ── Toast ────────────────────────────────────────────────────
+        function showToast(msg, type = '') {
+            const c = document.getElementById('toastContainer');
+            const t = document.createElement('div');
+            t.className = `toast ${type}`;
+            t.textContent = msg;
+            c.appendChild(t);
+            setTimeout(() => t.remove(), 2800);
         }
 
+        // ── Log ──────────────────────────────────────────────────────
+        function getLogConfig() {
+            return { url: localStorage.getItem('log_worker_url')||'', secret: localStorage.getItem('log_worker_secret')||'' };
+        }
         function hasLogWorker() { const { url, secret } = getLogConfig(); return url && secret; }
 
         function updateSyncStatus(status) {
             const el = document.getElementById('logSyncStatus');
             el.className = `log-sync-status ${status}`;
-            if (status === 'synced') el.textContent = '☁️ متزامن';
-            else if (status === 'local') el.textContent = '💾 محلي';
-            else if (status === 'loading') el.textContent = '⏳ جاري...';
+            el.textContent = status==='synced' ? '☁️ متزامن' : status==='loading' ? '⏳ جاري...' : '💾 محلي';
         }
 
-        function getLog() { try { return JSON.parse(localStorage.getItem('update_log') || '[]'); } catch { return []; } }
+        function getLog() { try { return JSON.parse(localStorage.getItem('update_log')||'[]'); } catch { return []; } }
 
         async function saveLogEntry(entry) {
-            const log = getLog();
-            log.unshift(entry);
+            const log = getLog(); log.unshift(entry);
             localStorage.setItem('update_log', JSON.stringify(log));
             renderLog(log);
-
             if (hasLogWorker()) {
                 try {
                     updateSyncStatus('loading');
@@ -720,12 +1047,11 @@
                     });
                     if (res.ok) {
                         const data = await res.json();
-                        if (data.entry && data.entry.orders) {
+                        if (data.entry?.orders) {
                             const localLog = getLog();
                             if (localLog.length > 0 && localLog[0].date === entry.date) {
                                 localLog[0] = data.entry;
                                 localStorage.setItem('update_log', JSON.stringify(localLog));
-                                renderLog(localLog);
                             }
                         }
                         updateSyncStatus('synced');
@@ -735,105 +1061,98 @@
         }
 
         async function syncFromCloud() {
-            if (!hasLogWorker()) { alert('أدخل Log Worker URL و Secret في الإعدادات'); document.getElementById('settings').classList.add('active'); return; }
+            if (!hasLogWorker()) { renderLog(); return; }
             try {
                 updateSyncStatus('loading');
                 const { url, secret } = getLogConfig();
                 const res = await fetch(`${url}/log`, { method: 'GET', headers: { 'Authorization': `Bearer ${secret}` } });
-                if (!res.ok) throw new Error('فشل الاتصال');
+                if (!res.ok) throw new Error();
                 const data = await res.json();
-                const merged = mergeAndDedupe(getLog(), data.log || []);
+                const merged = mergeAndDedupe(getLog(), data.log||[]);
                 localStorage.setItem('update_log', JSON.stringify(merged));
-                renderLog(merged);
-                updateSyncStatus('synced');
-            } catch (err) { updateSyncStatus('local'); alert('فشل جلب السجل: ' + err.message); }
+                renderLog(merged); updateSyncStatus('synced');
+            } catch { updateSyncStatus('local'); renderLog(); }
         }
 
-        function mergeAndDedupe(localLog, cloudLog) {
-            const seen = new Set(); const merged = [];
-            for (const entry of [...localLog, ...cloudLog]) {
-                if (!seen.has(entry.date)) { seen.add(entry.date); merged.push(entry); }
-            }
-            merged.sort((a, b) => new Date(b.date) - new Date(a.date));
-            return merged;
+        function mergeAndDedupe(a, b) {
+            const seen = new Set(), m = [];
+            for (const e of [...a, ...b]) { if (!seen.has(e.date)) { seen.add(e.date); m.push(e); } }
+            m.sort((x, y) => new Date(y.date) - new Date(x.date));
+            return m;
         }
 
         function toggleLogEntry(el) { el.closest('.log-entry').classList.toggle('open'); }
 
         function formatDate(iso) {
             const d = new Date(iso);
-            return `${d.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' })} — ${d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: true })}`;
+            return `${d.toLocaleDateString('en-GB', {day:'2-digit',month:'2-digit',year:'numeric'})} — ${d.toLocaleTimeString('en-GB', {hour:'2-digit',minute:'2-digit',hour12:true})}`;
         }
 
         function onLogCheckChange() {
-            const anyChecked = document.querySelectorAll('.log-check:checked').length > 0;
-            document.getElementById('exportSelectedBtn').classList.toggle('visible', anyChecked);
+            document.getElementById('exportSelectedBtn').classList.toggle('visible', document.querySelectorAll('.log-check:checked').length > 0);
         }
 
         function renderLog(log) {
             if (!log) log = getLog();
             const container = document.getElementById('logList');
-            if (log.length === 0) { container.innerHTML = '<div class="log-empty">لا توجد عمليات مسجلة</div>'; return; }
-
-            container.innerHTML = log.map((entry, i) => `
+            if (!container) return;
+            if (!log.length) { container.innerHTML = '<div class="log-empty">لا توجد عمليات مسجلة</div>'; return; }
+            container.innerHTML = log.map((entry, i) => {
+                const field = entry.field || 'S1';
+                return `
                 <div class="log-entry">
-                    <div class="log-entry-header">
-                        <input type="checkbox" class="log-check" data-log-index="${i}" onchange="onLogCheckChange()">
-                        <div class="log-entry-info" onclick="toggleLogEntry(this)">
-                            <div class="log-entry-date">${formatDate(entry.date)}</div>
-                            <div class="log-entry-summary">
-                                <span class="log-tag status-${entry.statusSpecifier}">${entry.status}</span>
-                                ${entry.courier ? `<span class="log-tag courier">${entry.courier}</span>` : ''}
-                                <span class="log-tag count">${entry.totalOrders} أوردر</span>
-                            </div>
+                    <div class="log-entry-header" onclick="toggleLogEntry(this)">
+                        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+                            <input type="checkbox" class="log-check" data-log-index="${i}" onchange="onLogCheckChange()" onclick="event.stopPropagation()">
+                            <strong>${formatDate(entry.date)}</strong>
+                            <span class="log-tag ${field.toLowerCase()}">${field}</span>
+                            <span class="log-tag status-${entry.statusSpecifier.replace('_S2','')}">${entry.status}</span>
+                            ${entry.courier ? `<span class="log-tag courier">${entry.courier}</span>` : ''}
+                            <span class="log-tag count">${entry.totalOrders} أوردر</span>
                         </div>
-                        <div class="log-entry-stats">
-                            <span class="stat-success">✓${entry.success}</span>
-                            <span class="stat-error">✗${entry.errors}</span>
+                        <div style="display:flex;align-items:center;gap:8px;">
+                            <span style="color:var(--success);font-weight:600;font-size:12px;">✓${entry.success}</span>
+                            <span style="color:var(--error);font-weight:600;font-size:12px;">✗${entry.errors}</span>
+                            <span class="log-toggle">▶</span>
                         </div>
-                        <span class="log-toggle" onclick="toggleLogEntry(this)">▶</span>
                     </div>
                     <div class="log-entry-details">
                         ${entry.orders.map(o => `
                             <div class="log-detail-item">
-                                <span class="log-detail-order">${o.orderName || ''} <span style="color:var(--text-dim);font-size:0.7rem">${o.order}</span></span>
-                                <span class="log-detail-status log-detail-${o.status}">${o.status === 'success' ? '✓ ناجح' : '✗ فشل'}</span>
-                            </div>
-                        `).join('')}
+                                <span class="log-detail-order">${o.orderName||''} <span style="color:var(--text-muted);font-size:11px">${o.order}</span></span>
+                                <span class="log-detail-status log-detail-${o.status}">${o.status==='success'?'✓ ناجح':'✗ فشل'}</span>
+                            </div>`).join('')}
                     </div>
-                </div>
-            `).join('');
+                </div>`;
+            }).join('');
             document.getElementById('exportSelectedBtn').classList.remove('visible');
         }
 
         function exportLogCSV(selectedOnly) {
             const fullLog = getLog();
-            if (fullLog.length === 0) { alert('السجل فارغ'); return; }
-
+            if (!fullLog.length) { alert('السجل فارغ'); return; }
             let log;
             if (selectedOnly) {
-                const checkedIndexes = [...document.querySelectorAll('.log-check:checked')].map(cb => parseInt(cb.dataset.logIndex));
-                if (checkedIndexes.length === 0) { alert('اختر عمليات أولاً'); return; }
-                log = checkedIndexes.map(i => fullLog[i]).filter(Boolean);
-            } else {
-                log = fullLog;
-            }
+                const idx = [...document.querySelectorAll('.log-check:checked')].map(cb => parseInt(cb.dataset.logIndex));
+                if (!idx.length) { alert('اختر عمليات أولاً'); return; }
+                log = idx.map(i => fullLog[i]).filter(Boolean);
+            } else { log = fullLog; }
 
-            const BOM = '\uFEFF';
-            const headers = ['التاريخ', 'الوقت', 'الحالة', 'المندوب', 'رقم الأوردر', 'Order ID', 'النتيجة'];
-            const rows = [headers.join(',')];
+            const BOM  = '\uFEFF';
+            const rows = [['التاريخ','الوقت','النوع','الحالة','المندوب','رقم الأوردر','Order ID','النتيجة'].join(',')];
             for (const entry of log) {
                 const d = new Date(entry.date);
                 const date = d.toLocaleDateString('en-GB');
-                const time = d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
+                const time = d.toLocaleTimeString('en-GB', {hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false});
                 for (const o of entry.orders) {
-                    rows.push([date, time, entry.status, entry.courier || '—', o.orderName || '—', `="${o.order}"`, o.status === 'success' ? 'ناجح' : 'فشل'].join(','));
+                    rows.push([date, time, entry.field||'S1', entry.status, entry.courier||'—', o.orderName||'—', `="${o.order}"`, o.status==='success'?'ناجح':'فشل'].join(','));
                 }
             }
-            const blob = new Blob([BOM + rows.join('\n')], { type: 'text/csv;charset=utf-8;' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a'); a.href = url; a.download = `order-log-${new Date().toISOString().slice(0,10)}.csv`; a.click();
-            URL.revokeObjectURL(url);
+            const blob = new Blob([BOM+rows.join('\n')], {type:'text/csv;charset=utf-8;'});
+            const url  = URL.createObjectURL(blob);
+            const a    = document.createElement('a'); a.href = url;
+            a.download = `order-log-${new Date().toISOString().slice(0,10)}.csv`;
+            a.click(); URL.revokeObjectURL(url);
         }
 
         renderLog();

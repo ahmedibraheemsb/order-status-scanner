@@ -63,10 +63,12 @@
 
         .wrapper { max-width: 1100px; margin: 0 auto; display: flex; flex-direction: column; gap: 16px; }
 
+        /* ── Top border strip ── */
         .page-border { position: fixed; top: 0; left: 0; right: 0; height: 3px; z-index: 50; background: var(--border); transition: background 0.4s; }
         body.field-s1 .page-border { background: var(--primary); }
         body.field-s2 .page-border { background: var(--amber); }
 
+        /* ── Header ── */
         .header {
             background: var(--surface); border: 1px solid var(--border);
             border-radius: var(--radius); padding: 16px 20px;
@@ -78,6 +80,7 @@
         .header-title h1 { font-size: 17px; font-weight: 700; }
         .header-title p  { font-size: 12px; color: var(--text-sub); margin-top: 2px; }
 
+        /* ── Tabs ── */
         .tabs-card {
             background: var(--surface); border: 1px solid var(--border);
             border-radius: var(--radius); padding: 10px 14px;
@@ -94,6 +97,7 @@
         .tab-content { display: none; }
         .tab-content.active { display: block; }
 
+        /* ── Card ── */
         .card {
             background: var(--surface); border: 1px solid var(--border);
             border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden;
@@ -107,8 +111,13 @@
         .card-header h2 { font-size: 13px; font-weight: 600; color: var(--text); display: flex; align-items: center; gap: 6px; }
         .card-body { padding: 16px 18px; }
 
+        /* ── Layout grids ── */
         .scanner-tab-content { display: flex; flex-direction: column; gap: 14px; }
+        .top-row   { display: grid; grid-template-columns: 230px 1fr; gap: 14px; align-items: start; }
+        .mid-row   { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; align-items: start; }
+        .bottom-row { display: grid; grid-template-columns: 1fr 360px; gap: 14px; align-items: start; }
 
+        /* ── Field Selector ── */
         .field-selector { display: flex; flex-direction: column; gap: 8px; }
         .field-btn {
             padding: 1rem 1rem; border-radius: 10px; font-family: inherit;
@@ -125,6 +134,7 @@
         .field-btn.active.s2 .field-main { color: var(--amber); }
         .field-btn.active.s2 .field-tag  { opacity: 0.7; color: var(--amber); }
 
+        /* ── Status Selector ── */
         .status-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
         .status-btn {
             padding: 0.65rem 0.3rem; border-radius: 9px; font-family: inherit;
@@ -141,6 +151,7 @@
         .status-btn.Cancelled.active { border-color: var(--error);    background: var(--error-bg);    color: var(--error); }
         .status-btn.Ready.active     { border-color: var(--purple);   background: var(--purple-bg);   color: var(--purple); }
 
+        /* ── Courier Selector ── */
         .courier-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
         .courier-btn {
             padding: 0.55rem 0.4rem; border-radius: 7px; font-family: inherit;
@@ -152,6 +163,7 @@
         .courier-btn.active { border-color: var(--pink); background: var(--pink-bg); color: var(--pink); font-weight: 600; }
         .courier-loading { padding: 0.75rem; color: var(--text-muted); font-size: 0.8rem; }
 
+        /* ── Scanner Input ── */
         .scanner-row { position: relative; }
         .scanner-icon { position: absolute; right: 0.85rem; top: 50%; transform: translateY(-50%); font-size: 1rem; pointer-events: none; }
         .scanner-input {
@@ -164,6 +176,7 @@
         .scanner-input:focus { outline: none; border-color: var(--primary); }
         .scanner-input::placeholder { color: var(--text-muted); font-size: 13px; font-family: 'IBM Plex Sans Arabic', sans-serif; }
 
+        /* ── Manual Input Row ── */
         .manual-row { display: flex; gap: 8px; align-items: center; position: relative; }
         .manual-icon { position: absolute; right: 0.85rem; top: 50%; transform: translateY(-50%); font-family: 'JetBrains Mono', monospace; font-size: 1rem; color: var(--text-muted); pointer-events: none; font-weight: 700; }
         .manual-input {
@@ -187,12 +200,14 @@
         .input-hint { font-size: 11px; color: var(--text-muted); margin-top: 5px; }
         .input-divider { border: none; border-top: 1px solid var(--border-light); margin: 10px 0; }
 
+        /* Scan feedback */
         .scan-feedback {
             display: none; font-size: 12px; padding: 6px 10px;
             border-radius: 7px; margin-top: 8px; text-align: center;
             font-weight: 500;
         }
 
+        /* ── Scanned Table ── */
         .scanned-table { width: 100%; border-collapse: collapse; font-size: 13px; }
         .scanned-table thead th {
             text-align: right; padding: 8px 12px;
@@ -214,21 +229,24 @@
         .scanned-table tbody td.col-order { font-weight: 700; color: var(--primary); font-size: 13px; white-space: nowrap; }
         .scanned-table tbody td.col-id { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text-muted); direction: ltr; text-align: left; }
         .scanned-table tbody td.col-del { text-align: center; }
-
+        /* ── Status Pills in table ── */
         .status-pill {
             display: inline-block; padding: 2px 8px; border-radius: 5px;
             font-size: 11px; font-weight: 600; white-space: nowrap;
         }
+        /* Named status colors */
         .status-pill.s-Shipped    { background: #f0f9ff; color: #0284c7; border: 1px solid #bae6fd; }
         .status-pill.s-Delivered  { background: #f0fdf4; color: #16a34a; border: 1px solid #bbf7d0; }
         .status-pill.s-Returned   { background: #fffbeb; color: #d97706; border: 1px solid #fde68a; }
         .status-pill.s-Cancelled  { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
         .status-pill.s-Ready      { background: #f5f3ff; color: #7c3aed; border: 1px solid #ddd6fe; }
+        /* Neutral for all others (Confirmed, etc.) */
         .status-pill.s-neutral    { background: #f3f4f6; color: #6b7280; border: 1px solid #e5e7eb; }
         .status-empty { color: var(--text-muted); font-size: 11px; }
         .empty-state { text-align: center; padding: 28px; color: var(--text-muted); font-size: 13px; }
         .empty-state .empty-icon { font-size: 28px; margin-bottom: 8px; }
 
+        /* ── Summary + Action sidebar ── */
         .summary-banner {
             padding: 14px 16px; text-align: center; font-size: 14px; font-weight: 700;
             background: var(--bg); color: var(--text-muted); letter-spacing: 0.02em;
@@ -265,6 +283,7 @@
         .progress-wrap.active { display: block; }
         .progress-bar  { height: 100%; background: var(--primary); border-radius: 4px; transition: width 0.3s; width: 0%; }
 
+        /* ── Results ── */
         .results { display: none; }
         .results.active { display: block; }
         .results-header { display: flex; justify-content: space-between; font-size: 12px; font-weight: 600; margin-bottom: 6px; }
@@ -278,6 +297,7 @@
         .result-success { background: var(--success-bg); color: var(--success); }
         .result-error   { background: var(--error-bg);   color: var(--error); }
 
+        /* ── Btn small ── */
         .btn-sm {
             display: inline-flex; align-items: center; gap: 5px;
             padding: 6px 12px; border-radius: 7px; font-size: 12px; font-weight: 600;
@@ -288,6 +308,7 @@
         .btn-sm.danger { color: var(--error); border-color: var(--error-b); }
         .btn-sm.danger:hover { background: var(--error-bg); }
 
+        /* ── Log Section (tab) ── */
         .log-entry { border: 1px solid var(--border); border-radius: 8px; overflow: hidden; margin-bottom: 8px; }
         .log-entry-header { background: var(--bg); padding: 9px 14px; display: flex; align-items: center; justify-content: space-between; font-size: 12px; color: var(--text-sub); gap: 10px; flex-wrap: wrap; cursor: pointer; }
         .log-entry-header strong { color: var(--text); font-size: 13px; }
@@ -320,6 +341,7 @@
         .export-selected-btn { display: none; }
         .export-selected-btn.visible { display: inline-flex; }
 
+        /* ── Modal ── */
         .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.3); z-index: 200; align-items: center; justify-content: center; padding: 1rem; }
         .modal-overlay.active { display: flex; }
         .modal { background: var(--surface); border-radius: 14px; padding: 22px; width: 100%; max-width: 420px; box-shadow: 0 20px 60px rgba(0,0,0,0.15); animation: modalIn 0.2s ease; }
@@ -337,6 +359,7 @@
         .modal-save   { flex: 1; padding: 10px; border-radius: 8px; font-family: inherit; font-size: 13px; font-weight: 600; cursor: pointer; border: none; background: var(--primary); color: white; }
         .modal-save:hover { background: var(--primary-h); }
 
+        /* ── Toast ── */
         .toast-container { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 300; display: flex; flex-direction: column; gap: 6px; align-items: center; }
         .toast { background: #1a1d27; color: white; padding: 9px 18px; border-radius: 8px; font-size: 12px; box-shadow: var(--shadow-md); animation: slideUp 0.2s ease; white-space: nowrap; font-weight: 500; }
         .toast.success { background: var(--success); }
@@ -403,9 +426,10 @@
         <div id="tab-scanner" class="tab-content active">
             <div class="scanner-tab-content">
 
+                <!-- Row 1: Field + Status + Summary (RTL: Field appears right, Summary left) -->
                 <div style="display:grid;grid-template-columns:220px 1fr 280px;gap:14px;align-items:start;">
 
-                    <!-- Field Selector -->
+                    <!-- Field Selector (rightmost in RTL) -->
                     <div class="card">
                         <div class="card-header"><h2>🔀 نوع التحديث</h2></div>
                         <div class="card-body">
@@ -422,7 +446,7 @@
                         </div>
                     </div>
 
-                    <!-- Status Selector -->
+                    <!-- Status Selector (middle) -->
                     <div class="card">
                         <div class="card-header"><h2>📌 الحالة</h2></div>
                         <div class="card-body">
@@ -430,7 +454,7 @@
                         </div>
                     </div>
 
-                    <!-- Summary + Action -->
+                    <!-- Summary + Action (leftmost in RTL) -->
                     <div class="card" style="overflow:hidden;">
                         <div class="summary-banner" id="summaryFieldBanner">— اختر نوع التحديث —</div>
                         <div class="summary-rows">
@@ -468,7 +492,7 @@
 
                 </div>
 
-                <!-- Courier -->
+                <!-- Row 2: Courier -->
                 <div class="card" id="courierCard" style="display:none">
                     <div class="card-header"><h2>🛵 المندوب</h2></div>
                     <div class="card-body">
@@ -478,7 +502,7 @@
                     </div>
                 </div>
 
-                <!-- Input -->
+                <!-- Row 3: Input (full width) -->
                 <div class="card">
                     <div class="card-header"><h2>🔫 إدخال الأوردرات</h2></div>
                     <div class="card-body">
@@ -508,7 +532,7 @@
                     </div>
                 </div>
 
-                <!-- Orders List -->
+                <!-- Row 4: Orders only -->
                 <div class="card">
                     <div class="card-header">
                         <h2>📋 الأوردرات</h2>
@@ -527,7 +551,7 @@
                     </div>
                 </div>
             </div>
-        </div>
+        </div><!-- /tab-scanner -->
 
         <!-- ══ TAB: Log ══ -->
         <div id="tab-log" class="tab-content">
@@ -546,9 +570,9 @@
                     </div>
                 </div>
             </div>
-        </div>
+        </div><!-- /tab-log -->
 
-    </div>
+    </div><!-- /wrapper -->
 
     <script>
         const FLOW_API_URL = 'https://flow-companion.mivicle.app/rest/1/flow/start/order';
@@ -579,7 +603,7 @@
         let currentStatusLabel = '';
         let currentCourier   = '';
         const orderNameMap   = {};
-        const orderStatusMap = {};
+        const orderStatusMap = {}; // orderId → { s1, s2 }
 
         const STATUS_COLOR_MAP = {
             'Shipped':   's-Shipped',
@@ -593,6 +617,7 @@
 
         function statusPillClass(value) {
             if (!value) return null;
+            // Strip _S2 suffix for lookup
             const base = value.replace(/_S2$/, '');
             return STATUS_COLOR_MAP[base] || 's-neutral';
         }
@@ -603,7 +628,7 @@
             return `<span class="status-pill ${cls}">${value}</span>`;
         }
 
-        // ── Tabs ─────────────────────────────────────────────────────
+        // ── Tabs ────────────────────────────────────────────────────
         function switchTab(tab, btn) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
@@ -612,7 +637,7 @@
             if (tab === 'log') syncFromCloud();
         }
 
-        // ── Settings ──────────────────────────────────────────────────
+        // ── Settings ─────────────────────────────────────────────────
         function openSettings() {
             document.getElementById('apiToken').value        = localStorage.getItem('api_token') || '';
             document.getElementById('logWorkerUrl').value    = localStorage.getItem('log_worker_url') || '';
@@ -635,7 +660,7 @@
             if (e.target === document.getElementById('settingsModal')) closeSettings();
         });
 
-        // ── Restore state ─────────────────────────────────────────────
+        // ── Restore state ────────────────────────────────────────────
         const saved = localStorage.getItem('scanned_orders');
         if (saved) { scannedOrders = JSON.parse(saved); renderList(); }
 
@@ -648,7 +673,7 @@
         const savedCourier = localStorage.getItem('selected_courier');
         if (savedCourier) selectCourier(savedCourier, false);
 
-        // ── Scanner Gun ───────────────────────────────────────────────
+        // ── Scanner Gun ──────────────────────────────────────────────
         const scannerGunInput = document.getElementById('scannerGunInput');
         let inputTimeout = null, lastInputTime = 0;
 
@@ -662,16 +687,14 @@
             scannerGunInput.focus();
         }
 
-        // ✅ الإصلاح: القراءة والمسح داخل الـ setTimeout مش قبله
         scannerGunInput.addEventListener('input', () => {
             if (inputTimeout) clearTimeout(inputTimeout);
             const now = Date.now(), gap = now - lastInputTime;
             lastInputTime = now;
-            inputTimeout = setTimeout(() => {
-                const val = scannerGunInput.value.trim();
-                scannerGunInput.value = '';
-                if (val) processScannedCode(val);
-            }, gap < 80 ? 150 : 400);
+            const val = scannerGunInput.value.trim();
+            scannerGunInput.value = '';
+            if (!val) return;
+            inputTimeout = setTimeout(() => processScannedCode(val), gap < 80 ? 150 : 400);
         });
 
         scannerGunInput.addEventListener('keypress', e => {
@@ -684,7 +707,7 @@
             }
         });
 
-        // ── Manual Order Add ──────────────────────────────────────────
+        // ── Manual Order Add ─────────────────────────────────────────
         document.getElementById('manualOrderInput').addEventListener('keypress', e => {
             if (e.key === 'Enter') { e.preventDefault(); handleManualOrderAdd(); }
         });
@@ -749,7 +772,7 @@
             }
         });
 
-        // ── Field Selection ───────────────────────────────────────────
+        // ── Field Selection ──────────────────────────────────────────
         function selectField(field, save = true) {
             currentField = field;
             document.getElementById('fieldBtnS1').classList.toggle('active', field === 'S1');
@@ -781,7 +804,7 @@
             ).join('');
         }
 
-        // ── Couriers ──────────────────────────────────────────────────
+        // ── Couriers ─────────────────────────────────────────────────
         async function loadCouriers() {
             const url    = localStorage.getItem('log_worker_url') || '';
             const secret = localStorage.getItem('log_worker_secret') || '';
@@ -800,7 +823,7 @@
             if (currentCourier) selectCourier(currentCourier, false);
         }
 
-        // ── Status Selection ──────────────────────────────────────────
+        // ── Status Selection ─────────────────────────────────────────
         function selectStatus(specifier, label, icon, save = true) {
             if (!currentField) { alert('اختر نوع التحديث أولاً'); return; }
             currentSpecifier = specifier; currentStatusLabel = label;
@@ -816,7 +839,7 @@
             if (save) localStorage.setItem('selected_status', JSON.stringify({ specifier, label, icon }));
         }
 
-        // ── Courier Selection ─────────────────────────────────────────
+        // ── Courier Selection ────────────────────────────────────────
         function selectCourier(element, save = true) {
             let courier, btnEl;
             if (typeof element === 'string') { courier = element; btnEl = document.querySelector(`.courier-btn[data-courier="${courier}"]`); }
@@ -828,12 +851,13 @@
             if (save) localStorage.setItem('selected_courier', courier);
         }
 
-        // ── Order List ────────────────────────────────────────────────
+        // ── Order List ───────────────────────────────────────────────
         function resolveNameInBackground(orderId) {
             const url    = localStorage.getItem('log_worker_url') || '';
             const secret = localStorage.getItem('log_worker_secret') || '';
             if (!url || !secret) return;
 
+            // Fetch name + statuses in parallel
             Promise.all([
                 fetch(`${url}/resolve`, {
                     method: 'POST',
@@ -911,7 +935,7 @@
             });
         }
 
-        // ── Update ────────────────────────────────────────────────────
+        // ── Update ───────────────────────────────────────────────────
         async function startUpdate() {
             const token = localStorage.getItem('api_token') || '';
             if (!token)            { alert('أدخل API Token في الإعدادات'); openSettings(); return; }
@@ -984,7 +1008,7 @@
 
         updateSummaryCount();
 
-        // ── Toast ─────────────────────────────────────────────────────
+        // ── Toast ────────────────────────────────────────────────────
         function showToast(msg, type = '') {
             const c = document.getElementById('toastContainer');
             const t = document.createElement('div');
@@ -994,7 +1018,7 @@
             setTimeout(() => t.remove(), 2800);
         }
 
-        // ── Log ───────────────────────────────────────────────────────
+        // ── Log ──────────────────────────────────────────────────────
         function getLogConfig() {
             return { url: localStorage.getItem('log_worker_url')||'', secret: localStorage.getItem('log_worker_secret')||'' };
         }
@@ -1075,6 +1099,8 @@
             if (!log.length) { container.innerHTML = '<div class="log-empty">لا توجد عمليات مسجلة</div>'; return; }
             container.innerHTML = log.map((entry, i) => {
                 const field = entry.field || 'S1';
+                const successOrders = entry.orders.filter(o => o.status === 'success');
+                const showPrint = entry.status === 'Shipped' && successOrders.length > 0;
                 return `
                 <div class="log-entry">
                     <div class="log-entry-header" onclick="toggleLogEntry(this)">
@@ -1089,6 +1115,7 @@
                         <div style="display:flex;align-items:center;gap:8px;">
                             <span style="color:var(--success);font-weight:600;font-size:12px;">✓${entry.success}</span>
                             <span style="color:var(--error);font-weight:600;font-size:12px;">✗${entry.errors}</span>
+                            ${showPrint ? `<button class="btn-sm" style="font-size:11px;padding:4px 10px;" onclick="event.stopPropagation();printManifest(${i})">🖨️ طباعة</button>` : ''}
                             <span class="log-toggle">▶</span>
                         </div>
                     </div>
@@ -1102,6 +1129,140 @@
                 </div>`;
             }).join('');
             document.getElementById('exportSelectedBtn').classList.remove('visible');
+        }
+
+        // ── Manifest Print ───────────────────────────────────────────
+        async function printManifest(logIndex) {
+            const log     = getLog();
+            const entry   = log[logIndex];
+            if (!entry) return;
+
+            const { url, secret } = getLogConfig();
+            if (!url || !secret) { alert('أدخل Log Worker URL و Secret في الإعدادات'); openSettings(); return; }
+
+            const successOrders = entry.orders.filter(o => o.status === 'success');
+            const orderIds      = successOrders.map(o => o.order);
+
+            // Show loading toast
+            showToast('⏳ جاري جلب بيانات العملاء...', '');
+
+            let details = {};
+            try {
+                const res  = await fetch(`${url}/order-details`, {
+                    method:  'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${secret}` },
+                    body:    JSON.stringify({ orderIds }),
+                });
+                const data = await res.json();
+                if (data.success) details = data.details;
+            } catch { showToast('⚠️ خطأ في جلب بيانات العملاء', 'error'); return; }
+
+            // Build manifest HTML
+            const date      = new Date(entry.date).toLocaleDateString('ar-EG', { day:'2-digit', month:'2-digit', year:'numeric' });
+            const courier   = entry.courier || '—';
+            const totalCOD  = orderIds.reduce((s, id) => s + parseFloat(details[id]?.cod || 0), 0);
+
+            const rows = successOrders.map((o, i) => {
+                const d = details[o.order] || {};
+                return `
+                <tr>
+                    <td style="text-align:center;font-weight:600;">${i + 1}</td>
+                    <td style="font-weight:700;color:#0284c7;text-align:right;">${d.orderName || o.orderName || '—'}</td>
+                    <td style="text-align:center;">
+                        <svg id="bc-${i}" style="display:block;margin:auto;"></svg>
+                    </td>
+                    <td style="text-align:right;">${d.customerName || '—'}</td>
+                    <td style="text-align:center;direction:ltr;">${d.phone || '—'}</td>
+                    <td style="text-align:right;font-size:11px;">${d.address || '—'}</td>
+                    <td style="text-align:left;font-weight:700;direction:ltr;">${d.cod || '—'}</td>
+                </tr>`;
+            }).join('');
+
+            const barcodeScripts = successOrders.map((o, i) =>
+                `JsBarcode("#bc-${i}", "${o.order}", { format:"CODE128", width:1.5, height:36, displayValue:false, margin:2 });`
+            ).join('\n');
+
+            const manifestHTML = `<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>Manifest — ${courier} — ${date}</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jsbarcode/3.11.6/JsBarcode.all.min.js"><\/script>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; padding: 20px; font-size: 13px; color: #1a1d27; direction: rtl; }
+        .manifest-header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:20px; padding-bottom:14px; border-bottom:2px solid #1a1d27; }
+        .manifest-title { font-size:20px; font-weight:800; margin-bottom:6px; }
+        .manifest-meta { display:flex; gap:24px; margin-top:8px; }
+        .meta-item { display:flex; flex-direction:column; }
+        .meta-label { font-size:10px; color:#6b7280; text-transform:uppercase; letter-spacing:0.05em; }
+        .meta-value { font-size:14px; font-weight:700; margin-top:2px; }
+        .manifest-logo { font-size:28px; }
+        table { width:100%; border-collapse:collapse; margin-bottom:16px; }
+        thead th { background:#f5f6fa; padding:8px 10px; font-size:11px; font-weight:700; color:#6b7280; text-transform:uppercase; letter-spacing:0.04em; border-bottom:1.5px solid #e2e5ed; white-space:nowrap; }
+        tbody td { padding:8px 10px; border-bottom:1px solid #eef0f5; vertical-align:middle; }
+        tbody tr:last-child td { border-bottom:none; }
+        tbody tr:nth-child(even) { background:#fafbfd; }
+        .manifest-footer { display:flex; justify-content:space-between; align-items:center; padding-top:12px; border-top:2px solid #1a1d27; margin-top:8px; }
+        .total-label { font-size:13px; color:#6b7280; }
+        .total-value { font-size:20px; font-weight:800; direction:ltr; }
+        .sign-box { border:1px solid #e2e5ed; border-radius:8px; padding:8px 20px; font-size:11px; color:#9ca3af; text-align:center; min-width:160px; }
+        @media print {
+            body { padding:10px; }
+            @page { margin:10mm; size:A4; }
+        }
+    </style>
+</head>
+<body>
+    <div class="manifest-header">
+        <div>
+            <div class="manifest-title">📦 Manifest — بيان شحن</div>
+            <div class="manifest-meta">
+                <div class="meta-item"><span class="meta-label">المندوب</span><span class="meta-value">${courier}</span></div>
+                <div class="meta-item"><span class="meta-label">التاريخ</span><span class="meta-value">${date}</span></div>
+                <div class="meta-item"><span class="meta-label">عدد الأوردرات</span><span class="meta-value">${successOrders.length}</span></div>
+                <div class="meta-item"><span class="meta-label">إجمالي COD</span><span class="meta-value" style="direction:ltr;">${totalCOD.toLocaleString('en-US', {minimumFractionDigits:2})} EGP</span></div>
+            </div>
+        </div>
+        <div class="manifest-logo">🛵</div>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th style="width:32px;text-align:center;">#</th>
+                <th style="text-align:right;">رقم الأوردر</th>
+                <th style="width:160px;text-align:center;">الباركود</th>
+                <th style="text-align:right;">اسم العميل</th>
+                <th style="text-align:center;">التليفون</th>
+                <th style="text-align:right;">العنوان</th>
+                <th style="text-align:left;">COD</th>
+            </tr>
+        </thead>
+        <tbody>${rows}</tbody>
+    </table>
+
+    <div class="manifest-footer">
+        <div>
+            <div class="total-label">إجمالي التحصيل</div>
+            <div class="total-value">${totalCOD.toLocaleString('en-US', {minimumFractionDigits:2})} EGP</div>
+        </div>
+        <div class="sign-box">توقيع المندوب<br><br><br></div>
+        <div class="sign-box">توقيع المستلم<br><br><br></div>
+    </div>
+
+    <script>
+        window.onload = function() {
+            ${barcodeScripts}
+            setTimeout(() => window.print(), 400);
+        };
+    <\/script>
+</body>
+</html>`;
+
+            const win = window.open('', '_blank');
+            win.document.write(manifestHTML);
+            win.document.close();
         }
 
         function exportLogCSV(selectedOnly) {

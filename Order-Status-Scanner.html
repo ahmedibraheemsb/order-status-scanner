@@ -113,9 +113,6 @@
 
         /* ── Layout grids ── */
         .scanner-tab-content { display: flex; flex-direction: column; gap: 14px; }
-        .top-row   { display: grid; grid-template-columns: 230px 1fr; gap: 14px; align-items: start; }
-        .mid-row   { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; align-items: start; }
-        .bottom-row { display: grid; grid-template-columns: 1fr 360px; gap: 14px; align-items: start; }
 
         /* ── Field Selector ── */
         .field-selector { display: flex; flex-direction: column; gap: 8px; }
@@ -229,18 +226,15 @@
         .scanned-table tbody td.col-order { font-weight: 700; color: var(--primary); font-size: 13px; white-space: nowrap; }
         .scanned-table tbody td.col-id { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text-muted); direction: ltr; text-align: left; }
         .scanned-table tbody td.col-del { text-align: center; }
-        /* ── Status Pills in table ── */
         .status-pill {
             display: inline-block; padding: 2px 8px; border-radius: 5px;
             font-size: 11px; font-weight: 600; white-space: nowrap;
         }
-        /* Named status colors */
         .status-pill.s-Shipped    { background: #f0f9ff; color: #0284c7; border: 1px solid #bae6fd; }
         .status-pill.s-Delivered  { background: #f0fdf4; color: #16a34a; border: 1px solid #bbf7d0; }
         .status-pill.s-Returned   { background: #fffbeb; color: #d97706; border: 1px solid #fde68a; }
         .status-pill.s-Cancelled  { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
         .status-pill.s-Ready      { background: #f5f3ff; color: #7c3aed; border: 1px solid #ddd6fe; }
-        /* Neutral for all others (Confirmed, etc.) */
         .status-pill.s-neutral    { background: #f3f4f6; color: #6b7280; border: 1px solid #e5e7eb; }
         .status-empty { color: var(--text-muted); font-size: 11px; }
         .empty-state { text-align: center; padding: 28px; color: var(--text-muted); font-size: 13px; }
@@ -308,7 +302,7 @@
         .btn-sm.danger { color: var(--error); border-color: var(--error-b); }
         .btn-sm.danger:hover { background: var(--error-bg); }
 
-        /* ── Log Section (tab) ── */
+        /* ── Log Section ── */
         .log-entry { border: 1px solid var(--border); border-radius: 8px; overflow: hidden; margin-bottom: 8px; }
         .log-entry-header { background: var(--bg); padding: 9px 14px; display: flex; align-items: center; justify-content: space-between; font-size: 12px; color: var(--text-sub); gap: 10px; flex-wrap: wrap; cursor: pointer; }
         .log-entry-header strong { color: var(--text); font-size: 13px; }
@@ -426,10 +420,10 @@
         <div id="tab-scanner" class="tab-content active">
             <div class="scanner-tab-content">
 
-                <!-- Row 1: Field + Status + Summary (RTL: Field appears right, Summary left) -->
+                <!-- Row 1 -->
                 <div style="display:grid;grid-template-columns:220px 1fr 280px;gap:14px;align-items:start;">
 
-                    <!-- Field Selector (rightmost in RTL) -->
+                    <!-- Field Selector -->
                     <div class="card">
                         <div class="card-header"><h2>🔀 نوع التحديث</h2></div>
                         <div class="card-body">
@@ -446,7 +440,7 @@
                         </div>
                     </div>
 
-                    <!-- Status Selector (middle) -->
+                    <!-- Status Selector -->
                     <div class="card">
                         <div class="card-header"><h2>📌 الحالة</h2></div>
                         <div class="card-body">
@@ -454,7 +448,7 @@
                         </div>
                     </div>
 
-                    <!-- Summary + Action (leftmost in RTL) -->
+                    <!-- Summary + Action -->
                     <div class="card" style="overflow:hidden;">
                         <div class="summary-banner" id="summaryFieldBanner">— اختر نوع التحديث —</div>
                         <div class="summary-rows">
@@ -502,7 +496,7 @@
                     </div>
                 </div>
 
-                <!-- Row 3: Input (full width) -->
+                <!-- Row 3: Input -->
                 <div class="card">
                     <div class="card-header"><h2>🔫 إدخال الأوردرات</h2></div>
                     <div class="card-body">
@@ -532,7 +526,7 @@
                     </div>
                 </div>
 
-                <!-- Row 4: Orders only -->
+                <!-- Row 4: Orders -->
                 <div class="card">
                     <div class="card-header">
                         <h2>📋 الأوردرات</h2>
@@ -603,7 +597,7 @@
         let currentStatusLabel = '';
         let currentCourier   = '';
         const orderNameMap   = {};
-        const orderStatusMap = {}; // orderId → { s1, s2 }
+        const orderStatusMap = {};
 
         const STATUS_COLOR_MAP = {
             'Shipped':   's-Shipped',
@@ -617,7 +611,6 @@
 
         function statusPillClass(value) {
             if (!value) return null;
-            // Strip _S2 suffix for lookup
             const base = value.replace(/_S2$/, '');
             return STATUS_COLOR_MAP[base] || 's-neutral';
         }
@@ -628,7 +621,7 @@
             return `<span class="status-pill ${cls}">${value}</span>`;
         }
 
-        // ── Tabs ────────────────────────────────────────────────────
+        // ── Tabs ──────────────────────────────────────────────────────
         function switchTab(tab, btn) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
@@ -637,7 +630,7 @@
             if (tab === 'log') syncFromCloud();
         }
 
-        // ── Settings ─────────────────────────────────────────────────
+        // ── Settings ──────────────────────────────────────────────────
         function openSettings() {
             document.getElementById('apiToken').value        = localStorage.getItem('api_token') || '';
             document.getElementById('logWorkerUrl').value    = localStorage.getItem('log_worker_url') || '';
@@ -660,7 +653,7 @@
             if (e.target === document.getElementById('settingsModal')) closeSettings();
         });
 
-        // ── Restore state ────────────────────────────────────────────
+        // ── Restore state ─────────────────────────────────────────────
         const saved = localStorage.getItem('scanned_orders');
         if (saved) { scannedOrders = JSON.parse(saved); renderList(); }
 
@@ -673,41 +666,54 @@
         const savedCourier = localStorage.getItem('selected_courier');
         if (savedCourier) selectCourier(savedCourier, false);
 
-        // ── Scanner Gun ──────────────────────────────────────────────
+        // ── Scanner Gun ───────────────────────────────────────────────
+        // ✅ FIX: نفس pattern أداة Payment — المسح جوه handleScan مش في الـ listener
         const scannerGunInput = document.getElementById('scannerGunInput');
         let inputTimeout = null, lastInputTime = 0;
 
-        function processScannedCode(code) {
-            if (code.length >= 3) {
-                if (!scannedOrders.includes(code)) {
-                    addOrder(code); showToast('✓ تم المسح', 'success');
-                    if (navigator.vibrate) navigator.vibrate(100);
-                } else { showScanStatus('⚠️ موجود بالفعل: ' + code); }
+        function focusInput() { scannerGunInput.focus(); }
+        window.addEventListener('load', focusInput);
+
+        document.addEventListener('click', e => {
+            const tag = e.target.tagName;
+            if (tag !== 'BUTTON' && tag !== 'INPUT' && !e.target.closest('.log-entry')
+                && !e.target.closest('.results') && !e.target.closest('.modal')) {
+                if (document.getElementById('tab-scanner').classList.contains('active')) {
+                    setTimeout(focusInput, 150);
+                }
             }
+        });
+
+        function handleScan() {
+            const val = scannerGunInput.value.trim();
+            scannerGunInput.value = '';
             scannerGunInput.focus();
+            if (!val || val.length < 3) return;
+            if (!scannedOrders.includes(val)) {
+                addOrder(val);
+                showToast('✓ تم المسح', 'success');
+                if (navigator.vibrate) navigator.vibrate(100);
+            } else {
+                showScanStatus('⚠️ موجود بالفعل: ' + val);
+            }
         }
 
         scannerGunInput.addEventListener('input', () => {
             if (inputTimeout) clearTimeout(inputTimeout);
             const now = Date.now(), gap = now - lastInputTime;
             lastInputTime = now;
-            const val = scannerGunInput.value.trim();
-            scannerGunInput.value = '';
-            if (!val) return;
-            inputTimeout = setTimeout(() => processScannedCode(val), gap < 80 ? 150 : 400);
+            inputTimeout = setTimeout(handleScan, gap < 80 ? 150 : 400);
         });
 
         scannerGunInput.addEventListener('keypress', e => {
             if (e.key === 'Enter') {
                 e.preventDefault();
                 if (inputTimeout) clearTimeout(inputTimeout);
-                const val = scannerGunInput.value.trim();
-                scannerGunInput.value = '';
-                if (val) processScannedCode(val);
+                handleScan();
             }
         });
 
-        // ── Manual Order Add ─────────────────────────────────────────
+        // ── Manual Order Add ──────────────────────────────────────────
         document.getElementById('manualOrderInput').addEventListener('keypress', e => {
             if (e.key === 'Enter') { e.preventDefault(); handleManualOrderAdd(); }
         });
@@ -760,19 +766,7 @@
             el._t = setTimeout(() => { el.style.display = 'none'; }, 2500);
         }
 
-        function focusInput() { scannerGunInput.focus(); }
-        window.addEventListener('load', focusInput);
-        document.addEventListener('click', e => {
-            const tag = e.target.tagName;
-            if (tag !== 'BUTTON' && tag !== 'INPUT' && !e.target.closest('.log-entry')
-                && !e.target.closest('.results') && !e.target.closest('.modal')) {
-                if (document.getElementById('tab-scanner').classList.contains('active')) {
-                    setTimeout(focusInput, 150);
-                }
-            }
-        });
-
-        // ── Field Selection ──────────────────────────────────────────
+        // ── Field Selection ───────────────────────────────────────────
         function selectField(field, save = true) {
             currentField = field;
             document.getElementById('fieldBtnS1').classList.toggle('active', field === 'S1');
@@ -804,7 +798,7 @@
             ).join('');
         }
 
-        // ── Couriers ─────────────────────────────────────────────────
+        // ── Couriers ──────────────────────────────────────────────────
         async function loadCouriers() {
             const url    = localStorage.getItem('log_worker_url') || '';
             const secret = localStorage.getItem('log_worker_secret') || '';
@@ -823,7 +817,7 @@
             if (currentCourier) selectCourier(currentCourier, false);
         }
 
-        // ── Status Selection ─────────────────────────────────────────
+        // ── Status Selection ──────────────────────────────────────────
         function selectStatus(specifier, label, icon, save = true) {
             if (!currentField) { alert('اختر نوع التحديث أولاً'); return; }
             currentSpecifier = specifier; currentStatusLabel = label;
@@ -839,7 +833,7 @@
             if (save) localStorage.setItem('selected_status', JSON.stringify({ specifier, label, icon }));
         }
 
-        // ── Courier Selection ────────────────────────────────────────
+        // ── Courier Selection ─────────────────────────────────────────
         function selectCourier(element, save = true) {
             let courier, btnEl;
             if (typeof element === 'string') { courier = element; btnEl = document.querySelector(`.courier-btn[data-courier="${courier}"]`); }
@@ -851,13 +845,12 @@
             if (save) localStorage.setItem('selected_courier', courier);
         }
 
-        // ── Order List ───────────────────────────────────────────────
+        // ── Order List ────────────────────────────────────────────────
         function resolveNameInBackground(orderId) {
             const url    = localStorage.getItem('log_worker_url') || '';
             const secret = localStorage.getItem('log_worker_secret') || '';
             if (!url || !secret) return;
 
-            // Fetch name + statuses in parallel
             Promise.all([
                 fetch(`${url}/resolve`, {
                     method: 'POST',
@@ -935,7 +928,7 @@
             });
         }
 
-        // ── Update ───────────────────────────────────────────────────
+        // ── Update ────────────────────────────────────────────────────
         async function startUpdate() {
             const token = localStorage.getItem('api_token') || '';
             if (!token)            { alert('أدخل API Token في الإعدادات'); openSettings(); return; }
@@ -1008,7 +1001,7 @@
 
         updateSummaryCount();
 
-        // ── Toast ────────────────────────────────────────────────────
+        // ── Toast ─────────────────────────────────────────────────────
         function showToast(msg, type = '') {
             const c = document.getElementById('toastContainer');
             const t = document.createElement('div');
@@ -1018,7 +1011,7 @@
             setTimeout(() => t.remove(), 2800);
         }
 
-        // ── Log ──────────────────────────────────────────────────────
+        // ── Log ───────────────────────────────────────────────────────
         function getLogConfig() {
             return { url: localStorage.getItem('log_worker_url')||'', secret: localStorage.getItem('log_worker_secret')||'' };
         }
@@ -1131,7 +1124,7 @@
             document.getElementById('exportSelectedBtn').classList.remove('visible');
         }
 
-        // ── Manifest Print ───────────────────────────────────────────
+        // ── Manifest Print ────────────────────────────────────────────
         async function printManifest(logIndex) {
             const log     = getLog();
             const entry   = log[logIndex];
@@ -1143,7 +1136,6 @@
             const successOrders = entry.orders.filter(o => o.status === 'success');
             const orderIds      = successOrders.map(o => o.order);
 
-            // Show loading toast
             showToast('⏳ جاري جلب بيانات العملاء...', '');
 
             let details = {};
@@ -1157,7 +1149,6 @@
                 if (data.success) details = data.details;
             } catch { showToast('⚠️ خطأ في جلب بيانات العملاء', 'error'); return; }
 
-            // Build manifest HTML
             const date      = new Date(entry.date).toLocaleDateString('ar-EG', { day:'2-digit', month:'2-digit', year:'numeric' });
             const courier   = entry.courier || '—';
             const totalCOD  = orderIds.reduce((s, id) => s + parseFloat(details[id]?.cod || 0), 0);
@@ -1197,20 +1188,15 @@
         .meta-item { display:flex; flex-direction:column; }
         .meta-label { font-size:10px; color:#6b7280; text-transform:uppercase; letter-spacing:0.05em; }
         .meta-value { font-size:14px; font-weight:700; margin-top:2px; }
-        .manifest-logo { font-size:28px; }
         table { width:100%; border-collapse:collapse; margin-bottom:16px; }
         thead th { background:#f5f6fa; padding:8px 10px; font-size:11px; font-weight:700; color:#6b7280; text-transform:uppercase; letter-spacing:0.04em; border-bottom:1.5px solid #e2e5ed; white-space:nowrap; }
         tbody td { padding:8px 10px; border-bottom:1px solid #eef0f5; vertical-align:middle; }
         tbody tr:last-child td { border-bottom:none; }
         tbody tr:nth-child(even) { background:#fafbfd; }
         .manifest-footer { display:flex; justify-content:space-between; align-items:center; padding-top:12px; border-top:2px solid #1a1d27; margin-top:8px; }
-        .total-label { font-size:13px; color:#6b7280; }
         .total-value { font-size:20px; font-weight:800; direction:ltr; }
         .sign-box { border:1px solid #e2e5ed; border-radius:8px; padding:8px 20px; font-size:11px; color:#9ca3af; text-align:center; min-width:160px; }
-        @media print {
-            body { padding:10px; }
-            @page { margin:10mm; size:A4; }
-        }
+        @media print { body { padding:10px; } @page { margin:10mm; size:A4; } }
     </style>
 </head>
 <body>
@@ -1224,9 +1210,8 @@
                 <div class="meta-item"><span class="meta-label">إجمالي COD</span><span class="meta-value" style="direction:ltr;">${totalCOD.toLocaleString('en-US', {minimumFractionDigits:2})} EGP</span></div>
             </div>
         </div>
-        <div class="manifest-logo">🛵</div>
+        <div style="font-size:28px;">🛵</div>
     </div>
-
     <table>
         <thead>
             <tr>
@@ -1241,16 +1226,14 @@
         </thead>
         <tbody>${rows}</tbody>
     </table>
-
     <div class="manifest-footer">
         <div>
-            <div class="total-label">إجمالي التحصيل</div>
+            <div style="font-size:13px;color:#6b7280;">إجمالي التحصيل</div>
             <div class="total-value">${totalCOD.toLocaleString('en-US', {minimumFractionDigits:2})} EGP</div>
         </div>
         <div class="sign-box">توقيع المندوب<br><br><br></div>
         <div class="sign-box">توقيع المستلم<br><br><br></div>
     </div>
-
     <script>
         window.onload = function() {
             ${barcodeScripts}

@@ -63,12 +63,10 @@
 
         .wrapper { max-width: 1100px; margin: 0 auto; display: flex; flex-direction: column; gap: 16px; }
 
-        /* ── Top border strip ── */
         .page-border { position: fixed; top: 0; left: 0; right: 0; height: 3px; z-index: 50; background: var(--border); transition: background 0.4s; }
         body.field-s1 .page-border { background: var(--primary); }
         body.field-s2 .page-border { background: var(--amber); }
 
-        /* ── Header ── */
         .header {
             background: var(--surface); border: 1px solid var(--border);
             border-radius: var(--radius); padding: 16px 20px;
@@ -80,7 +78,6 @@
         .header-title h1 { font-size: 17px; font-weight: 700; }
         .header-title p  { font-size: 12px; color: var(--text-sub); margin-top: 2px; }
 
-        /* ── Tabs ── */
         .tabs-card {
             background: var(--surface); border: 1px solid var(--border);
             border-radius: var(--radius); padding: 10px 14px;
@@ -97,7 +94,6 @@
         .tab-content { display: none; }
         .tab-content.active { display: block; }
 
-        /* ── Card ── */
         .card {
             background: var(--surface); border: 1px solid var(--border);
             border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden;
@@ -111,10 +107,8 @@
         .card-header h2 { font-size: 13px; font-weight: 600; color: var(--text); display: flex; align-items: center; gap: 6px; }
         .card-body { padding: 16px 18px; }
 
-        /* ── Layout grids ── */
         .scanner-tab-content { display: flex; flex-direction: column; gap: 14px; }
 
-        /* ── Field Selector ── */
         .field-selector { display: flex; flex-direction: column; gap: 8px; }
         .field-btn {
             padding: 1rem 1rem; border-radius: 10px; font-family: inherit;
@@ -131,7 +125,6 @@
         .field-btn.active.s2 .field-main { color: var(--amber); }
         .field-btn.active.s2 .field-tag  { opacity: 0.7; color: var(--amber); }
 
-        /* ── Status Selector ── */
         .status-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
         .status-btn {
             padding: 0.65rem 0.3rem; border-radius: 9px; font-family: inherit;
@@ -148,7 +141,6 @@
         .status-btn.Cancelled.active { border-color: var(--error);    background: var(--error-bg);    color: var(--error); }
         .status-btn.Ready.active     { border-color: var(--purple);   background: var(--purple-bg);   color: var(--purple); }
 
-        /* ── Courier Selector ── */
         .courier-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
         .courier-btn {
             padding: 0.55rem 0.4rem; border-radius: 7px; font-family: inherit;
@@ -160,7 +152,6 @@
         .courier-btn.active { border-color: var(--pink); background: var(--pink-bg); color: var(--pink); font-weight: 600; }
         .courier-loading { padding: 0.75rem; color: var(--text-muted); font-size: 0.8rem; }
 
-        /* ── Scanner Input ── */
         .scanner-row { position: relative; }
         .scanner-icon { position: absolute; right: 0.85rem; top: 50%; transform: translateY(-50%); font-size: 1rem; pointer-events: none; }
         .scanner-input {
@@ -173,7 +164,6 @@
         .scanner-input:focus { outline: none; border-color: var(--primary); }
         .scanner-input::placeholder { color: var(--text-muted); font-size: 13px; font-family: 'IBM Plex Sans Arabic', sans-serif; }
 
-        /* ── Manual Input Row ── */
         .manual-row { display: flex; gap: 8px; align-items: center; position: relative; }
         .manual-icon { position: absolute; right: 0.85rem; top: 50%; transform: translateY(-50%); font-family: 'JetBrains Mono', monospace; font-size: 1rem; color: var(--text-muted); pointer-events: none; font-weight: 700; }
         .manual-input {
@@ -197,14 +187,12 @@
         .input-hint { font-size: 11px; color: var(--text-muted); margin-top: 5px; }
         .input-divider { border: none; border-top: 1px solid var(--border-light); margin: 10px 0; }
 
-        /* Scan feedback */
         .scan-feedback {
             display: none; font-size: 12px; padding: 6px 10px;
             border-radius: 7px; margin-top: 8px; text-align: center;
             font-weight: 500;
         }
 
-        /* ── Scanned Table ── */
         .scanned-table { width: 100%; border-collapse: collapse; font-size: 13px; }
         .scanned-table thead th {
             text-align: right; padding: 8px 12px;
@@ -240,7 +228,6 @@
         .empty-state { text-align: center; padding: 28px; color: var(--text-muted); font-size: 13px; }
         .empty-state .empty-icon { font-size: 28px; margin-bottom: 8px; }
 
-        /* ── Summary + Action sidebar ── */
         .summary-banner {
             padding: 14px 16px; text-align: center; font-size: 14px; font-weight: 700;
             background: var(--bg); color: var(--text-muted); letter-spacing: 0.02em;
@@ -277,7 +264,6 @@
         .progress-wrap.active { display: block; }
         .progress-bar  { height: 100%; background: var(--primary); border-radius: 4px; transition: width 0.3s; width: 0%; }
 
-        /* ── Results ── */
         .results { display: none; }
         .results.active { display: block; }
         .results-header { display: flex; justify-content: space-between; font-size: 12px; font-weight: 600; margin-bottom: 6px; }
@@ -291,7 +277,6 @@
         .result-success { background: var(--success-bg); color: var(--success); }
         .result-error   { background: var(--error-bg);   color: var(--error); }
 
-        /* ── Btn small ── */
         .btn-sm {
             display: inline-flex; align-items: center; gap: 5px;
             padding: 6px 12px; border-radius: 7px; font-size: 12px; font-weight: 600;
@@ -301,6 +286,38 @@
         .btn-sm:hover { background: var(--bg); border-color: #9ca3af; color: var(--text); }
         .btn-sm.danger { color: var(--error); border-color: var(--error-b); }
         .btn-sm.danger:hover { background: var(--error-bg); }
+
+        /* ── Log Filters ── */
+        .log-filter-bar {
+            padding: 12px 18px;
+            border-bottom: 1px solid var(--border-light);
+            display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+            background: var(--bg);
+        }
+        .log-filter-input {
+            flex: 1; min-width: 160px;
+            padding: 7px 12px; border: 1.5px solid var(--border);
+            border-radius: 7px; font-family: 'JetBrains Mono', monospace;
+            font-size: 13px; color: var(--text); background: white;
+            outline: none; direction: ltr; transition: border-color 0.15s;
+        }
+        .log-filter-input:focus { border-color: var(--primary); }
+        .log-filter-input::placeholder { font-family: 'IBM Plex Sans Arabic', sans-serif; color: var(--text-muted); font-size: 12px; direction: rtl; }
+        .log-filter-select {
+            padding: 7px 10px; border: 1.5px solid var(--border);
+            border-radius: 7px; font-family: inherit; font-size: 12px;
+            color: var(--text); background: white; outline: none;
+            cursor: pointer; transition: border-color 0.15s; max-width: 140px;
+        }
+        .log-filter-select:focus { border-color: var(--primary); }
+        .log-filter-clear {
+            padding: 7px 12px; border-radius: 7px; font-family: inherit;
+            font-size: 12px; font-weight: 600; cursor: pointer;
+            border: 1.5px solid var(--border); background: var(--surface);
+            color: var(--text-sub); transition: all 0.15s; white-space: nowrap;
+        }
+        .log-filter-clear:hover { border-color: var(--error); color: var(--error); background: var(--error-bg); }
+        .log-filter-count { font-size: 11px; color: var(--text-muted); white-space: nowrap; }
 
         /* ── Log Section ── */
         .log-entry { border: 1px solid var(--border); border-radius: 8px; overflow: hidden; margin-bottom: 8px; }
@@ -335,7 +352,9 @@
         .export-selected-btn { display: none; }
         .export-selected-btn.visible { display: inline-flex; }
 
-        /* ── Modal ── */
+        /* highlight matching order rows */
+        .log-detail-item.highlight-match { background: #fefce8; }
+
         .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.3); z-index: 200; align-items: center; justify-content: center; padding: 1rem; }
         .modal-overlay.active { display: flex; }
         .modal { background: var(--surface); border-radius: 14px; padding: 22px; width: 100%; max-width: 420px; box-shadow: 0 20px 60px rgba(0,0,0,0.15); animation: modalIn 0.2s ease; }
@@ -353,7 +372,6 @@
         .modal-save   { flex: 1; padding: 10px; border-radius: 8px; font-family: inherit; font-size: 13px; font-weight: 600; cursor: pointer; border: none; background: var(--primary); color: white; }
         .modal-save:hover { background: var(--primary-h); }
 
-        /* ── Toast ── */
         .toast-container { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 300; display: flex; flex-direction: column; gap: 6px; align-items: center; }
         .toast { background: #1a1d27; color: white; padding: 9px 18px; border-radius: 8px; font-size: 12px; box-shadow: var(--shadow-md); animation: slideUp 0.2s ease; white-space: nowrap; font-weight: 500; }
         .toast.success { background: var(--success); }
@@ -501,7 +519,6 @@
                     <div class="card-header"><h2>🔫 إدخال الأوردرات</h2></div>
                     <div class="card-body">
                         <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
-                            <!-- Scanner Gun -->
                             <div>
                                 <div class="scanner-row">
                                     <span class="scanner-icon">🔫</span>
@@ -510,7 +527,6 @@
                                 </div>
                                 <p class="input-hint" style="text-align:center;">💡 Scanner Gun: امسح وسيتم الإضافة تلقائياً</p>
                             </div>
-                            <!-- Manual -->
                             <div>
                                 <div class="manual-row">
                                     <span class="manual-icon">#</span>
@@ -558,6 +574,27 @@
                         <button class="btn-sm" onclick="exportLogCSV(false)">📥 تصدير الكل</button>
                     </div>
                 </div>
+
+                <!-- Filter Bar -->
+                <div class="log-filter-bar">
+                    <input type="text" class="log-filter-input" id="logSearchInput"
+                        placeholder="ابحث برقم الأوردر... (#37269)"
+                        oninput="applyLogFilters()" autocomplete="off" spellcheck="false">
+                    <select class="log-filter-select" id="logStatusFilter" onchange="applyLogFilters()">
+                        <option value="">كل الحالات</option>
+                        <option value="Shipped">Shipped</option>
+                        <option value="Delivered">Delivered</option>
+                        <option value="Returned">Returned</option>
+                        <option value="Cancelled">Cancelled</option>
+                        <option value="Ready">Ready</option>
+                    </select>
+                    <select class="log-filter-select" id="logCourierFilter" onchange="applyLogFilters()">
+                        <option value="">كل المناديب</option>
+                    </select>
+                    <button class="log-filter-clear" onclick="clearLogFilters()">✕ مسح الفلتر</button>
+                    <span class="log-filter-count" id="logFilterCount"></span>
+                </div>
+
                 <div class="card-body">
                     <div id="logList">
                         <div class="log-empty">لا توجد عمليات مسجلة</div>
@@ -667,7 +704,6 @@
         if (savedCourier) selectCourier(savedCourier, false);
 
         // ── Scanner Gun ───────────────────────────────────────────────
-        // ✅ FIX: نفس pattern أداة Payment — المسح جوه handleScan مش في الـ listener
         const scannerGunInput = document.getElementById('scannerGunInput');
         let inputTimeout = null, lastInputTime = 0;
 
@@ -676,7 +712,7 @@
 
         document.addEventListener('click', e => {
             const tag = e.target.tagName;
-            if (tag !== 'BUTTON' && tag !== 'INPUT' && !e.target.closest('.log-entry')
+            if (tag !== 'BUTTON' && tag !== 'INPUT' && tag !== 'SELECT' && !e.target.closest('.log-entry')
                 && !e.target.closest('.results') && !e.target.closest('.modal')) {
                 if (document.getElementById('tab-scanner').classList.contains('active')) {
                     setTimeout(focusInput, 150);
@@ -1063,6 +1099,7 @@
                 const data = await res.json();
                 const merged = mergeAndDedupe(getLog(), data.log||[]);
                 localStorage.setItem('update_log', JSON.stringify(merged));
+                populateCourierFilter(merged);
                 renderLog(merged); updateSyncStatus('synced');
             } catch { updateSyncStatus('local'); renderLog(); }
         }
@@ -1085,17 +1122,94 @@
             document.getElementById('exportSelectedBtn').classList.toggle('visible', document.querySelectorAll('.log-check:checked').length > 0);
         }
 
-        function renderLog(log) {
+        // ── Log Filters ───────────────────────────────────────────────
+        function populateCourierFilter(log) {
+            const sel = document.getElementById('logCourierFilter');
+            if (!sel) return;
+            const current = sel.value;
+            const couriers = [...new Set((log || getLog()).filter(e => e.courier).map(e => e.courier))].sort();
+            sel.innerHTML = '<option value="">كل المناديب</option>' +
+                couriers.map(c => `<option value="${c}"${c === current ? ' selected' : ''}>${c}</option>`).join('');
+        }
+
+        function applyLogFilters() {
+            const search  = (document.getElementById('logSearchInput')?.value || '').trim().replace(/^#/, '').toLowerCase();
+            const status  = document.getElementById('logStatusFilter')?.value || '';
+            const courier = document.getElementById('logCourierFilter')?.value || '';
+
+            const fullLog = getLog();
+            let filtered  = fullLog;
+
+            if (search) {
+                filtered = filtered.filter(entry =>
+                    entry.orders?.some(o =>
+                        (o.order || '').toLowerCase().includes(search) ||
+                        (o.orderName || '').toLowerCase().replace(/^#/, '').includes(search)
+                    )
+                );
+            }
+            if (status) {
+                filtered = filtered.filter(entry =>
+                    (entry.statusSpecifier || '').replace('_S2', '') === status ||
+                    entry.status === status
+                );
+            }
+            if (courier) {
+                filtered = filtered.filter(entry => entry.courier === courier);
+            }
+
+            const countEl = document.getElementById('logFilterCount');
+            const isFiltered = search || status || courier;
+            if (countEl) {
+                countEl.textContent = isFiltered ? `${filtered.length} من ${fullLog.length} عملية` : '';
+            }
+
+            // pass search term so we can highlight matched orders
+            renderLog(filtered, true, search);
+        }
+
+        function clearLogFilters() {
+            const s  = document.getElementById('logSearchInput');
+            const st = document.getElementById('logStatusFilter');
+            const co = document.getElementById('logCourierFilter');
+            if (s)  s.value  = '';
+            if (st) st.value = '';
+            if (co) co.value = '';
+            const countEl = document.getElementById('logFilterCount');
+            if (countEl) countEl.textContent = '';
+            renderLog(getLog());
+        }
+
+        // ── Render Log ────────────────────────────────────────────────
+        function renderLog(log, skipCourierPopulate = false, highlightSearch = '') {
             if (!log) log = getLog();
+            if (!skipCourierPopulate) populateCourierFilter(log);
             const container = document.getElementById('logList');
             if (!container) return;
             if (!log.length) { container.innerHTML = '<div class="log-empty">لا توجد عمليات مسجلة</div>'; return; }
+
             container.innerHTML = log.map((entry, i) => {
                 const field = entry.field || 'S1';
                 const successOrders = entry.orders.filter(o => o.status === 'success');
                 const showPrint = entry.status === 'Shipped' && successOrders.length > 0;
+
+                // highlight matched order rows if searching
+                const ordersHTML = entry.orders.map(o => {
+                    const isMatch = highlightSearch && (
+                        (o.order || '').toLowerCase().includes(highlightSearch) ||
+                        (o.orderName || '').toLowerCase().replace(/^#/, '').includes(highlightSearch)
+                    );
+                    return `<div class="log-detail-item${isMatch ? ' highlight-match' : ''}">
+                        <span class="log-detail-order">${o.orderName||''} <span style="color:var(--text-muted);font-size:11px">${o.order}</span></span>
+                        <span class="log-detail-status log-detail-${o.status}">${o.status==='success'?'✓ ناجح':'✗ فشل'}</span>
+                    </div>`;
+                }).join('');
+
+                // auto-open entry if a search is active and the entry matched
+                const autoOpen = highlightSearch ? 'open' : '';
+
                 return `
-                <div class="log-entry">
+                <div class="log-entry ${autoOpen}">
                     <div class="log-entry-header" onclick="toggleLogEntry(this)">
                         <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
                             <input type="checkbox" class="log-check" data-log-index="${i}" onchange="onLogCheckChange()" onclick="event.stopPropagation()">
@@ -1113,14 +1227,11 @@
                         </div>
                     </div>
                     <div class="log-entry-details">
-                        ${entry.orders.map(o => `
-                            <div class="log-detail-item">
-                                <span class="log-detail-order">${o.orderName||''} <span style="color:var(--text-muted);font-size:11px">${o.order}</span></span>
-                                <span class="log-detail-status log-detail-${o.status}">${o.status==='success'?'✓ ناجح':'✗ فشل'}</span>
-                            </div>`).join('')}
+                        ${ordersHTML}
                     </div>
                 </div>`;
             }).join('');
+
             document.getElementById('exportSelectedBtn').classList.remove('visible');
         }
 

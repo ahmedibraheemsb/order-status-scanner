@@ -208,6 +208,7 @@
         .scanned-table tbody tr:last-child { border-bottom: none; }
         .scanned-table tbody tr:hover { background: #fafbfd; }
         .scanned-table tbody tr.row-new { animation: rowHighlight 1s ease; }
+        .scanned-table tbody tr.row-cancelled { background: #fef2f2; opacity: 0.7; }
         @keyframes rowHighlight { 0% { background: #dcfce7; } 100% { background: transparent; } }
         .scanned-table tbody td { padding: 9px 12px; vertical-align: middle; }
         .scanned-table tbody td.col-num { text-align: center; color: var(--text-muted); font-size: 11px; }
@@ -227,6 +228,12 @@
         .status-empty { color: var(--text-muted); font-size: 11px; }
         .empty-state { text-align: center; padding: 28px; color: var(--text-muted); font-size: 13px; }
         .empty-state .empty-icon { font-size: 28px; margin-bottom: 8px; }
+
+        .order-cancelled-badge {
+            display: inline-block; padding: 2px 8px; border-radius: 5px;
+            font-size: 11px; font-weight: 700; background: #fef2f2;
+            color: #dc2626; border: 1px solid #fecaca; margin-right: 6px;
+        }
 
         .summary-banner {
             padding: 14px 16px; text-align: center; font-size: 14px; font-weight: 700;
@@ -635,6 +642,7 @@
         let currentCourier   = '';
         const orderNameMap   = {};
         const orderStatusMap = {};
+        const orderCancelledMap = {}; // Track which orders are cancelled on Shopify
 
         const STATUS_COLOR_MAP = {
             'Shipped':   's-Shipped',
@@ -907,6 +915,10 @@
                 }
                 if (statusData?.success && statusData.statuses) {
                     Object.assign(orderStatusMap, statusData.statuses);
+                    // Track cancelled status
+                    for (const [id, stat] of Object.entries(statusData.statuses)) {
+                        orderCancelledMap[id] = stat.isCancelled;
+                    }
                     changed = true;
                 }
                 if (changed) renderList();
@@ -948,10 +960,13 @@
                             const statuses = orderStatusMap[order];
                             const s1 = statuses?.s1 || null;
                             const s2 = statuses?.s2 || null;
-                            return `<tr class="${i === 0 && isNew ? 'row-new' : ''}">
+                            const isCancelled = orderCancelledMap[order];
+                            const rowClass = isCancelled ? 'row-cancelled' : (i === 0 && isNew ? 'row-new' : '');
+                            const cancelledBadge = isCancelled ? '<span class="order-cancelled-badge">❌ ملغي على الموقع</span>' : '';
+                            return `<tr class="${rowClass}">
                                 <td class="col-del"><button class="chip-del" data-remove="${order}">×</button></td>
                                 <td class="col-num">${i + 1}</td>
-                                <td class="col-order">${name || '—'}</td>
+                                <td class="col-order">${cancelledBadge}${name || '—'}</td>
                                 <td class="col-id">${order}</td>
                                 <td>${statusPill(s1)}</td>
                                 <td>${statusPill(s2)}</td>
@@ -972,6 +987,14 @@
             if (!currentSpecifier) { alert('اختر الحالة أولاً'); return; }
             if (needsCourier(currentSpecifier) && !currentCourier) { alert('اختر المندوب أولاً'); return; }
             if (!scannedOrders.length) { alert('لا توجد أوردرات'); return; }
+
+            // Check for cancelled orders
+            const cancelledOrders = scannedOrders.filter(o => orderCancelledMap[o]);
+            if (cancelledOrders.length > 0) {
+                const cancelledNames = cancelledOrders.map(o => orderNameMap[o] || o).join('، ');
+                alert(`⚠️ لا يمكن تحديث الأوردرات المُلغاة على الموقع:\n\n${cancelledNames}\n\nيرجى حذفها من القائمة أولاً.`);
+                return;
+            }
 
             const fieldLabel = currentField === 'S1' ? 'S1 — توصيل عادي' : 'S2 — استبدال / استرجاع';
             const confirmMsg = needsCourier(currentSpecifier)

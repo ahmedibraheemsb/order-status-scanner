@@ -466,6 +466,7 @@
                     </div>
                     <ul class="changelog-desc">
                         <li>إضافة خاصية "البحث التلقائي عن أوردرات المندوب" لجلب الأوردرات المتطابقة مع الحالة المستهدفة وإضافتها للقائمة بضغطة زر.</li>
+                        <li>تحديث شروط تحديث الحالة (Validation) لتشمل السماح بالانتقال لـ Delivered حتى وإن كانت S2 فارغة.</li>
                     </ul>
                 </div>
                 <div class="changelog-item">
@@ -788,7 +789,8 @@
                     return s1 === 'Ready' && isBlankS2;
                 }
                 if (targetStatusLabel === 'Delivered') {
-                    return s1 === 'Shipped' && (s2 === 'Confirmed + RETURN' || s2 === 'Confirmed + EXCHANGE' || s2 === 'Ready');
+                    // التعديل الجديد: تم إضافة isBlankS2 كشرط مسموح به
+                    return s1 === 'Shipped' && (s2 === 'Confirmed + RETURN' || s2 === 'Confirmed + EXCHANGE' || s2 === 'Ready' || isBlankS2);
                 }
                 if (targetStatusLabel === 'Cancelled') {
                     return (s1 === 'Ready' || s1 === 'Shipped') && isBlankS2;

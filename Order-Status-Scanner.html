@@ -75,8 +75,15 @@
         }
         .header-left { display: flex; align-items: center; gap: 12px; }
         .header-icon { width: 40px; height: 40px; background: var(--primary-bg); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
-        .header-title h1 { font-size: 17px; font-weight: 700; }
+        .header-title h1 { font-size: 17px; font-weight: 700; display: flex; align-items: center; }
         .header-title p  { font-size: 12px; color: var(--text-sub); margin-top: 2px; }
+        
+        .version-badge {
+            display: inline-block; padding: 2px 6px; margin-right: 8px;
+            background: var(--primary-bg); color: var(--primary); border: 1px solid var(--primary-b);
+            border-radius: 6px; font-size: 11px; font-family: 'JetBrains Mono', monospace;
+            font-weight: 700; vertical-align: middle; direction: ltr;
+        }
 
         .tabs-card {
             background: var(--surface); border: 1px solid var(--border);
@@ -141,7 +148,7 @@
         .status-btn.Cancelled.active { border-color: var(--error);    background: var(--error-bg);    color: var(--error); }
         .status-btn.Ready.active     { border-color: var(--purple);   background: var(--purple-bg);   color: var(--purple); }
 
-        .courier-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
+        .courier-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin-bottom: 12px; }
         .courier-btn {
             padding: 0.55rem 0.4rem; border-radius: 7px; font-family: inherit;
             font-size: 0.78rem; font-weight: 500; cursor: pointer;
@@ -295,7 +302,7 @@
         .result-error   { background: var(--error-bg);   color: var(--error); }
 
         .btn-sm {
-            display: inline-flex; align-items: center; gap: 5px;
+            display: inline-flex; align-items: center; gap: 5px; justify-content: center;
             padding: 6px 12px; border-radius: 7px; font-size: 12px; font-weight: 600;
             border: 1px solid var(--border); background: var(--surface); color: var(--text-sub);
             cursor: pointer; font-family: inherit; transition: all 0.15s; white-space: nowrap;
@@ -303,6 +310,8 @@
         .btn-sm:hover { background: var(--bg); border-color: #9ca3af; color: var(--text); }
         .btn-sm.danger { color: var(--error); border-color: var(--error-b); }
         .btn-sm.danger:hover { background: var(--error-bg); }
+        .btn-sm.primary { background: var(--primary-bg); color: var(--primary); border-color: var(--primary-b); }
+        .btn-sm.primary:hover { background: var(--primary); color: white; }
 
         /* ── Log Filters ── */
         .log-filter-bar {
@@ -397,6 +406,19 @@
 
         .spinner { width: 14px; height: 14px; border: 2px solid transparent; border-top-color: currentColor; border-radius: 50%; animation: spin 0.8s linear infinite; display: inline-block; }
         @keyframes spin { to { transform: rotate(360deg); } }
+        
+        /* ── Change Log Styles ── */
+        .changelog-list { max-height: 350px; overflow-y: auto; padding-right: 4px; display: flex; flex-direction: column; gap: 16px; }
+        .changelog-item { border-bottom: 1px solid var(--border-light); padding-bottom: 16px; }
+        .changelog-item:last-child { border-bottom: none; padding-bottom: 0; }
+        .changelog-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+        .changelog-version { font-family: 'JetBrains Mono', monospace; font-weight: 700; font-size: 13px; color: var(--text); background: var(--bg); padding: 2px 8px; border-radius: 6px; border: 1px solid var(--border); direction: ltr; }
+        .changelog-date { font-size: 12px; color: var(--text-muted); font-family: 'JetBrains Mono', monospace; direction: ltr; }
+        .changelog-desc { list-style-type: disc; margin-right: 20px; font-size: 13px; color: var(--text-sub); line-height: 1.6; }
+        .changelog-desc li { margin-bottom: 4px; }
+        
+        /* ── Courier Search Modal Styles ── */
+        .courier-order-check { width: 16px; height: 16px; accent-color: var(--primary); cursor: pointer; }
     </style>
 </head>
 <body>
@@ -429,6 +451,89 @@
         </div>
     </div>
 
+    <!-- Change Log Modal -->
+    <div class="modal-overlay" id="changeLogModal">
+        <div class="modal" style="max-width: 500px;">
+            <div class="modal-header">
+                <span class="modal-title">📝 سجل التحديثات (Change Log)</span>
+                <button class="modal-close" onclick="closeChangeLog()">✕</button>
+            </div>
+            <div class="changelog-list">
+                <div class="changelog-item">
+                    <div class="changelog-header">
+                        <span class="changelog-version">v1.2.0</span>
+                        <span class="changelog-date">19-04-2026</span>
+                    </div>
+                    <ul class="changelog-desc">
+                        <li>إضافة خاصية "البحث التلقائي عن أوردرات المندوب" لجلب الأوردرات المتطابقة مع الحالة المستهدفة وإضافتها للقائمة بضغطة زر.</li>
+                    </ul>
+                </div>
+                <div class="changelog-item">
+                    <div class="changelog-header">
+                        <span class="changelog-version">v1.1.0</span>
+                        <span class="changelog-date">19-04-2026</span>
+                    </div>
+                    <ul class="changelog-desc">
+                        <li>إضافة فحص صارم للحالات (State Transition Validation) لمنع تحديث الأوردرات إلا بالترتيب المنطقي المتفق عليه.</li>
+                        <li>تمييز الأوردرات غير المطابقة للشروط باللون الأحمر داخل القائمة لمنع الأخطاء مبكراً.</li>
+                        <li>إضافة قسم سجل التحديثات وعرض رقم النسخة في واجهة الأداة.</li>
+                    </ul>
+                </div>
+                <div class="changelog-item">
+                    <div class="changelog-header">
+                        <span class="changelog-version">v1.0.0</span>
+                        <span class="changelog-date">18-04-2026</span>
+                    </div>
+                    <ul class="changelog-desc">
+                        <li>الإطلاق الأولي لأداة تحديث حالة الأوردرات.</li>
+                        <li>دعم كامل لاستخدام Scanner Gun وإدخال أرقام الأوردرات يدوياً.</li>
+                        <li>ربط الأداة بـ Cloudflare Worker للاحتفاظ بسجل دائم بالعمليات السابقة.</li>
+                        <li>إمكانية تصدير السجل بصيغة CSV وطباعة بيان شحن (Manifest) للمناديب بالباركود.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Courier Search Modal -->
+    <div class="modal-overlay" id="courierSearchModal">
+        <div class="modal" style="max-width: 600px;">
+            <div class="modal-header">
+                <span class="modal-title">🔍 أوردرات المندوب: <span id="searchModalCourierName" style="color:var(--primary);"></span></span>
+                <button class="modal-close" onclick="closeCourierSearch()">✕</button>
+            </div>
+            
+            <div id="courierSearchLoading" style="text-align:center; padding: 30px; color: var(--text-sub);">
+                <span class="spinner" style="border-top-color: var(--primary);"></span><br><br>
+                جاري البحث في Shopify عن الأوردرات المفتوحة للمندوب...<br>
+                <small style="opacity:0.7;">سيتم فلترة الأوردرات الصالحة للتحديث فقط</small>
+            </div>
+
+            <div id="courierSearchContent" style="display:none;">
+                <div style="max-height: 350px; overflow-y: auto; border: 1px solid var(--border); border-radius: 8px; margin-bottom: 16px;">
+                    <table class="scanned-table" style="margin-bottom: 0;">
+                        <thead style="position: sticky; top: 0; z-index: 10;">
+                            <tr>
+                                <th style="width:40px;text-align:center;"><input type="checkbox" id="selectAllCourierOrders" class="courier-order-check" onchange="toggleAllCourierOrders(this)"></th>
+                                <th>رقم الأوردر</th>
+                                <th style="min-width: 110px;">S1 الحالية</th>
+                                <th style="min-width: 110px;">S2 الحالية</th>
+                            </tr>
+                        </thead>
+                        <tbody id="courierSearchTableBody">
+                            <!-- Rows will be populated here -->
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button class="modal-cancel" onclick="closeCourierSearch()">إلغاء</button>
+                    <button class="modal-save" onclick="addSelectedCourierOrders()">➕ إضافة المحدد (<span id="selectedCourierOrdersCount">0</span>)</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
     <div class="wrapper">
 
         <!-- Header -->
@@ -436,11 +541,14 @@
             <div class="header-left">
                 <div class="header-icon">📦</div>
                 <div class="header-title">
-                    <h1>Order Status Updater</h1>
+                    <h1>Order Status Updater <span class="version-badge">v1.2.0</span></h1>
                     <p>تحديث حالة الأوردرات</p>
                 </div>
             </div>
-            <button class="btn-sm" onclick="openSettings()">⚙️ الإعدادات</button>
+            <div style="display:flex; gap:8px;">
+                <button class="btn-sm" onclick="openChangeLog()">📝 التحديثات</button>
+                <button class="btn-sm" onclick="openSettings()">⚙️ الإعدادات</button>
+            </div>
         </div>
 
         <!-- Tabs -->
@@ -523,7 +631,10 @@
 
                 <!-- Row 2: Courier -->
                 <div class="card" id="courierCard" style="display:none">
-                    <div class="card-header"><h2>🛵 المندوب</h2></div>
+                    <div class="card-header">
+                        <h2>🛵 المندوب</h2>
+                        <button class="btn-sm primary" id="btnSearchCourierOrders" onclick="openCourierSearchModal()" style="display:none;">🔍 البحث عن أوردرات المندوب</button>
+                    </div>
                     <div class="card-body">
                         <div class="courier-grid" id="courierSelector">
                             <div class="courier-loading">⏳ جاري التحميل...</div>
@@ -572,7 +683,7 @@
                         <div id="scannedList">
                             <div class="empty-state" style="padding:32px;">
                                 <div class="empty-icon">📋</div>
-                                <div>لم يتم مسح أي باركود بعد</div>
+                                <div>لم يتم مسح أو إضافة أي أوردرات بعد</div>
                             </div>
                         </div>
                     </div>
@@ -744,6 +855,156 @@
         document.getElementById('settingsModal').addEventListener('click', e => {
             if (e.target === document.getElementById('settingsModal')) closeSettings();
         });
+        
+        // ── Change Log Modal ──────────────────────────────────────────
+        function openChangeLog() {
+            document.getElementById('changeLogModal').classList.add('active');
+        }
+        function closeChangeLog() {
+            document.getElementById('changeLogModal').classList.remove('active');
+            scannerGunInput.focus();
+        }
+        document.getElementById('changeLogModal').addEventListener('click', e => {
+            if (e.target === document.getElementById('changeLogModal')) closeChangeLog();
+        });
+        
+        // ── Courier Search Modal & Logic ──────────────────────────────
+        let currentCourierSearchResults = [];
+        
+        function openCourierSearchModal() {
+            if (!currentCourier || !currentField || !currentStatusLabel) return;
+            document.getElementById('searchModalCourierName').textContent = currentCourier;
+            document.getElementById('courierSearchModal').classList.add('active');
+            document.getElementById('courierSearchLoading').style.display = 'block';
+            document.getElementById('courierSearchContent').style.display = 'none';
+            document.getElementById('selectAllCourierOrders').checked = false;
+            fetchCourierOrders();
+        }
+
+        function closeCourierSearch() {
+            document.getElementById('courierSearchModal').classList.remove('active');
+        }
+        
+        document.getElementById('courierSearchModal').addEventListener('click', e => {
+            if (e.target === document.getElementById('courierSearchModal')) closeCourierSearch();
+        });
+
+        async function fetchCourierOrders() {
+            const url = localStorage.getItem('log_worker_url') || '';
+            const secret = localStorage.getItem('log_worker_secret') || '';
+            
+            if (!url || !secret) {
+                alert('أدخل Log Worker URL و Secret في الإعدادات');
+                closeCourierSearch();
+                openSettings();
+                return;
+            }
+
+            try {
+                // We ask the worker to fetch ALL unfulfilled orders for this courier
+                const res = await fetch(`${url}/search-courier-orders`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${secret}` },
+                    body: JSON.stringify({ courier: currentCourier })
+                });
+                
+                const data = await res.json();
+                if (data.success) {
+                    // Filter them in the frontend using our validation matrix!
+                    const allOrders = data.orders || [];
+                    currentCourierSearchResults = allOrders.filter(o => 
+                        !o.isCancelled && isTransitionValid(currentField, currentStatusLabel, o.s1, o.s2)
+                    );
+                    renderCourierSearchResults();
+                } else {
+                    alert('خطأ في جلب الأوردرات من شوبيفاي: ' + (data.error || 'Unknown'));
+                    closeCourierSearch();
+                }
+            } catch (err) {
+                alert('خطأ في الاتصال بالسيرفر');
+                closeCourierSearch();
+            }
+        }
+
+        function renderCourierSearchResults() {
+            document.getElementById('courierSearchLoading').style.display = 'none';
+            document.getElementById('courierSearchContent').style.display = 'block';
+            const tbody = document.getElementById('courierSearchTableBody');
+
+            if (currentCourierSearchResults.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:30px;color:var(--text-muted);">لا توجد أوردرات مطابقة لشروط الحالة الحالية 🤷‍♂️</td></tr>';
+                document.getElementById('selectedCourierOrdersCount').textContent = '0';
+                return;
+            }
+
+            tbody.innerHTML = currentCourierSearchResults.map(o => `
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                    <td style="text-align:center; padding: 10px;">
+                        <input type="checkbox" class="courier-order-check" value="${o.id}" onchange="updateSelectedCourierCount()">
+                    </td>
+                    <td style="font-weight:bold;color:var(--primary); padding: 10px; font-family:'JetBrains Mono', monospace; direction:ltr; text-align:left;">${o.name}</td>
+                    <td style="padding: 10px;">${statusPill(o.s1)}</td>
+                    <td style="padding: 10px;">${statusPill(o.s2)}</td>
+                </tr>
+            `).join('');
+            
+            updateSelectedCourierCount();
+        }
+
+        function toggleAllCourierOrders(checkbox) {
+            const checks = document.querySelectorAll('.courier-order-check');
+            checks.forEach(c => c.checked = checkbox.checked);
+            updateSelectedCourierCount();
+        }
+
+        function updateSelectedCourierCount() {
+            const count = document.querySelectorAll('.courier-order-check:checked').length;
+            document.getElementById('selectedCourierOrdersCount').textContent = count;
+            
+            // Sync the "Select All" checkbox state
+            const total = document.querySelectorAll('.courier-order-check').length;
+            const selectAll = document.getElementById('selectAllCourierOrders');
+            if (total > 0) {
+                selectAll.checked = (count === total);
+                selectAll.indeterminate = (count > 0 && count < total);
+            }
+        }
+
+        function addSelectedCourierOrders() {
+            const checks = document.querySelectorAll('.courier-order-check:checked');
+            if (checks.length === 0) {
+                alert('يرجى تحديد أوردر واحد على الأقل');
+                return;
+            }
+
+            let addedCount = 0;
+            checks.forEach(c => {
+                const id = c.value;
+                if (!scannedOrders.includes(id)) {
+                    scannedOrders.unshift(id); // Add to top of list
+                    
+                    // Populate the maps so we don't need to fetch them again
+                    const orderData = currentCourierSearchResults.find(o => o.id === id);
+                    if (orderData) {
+                        orderNameMap[id] = orderData.name;
+                        orderStatusMap[id] = { s1: orderData.s1, s2: orderData.s2 };
+                        orderCancelledMap[id] = orderData.isCancelled;
+                    }
+                    addedCount++;
+                }
+            });
+
+            if (addedCount > 0) {
+                saveOrders();
+                renderList(true);
+                updateSummaryCount();
+                showToast(`✅ تم إضافة ${addedCount} أوردر للقائمة بنجاح`, 'success');
+            } else {
+                showToast('⚠️ كل الأوردرات المحددة موجودة بالفعل في القائمة', 'error');
+            }
+
+            closeCourierSearch();
+        }
 
         // ── Restore state ─────────────────────────────────────────────
         const saved = localStorage.getItem('scanned_orders');
@@ -876,6 +1137,8 @@
             document.getElementById('updateBtn').className = 'btn-update';
             document.getElementById('courierCard').style.display = 'none';
             document.getElementById('courierRow').style.display  = 'none';
+            
+            updateCourierSearchButtonVisibility();
 
             loadCouriers();
             if (save) { localStorage.setItem('selected_field', field); localStorage.removeItem('selected_status'); }
@@ -908,6 +1171,18 @@
             } catch { sel.innerHTML = '<div class="courier-loading" style="color:var(--error)">⚠️ خطأ في الاتصال</div>'; }
             if (currentCourier) selectCourier(currentCourier, false);
         }
+        
+        function updateCourierSearchButtonVisibility() {
+            const btn = document.getElementById('btnSearchCourierOrders');
+            if (btn) {
+                if (currentCourier && currentField && currentStatusLabel && needsCourier(currentSpecifier)) {
+                    btn.style.display = 'inline-flex';
+                    btn.innerHTML = `🔍 البحث عن أوردرات المندوب (${currentCourier})`;
+                } else {
+                    btn.style.display = 'none';
+                }
+            }
+        }
 
         // ── Status Selection ──────────────────────────────────────────
         function selectStatus(specifier, label, icon, save = true) {
@@ -922,6 +1197,9 @@
             const show = needsCourier(specifier);
             document.getElementById('courierCard').style.display = show ? '' : 'none';
             document.getElementById('courierRow').style.display  = show ? 'flex' : 'none';
+            
+            updateCourierSearchButtonVisibility();
+            
             if (save) localStorage.setItem('selected_status', JSON.stringify({ specifier, label, icon }));
             
             renderList(); // Re-render to show validation highlights for the newly selected status
@@ -936,6 +1214,9 @@
             document.querySelectorAll('.courier-btn').forEach(b => b.classList.remove('active'));
             if (btnEl) btnEl.classList.add('active');
             document.getElementById('summaryCourier').textContent = `🛵 ${courier}`;
+            
+            updateCourierSearchButtonVisibility();
+            
             if (save) localStorage.setItem('selected_courier', courier);
         }
 
@@ -989,7 +1270,7 @@
             const container = document.getElementById('scannedList');
             document.getElementById('count').textContent = scannedOrders.length;
             if (!scannedOrders.length) {
-                container.innerHTML = '<div class="empty-state" style="padding:32px;"><div class="empty-icon">📋</div><div>لم يتم مسح أي باركود بعد</div></div>';
+                container.innerHTML = '<div class="empty-state" style="padding:32px;"><div class="empty-icon">📋</div><div>لم يتم مسح أو إضافة أي أوردرات بعد</div></div>';
                 return;
             }
             container.innerHTML = `

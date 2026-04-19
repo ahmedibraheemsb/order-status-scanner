@@ -419,6 +419,12 @@
         
         /* ── Courier Search Modal Styles ── */
         .courier-order-check { width: 16px; height: 16px; accent-color: var(--primary); cursor: pointer; }
+        .truncated-warning {
+            background: var(--orange-bg); color: var(--orange-b);
+            border: 1.5px solid var(--orange-b); border-radius: 7px;
+            padding: 8px 12px; margin-bottom: 12px; font-size: 12px;
+            font-weight: 600; color: var(--orange);
+        }
     </style>
 </head>
 <body>
@@ -459,6 +465,17 @@
                 <button class="modal-close" onclick="closeChangeLog()">✕</button>
             </div>
             <div class="changelog-list">
+                <div class="changelog-item">
+                    <div class="changelog-header">
+                        <span class="changelog-version">v1.3.0</span>
+                        <span class="changelog-date">19-04-2026</span>
+                    </div>
+                    <ul class="changelog-desc">
+                        <li>تحسين أداء البحث عن أوردرات المندوب — الفلترة الآن تتم على Shopify مباشرة بناءً على الحالة المختارة (أسرع بكتير).</li>
+                        <li>الـ Modal الآن يعرض كل أوردرات المندوب المطابقة للحالة، وفلترة الانتقالات (S1/S2 conditions) تُطبَّق في الجدول الرئيسي بعد الإضافة.</li>
+                        <li>إضافة تحذير عند تجاوز سقف النتائج (1000 أوردر).</li>
+                    </ul>
+                </div>
                 <div class="changelog-item">
                     <div class="changelog-header">
                         <span class="changelog-version">v1.2.0</span>
@@ -506,11 +523,14 @@
             
             <div id="courierSearchLoading" style="text-align:center; padding: 30px; color: var(--text-sub);">
                 <span class="spinner" style="border-top-color: var(--primary);"></span><br><br>
-                جاري البحث في Shopify عن الأوردرات المفتوحة للمندوب...<br>
-                <small style="opacity:0.7;">سيتم فلترة الأوردرات الصالحة للتحديث فقط</small>
+                جاري البحث في Shopify عن أوردرات المندوب...<br>
+                <small style="opacity:0.7;" id="courierSearchLoadingHint">سيتم جلب الأوردرات المطابقة للحالة المختارة فقط</small>
             </div>
 
             <div id="courierSearchContent" style="display:none;">
+                <div id="truncatedWarning" class="truncated-warning" style="display:none;">
+                    ⚠️ تم الوصول للحد الأقصى (1000 أوردر). قد توجد نتائج إضافية لم تُعرض.
+                </div>
                 <div style="max-height: 350px; overflow-y: auto; border: 1px solid var(--border); border-radius: 8px; margin-bottom: 16px;">
                     <table class="scanned-table" style="margin-bottom: 0;">
                         <thead style="position: sticky; top: 0; z-index: 10;">
@@ -542,7 +562,7 @@
             <div class="header-left">
                 <div class="header-icon">📦</div>
                 <div class="header-title">
-                    <h1>Order Status Updater <span class="version-badge">v1.2.0</span></h1>
+                    <h1>Order Status Updater <span class="version-badge">v1.3.0</span></h1>
                     <p>تحديث حالة الأوردرات</p>
                 </div>
             </div>
@@ -826,6 +846,10 @@
             return `<span class="status-pill ${cls}">${value}</span>`;
         }
 
+        // Strategy: We send the selected status (currentStatusLabel) to the worker so it can filter
+        // by that exact metafield value (e.g. manual_status:Delivered or status_2_r_e:Shipped).
+        // The S1/S2 transition rules are then applied later in the main table after adding (via row-invalid).
+
         // ── Tabs ──────────────────────────────────────────────────────
         function switchTab(tab, btn) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
@@ -876,9 +900,12 @@
         function openCourierSearchModal() {
             if (!currentCourier || !currentField || !currentStatusLabel) return;
             document.getElementById('searchModalCourierName').textContent = currentCourier;
+            document.getElementById('courierSearchLoadingHint').textContent =
+                `سيتم جلب أوردرات المندوب التي ${currentField}=${currentStatusLabel} فقط`;
             document.getElementById('courierSearchModal').classList.add('active');
             document.getElementById('courierSearchLoading').style.display = 'block';
             document.getElementById('courierSearchContent').style.display = 'none';
+            document.getElementById('truncatedWarning').style.display = 'none';
             document.getElementById('selectAllCourierOrders').checked = false;
             fetchCourierOrders();
         }
@@ -903,20 +930,31 @@
             }
 
             try {
-                // We ask the worker to fetch ALL unfulfilled orders for this courier
+                // Send courier + targetField + targetStatus to the worker.
+                // The worker uses these to query Shopify directly with the correct metafield filter.
+                // Note: targetStatus is the label without the _S2 suffix (e.g. "Shipped" not "Shipped_S2"),
+                // and targetField tells the worker whether to query manual_status or status_2_r_e.
                 const res = await fetch(`${url}/search-courier-orders`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${secret}` },
-                    body: JSON.stringify({ courier: currentCourier })
+                    body: JSON.stringify({
+                        courier: currentCourier,
+                        targetField: currentField,
+                        targetStatus: currentStatusLabel,
+                    })
                 });
                 
                 const data = await res.json();
                 if (data.success) {
-                    // Filter them in the frontend using our validation matrix!
+                    // The worker already filtered by courier + status,
+                    // we just exclude cancelled orders here.
+                    // S1/S2 transition validity is shown in the main table after adding.
                     const allOrders = data.orders || [];
-                    currentCourierSearchResults = allOrders.filter(o => 
-                        !o.isCancelled && isTransitionValid(currentField, currentStatusLabel, o.s1, o.s2)
-                    );
+                    currentCourierSearchResults = allOrders.filter(o => !o.isCancelled);
+
+                    if (data.truncated) {
+                        document.getElementById('truncatedWarning').style.display = 'block';
+                    }
                     renderCourierSearchResults();
                 } else {
                     alert('خطأ في جلب الأوردرات من شوبيفاي: ' + (data.error || 'Unknown'));
@@ -934,7 +972,7 @@
             const tbody = document.getElementById('courierSearchTableBody');
 
             if (currentCourierSearchResults.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:30px;color:var(--text-muted);">لا توجد أوردرات مطابقة لشروط الحالة الحالية 🤷‍♂️</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:30px;color:var(--text-muted);">لا توجد أوردرات لهذا المندوب بالحالة المطلوبة 🤷‍♂️</td></tr>';
                 document.getElementById('selectedCourierOrdersCount').textContent = '0';
                 return;
             }

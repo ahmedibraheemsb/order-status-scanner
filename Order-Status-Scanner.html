@@ -208,13 +208,18 @@
         .scanned-table tbody tr:last-child { border-bottom: none; }
         .scanned-table tbody tr:hover { background: #fafbfd; }
         .scanned-table tbody tr.row-new { animation: rowHighlight 1s ease; }
+        
+        /* Validation & States rows */
         .scanned-table tbody tr.row-cancelled { background: #fef2f2; opacity: 0.7; }
+        .scanned-table tbody tr.row-invalid   { background: #fff1f2; opacity: 0.9; border-left: 3px solid var(--error); }
+        
         @keyframes rowHighlight { 0% { background: #dcfce7; } 100% { background: transparent; } }
         .scanned-table tbody td { padding: 9px 12px; vertical-align: middle; }
         .scanned-table tbody td.col-num { text-align: center; color: var(--text-muted); font-size: 11px; }
         .scanned-table tbody td.col-order { font-weight: 700; color: var(--primary); font-size: 13px; white-space: nowrap; }
         .scanned-table tbody td.col-id { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text-muted); direction: ltr; text-align: left; }
         .scanned-table tbody td.col-del { text-align: center; }
+        
         .status-pill {
             display: inline-block; padding: 2px 8px; border-radius: 5px;
             font-size: 11px; font-weight: 600; white-space: nowrap;
@@ -233,6 +238,11 @@
             display: inline-block; padding: 2px 8px; border-radius: 5px;
             font-size: 11px; font-weight: 700; background: #fef2f2;
             color: #dc2626; border: 1px solid #fecaca; margin-right: 6px;
+        }
+        .order-invalid-badge {
+            display: inline-block; padding: 2px 8px; border-radius: 5px;
+            font-size: 11px; font-weight: 700; background: #fff1f2;
+            color: #be123c; border: 1px solid #fda4af; margin-right: 6px;
         }
 
         .summary-banner {
@@ -652,6 +662,43 @@
             'Ready':     's-Ready',
         };
 
+        // ── Validation Logic ──────────────────────────────────────────
+        // Validate transition states strictly against the agreed rules
+        function isTransitionValid(targetField, targetStatusLabel, currentS1, currentS2) {
+            const s1 = (currentS1 || '').trim();
+            const s2 = (currentS2 || '').trim();
+            const isBlankS2 = s2 === '';
+
+            if (targetField === 'S1') {
+                if (targetStatusLabel === 'Ready') {
+                    return (s1 === 'Confirmed' || s1 === 'Confirmed + Edit' || s1 === 'Shipped') && isBlankS2;
+                }
+                if (targetStatusLabel === 'Shipped') {
+                    return s1 === 'Ready' && isBlankS2;
+                }
+                if (targetStatusLabel === 'Delivered') {
+                    return s1 === 'Shipped' && (s2 === 'Confirmed + RETURN' || s2 === 'Confirmed + EXCHANGE' || s2 === 'Ready');
+                }
+                if (targetStatusLabel === 'Cancelled') {
+                    return (s1 === 'Ready' || s1 === 'Shipped') && isBlankS2;
+                }
+                if (targetStatusLabel === 'Returned') {
+                    return s1 === 'Shipped' && isBlankS2;
+                }
+            } else if (targetField === 'S2') {
+                if (targetStatusLabel === 'Ready') {
+                    return (s1 === 'Shipped' || s1 === 'Delivered') && (s2 === 'Confirmed + RETURN' || s2 === 'Confirmed + EXCHANGE' || s2 === 'Shipped');
+                }
+                if (targetStatusLabel === 'Shipped') {
+                    return s1 === 'Delivered' && s2 === 'Ready';
+                }
+                if (targetStatusLabel === 'Returned') {
+                    return s1 === 'Delivered' && s2 === 'Shipped';
+                }
+            }
+            return false; // Fallback rule: block unknown state transitions
+        }
+
         function needsCourier(s) { return COURIER_SPECIFIERS.has(s); }
 
         function statusPillClass(value) {
@@ -832,6 +879,7 @@
 
             loadCouriers();
             if (save) { localStorage.setItem('selected_field', field); localStorage.removeItem('selected_status'); }
+            renderList(); // Re-render to clear or update validation highlights
         }
 
         function renderStatusButtons(field) {
@@ -875,6 +923,8 @@
             document.getElementById('courierCard').style.display = show ? '' : 'none';
             document.getElementById('courierRow').style.display  = show ? 'flex' : 'none';
             if (save) localStorage.setItem('selected_status', JSON.stringify({ specifier, label, icon }));
+            
+            renderList(); // Re-render to show validation highlights for the newly selected status
         }
 
         // ── Courier Selection ─────────────────────────────────────────
@@ -961,12 +1011,22 @@
                             const s1 = statuses?.s1 || null;
                             const s2 = statuses?.s2 || null;
                             const isCancelled = orderCancelledMap[order];
-                            const rowClass = isCancelled ? 'row-cancelled' : (i === 0 && isNew ? 'row-new' : '');
+                            
+                            let isInvalid = false;
+                            if (currentField && currentStatusLabel && statuses && !isCancelled) {
+                                if (!isTransitionValid(currentField, currentStatusLabel, s1, s2)) {
+                                    isInvalid = true;
+                                }
+                            }
+                            
+                            const rowClass = isCancelled ? 'row-cancelled' : (isInvalid ? 'row-invalid' : (i === 0 && isNew ? 'row-new' : ''));
                             const cancelledBadge = isCancelled ? '<span class="order-cancelled-badge">❌ ملغي على الموقع</span>' : '';
+                            const invalidBadge   = isInvalid ? '<span class="order-invalid-badge">⚠️ غير مطابق</span>' : '';
+                            
                             return `<tr class="${rowClass}">
                                 <td class="col-del"><button class="chip-del" data-remove="${order}">×</button></td>
                                 <td class="col-num">${i + 1}</td>
-                                <td class="col-order">${cancelledBadge}${name || '—'}</td>
+                                <td class="col-order">${cancelledBadge}${invalidBadge}${name || '—'}</td>
                                 <td class="col-id">${order}</td>
                                 <td>${statusPill(s1)}</td>
                                 <td>${statusPill(s2)}</td>
@@ -988,7 +1048,7 @@
             if (needsCourier(currentSpecifier) && !currentCourier) { alert('اختر المندوب أولاً'); return; }
             if (!scannedOrders.length) { alert('لا توجد أوردرات'); return; }
 
-            // Check for cancelled orders
+            // 1. Check for cancelled orders
             const cancelledOrders = scannedOrders.filter(o => orderCancelledMap[o]);
             if (cancelledOrders.length > 0) {
                 const cancelledNames = cancelledOrders.map(o => orderNameMap[o] || o).join('، ');
@@ -996,6 +1056,45 @@
                 return;
             }
 
+            // 2. Strict State Transition Validation
+            const invalidOrders = [];
+            const missingStatusOrders = [];
+            
+            for (const o of scannedOrders) {
+                const statuses = orderStatusMap[o];
+                if (!statuses) {
+                    missingStatusOrders.push(o);
+                    continue;
+                }
+                if (!isTransitionValid(currentField, currentStatusLabel, statuses.s1, statuses.s2)) {
+                    invalidOrders.push({
+                        id: o, 
+                        name: orderNameMap[o] || o, 
+                        s1: statuses.s1 || 'فارغ', 
+                        s2: statuses.s2 || 'فارغ'
+                    });
+                }
+            }
+
+            if (missingStatusOrders.length > 0) {
+                alert(`⚠️ جاري جلب حالة الأوردرات من Shopify (${missingStatusOrders.length} أوردر).\nيرجى الانتظار ثواني والمحاولة مرة أخرى للتحقق من تطابق الحالة.`);
+                return;
+            }
+
+            if (invalidOrders.length > 0) {
+                let msg = `⚠️ لا يمكن التحديث! يوجد ${invalidOrders.length} أوردر لا تتطابق حالتهم الحالية مع قواعد التحديث إلى "${currentStatusLabel}":\n\n`;
+                invalidOrders.slice(0, 10).forEach(inv => {
+                    msg += `- ${inv.name}  (S1: ${inv.s1} | S2: ${inv.s2})\n`;
+                });
+                if (invalidOrders.length > 10) {
+                    msg += `... بالإضافة إلى ${invalidOrders.length - 10} أوردر آخر\n`;
+                }
+                msg += `\nيرجى حذفهم من القائمة أولاً للمتابعة.`;
+                alert(msg);
+                return;
+            }
+
+            // 3. Confirm Dialog
             const fieldLabel = currentField === 'S1' ? 'S1 — توصيل عادي' : 'S2 — استبدال / استرجاع';
             const confirmMsg = needsCourier(currentSpecifier)
                 ? `تحديث ${scannedOrders.length} أوردر؟\n\nالنوع: ${fieldLabel}\nالحالة: ${currentStatusLabel}\nالمندوب: ${currentCourier}`

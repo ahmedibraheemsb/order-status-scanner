@@ -467,6 +467,17 @@
             <div class="changelog-list">
                 <div class="changelog-item">
                     <div class="changelog-header">
+                        <span class="changelog-version">v1.3.1</span>
+                        <span class="changelog-date">19-04-2026</span>
+                    </div>
+                    <ul class="changelog-desc">
+                        <li>🎯 تصحيح جوهري: البحث عن أوردرات المندوب الآن يجلب الأوردرات <strong>القابلة للتحويل</strong> للحالة المختارة (بدلاً من الأوردرات التي هي بالفعل في تلك الحالة).</li>
+                        <li>مثال: عند اختيار "Delivered"، يتم جلب الأوردرات التي حالتها الحالية <code>Shipped</code> (وليس Delivered).</li>
+                        <li>الـ Worker يبني الآن Shopify query ديناميكي بناءً على قواعد الانتقال الـ 8، مع دعم قيم مثل <code>Confirmed + Edit</code> و <code>Confirmed + RETURN</code>.</li>
+                    </ul>
+                </div>
+                <div class="changelog-item">
+                    <div class="changelog-header">
                         <span class="changelog-version">v1.3.0</span>
                         <span class="changelog-date">19-04-2026</span>
                     </div>
@@ -524,7 +535,7 @@
             <div id="courierSearchLoading" style="text-align:center; padding: 30px; color: var(--text-sub);">
                 <span class="spinner" style="border-top-color: var(--primary);"></span><br><br>
                 جاري البحث في Shopify عن أوردرات المندوب...<br>
-                <small style="opacity:0.7;" id="courierSearchLoadingHint">سيتم جلب الأوردرات المطابقة للحالة المختارة فقط</small>
+                <small style="opacity:0.7;" id="courierSearchLoadingHint">سيتم جلب الأوردرات القابلة للتحويل للحالة المختارة</small>
             </div>
 
             <div id="courierSearchContent" style="display:none;">
@@ -562,7 +573,7 @@
             <div class="header-left">
                 <div class="header-icon">📦</div>
                 <div class="header-title">
-                    <h1>Order Status Updater <span class="version-badge">v1.3.0</span></h1>
+                    <h1>Order Status Updater <span class="version-badge">v1.3.1</span></h1>
                     <p>تحديث حالة الأوردرات</p>
                 </div>
             </div>
@@ -901,7 +912,7 @@
             if (!currentCourier || !currentField || !currentStatusLabel) return;
             document.getElementById('searchModalCourierName').textContent = currentCourier;
             document.getElementById('courierSearchLoadingHint').textContent =
-                `سيتم جلب أوردرات المندوب التي ${currentField}=${currentStatusLabel} فقط`;
+                `سيتم جلب أوردرات المندوب القابلة للتحويل إلى ${currentField}=${currentStatusLabel}`;
             document.getElementById('courierSearchModal').classList.add('active');
             document.getElementById('courierSearchLoading').style.display = 'block';
             document.getElementById('courierSearchContent').style.display = 'none';

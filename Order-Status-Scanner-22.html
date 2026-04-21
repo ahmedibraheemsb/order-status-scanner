@@ -1756,7 +1756,7 @@
                     <td style="text-align:center;font-weight:600;">${i + 1}</td>
                     <td style="font-weight:700;color:#0284c7;text-align:right;">${d.orderName || o.orderName || '—'}</td>
                     <td style="text-align:center;">
-                        <svg id="bc-${i}" style="display:block;margin:auto;shape-rendering:crispEdges;"></svg>
+                        <svg id="bc-${i}" style="display:block;margin:auto;"></svg>
                     </td>
                     <td style="text-align:right;">${d.customerName || '—'}</td>
                     <td style="text-align:center;direction:ltr;">${d.phone || '—'}</td>
@@ -1778,7 +1778,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jsbarcode/3.11.6/JsBarcode.all.min.js"><\/script>
     <style>
         * { margin:0; padding:0; box-sizing:border-box; }
-        body { font-family: 'Segoe UI', Arial, sans-serif; padding: 20px; font-size: 11px; color: #1a1d27; direction: rtl; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; padding: 20px; font-size: 10.5px; color: #1a1d27; direction: rtl; }
         .manifest-header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:20px; padding-bottom:14px; border-bottom:2px solid #1a1d27; }
         .manifest-title { font-size:20px; font-weight:800; margin-bottom:6px; }
         .manifest-meta { display:flex; gap:24px; margin-top:8px; }
@@ -1793,13 +1793,16 @@
         col.col-phone   { width:98px; }
         col.col-address { width:auto; }
         col.col-cod     { width:62px; }
-        thead th { background:#f5f6fa; padding:4px 3px; font-size:11px; font-weight:700; color:#6b7280; text-transform:uppercase; letter-spacing:0.04em; border-bottom:1.5px solid #e2e5ed; white-space:nowrap; overflow:hidden; }
-        tbody td { padding:3px 3px; border-bottom:1px solid #eef0f5; vertical-align:middle; overflow:hidden; word-break:break-word; }
+        thead th { background:#f5f6fa; padding:3px 3px; font-size:11px; font-weight:700; color:#6b7280; text-transform:uppercase; letter-spacing:0.04em; border-bottom:1.5px solid #e2e5ed; white-space:nowrap; overflow:hidden; }
+        tbody td { padding:2px 3px; border-bottom:1px solid #eef0f5; vertical-align:middle; overflow:hidden; word-break:break-word; line-height:1.2; }
         tbody tr:last-child td { border-bottom:none; }
         tbody tr:nth-child(even) { background:#fafbfd; }
         .manifest-footer { display:flex; justify-content:space-between; align-items:center; padding-top:12px; border-top:2px solid #1a1d27; margin-top:8px; }
         .total-value { font-size:20px; font-weight:800; direction:ltr; }
         .sign-box { border:1px solid #e2e5ed; border-radius:8px; padding:8px 20px; font-size:11px; color:#9ca3af; text-align:center; min-width:160px; }
+        /* crispEdges على كل rect جوا الباركود SVG */
+        svg rect { shape-rendering: crispEdges; }
+        svg path { shape-rendering: crispEdges; }
         @media print { body { padding:10px; } @page { margin:10mm; size:A4; } }
     </style>
 </head>

@@ -467,10 +467,12 @@
             <div class="changelog-list">
                 <div class="changelog-item">
                     <div class="changelog-header">
-                        <span class="changelog-version">v1.3.2</span>
+                        <span class="changelog-version">v1.3.3</span>
                         <span class="changelog-date">21-04-2026</span>
                     </div>
                     <ul class="changelog-desc">
+                        <li>🖨️ إضافة "طباعة المحدد": تحديد عمليتين أو أكثر من نوع Shipped لنفس المندوب وطباعتهم في manifest واحد مجمع.</li>
+                        <li>رفض الطباعة تلقائياً لو كانت العمليات المحددة لمناديب مختلفين مع رسالة توضيحية.</li>
                         <li>🖨️ تحسين طباعة المانفيست: تصغير عمود الباركود للنصف، توسيع عمود العنوان لضعفه، تقليل الهوامش بين الأعمدة لأدنى قيمة ممكنة.</li>
                         <li>إزالة العلامات العشرية من أرقام COD والإجمالي (أرقام صحيحة فقط).</li>
                         <li>توحيد جميع الأرقام في المانفيست بالشكل الإنجليزي.</li>
@@ -584,7 +586,7 @@
             <div class="header-left">
                 <div class="header-icon">📦</div>
                 <div class="header-title">
-                    <h1>Order Status Updater <span class="version-badge">v1.3.2</span></h1>
+                    <h1>Order Status Updater <span class="version-badge">v1.3.3</span></h1>
                     <p>تحديث حالة الأوردرات</p>
                 </div>
             </div>
@@ -741,6 +743,7 @@
                     <h2>📜 سجل التحديثات السابقة <span class="log-sync-status local" id="logSyncStatus">محلي</span></h2>
                     <div style="display:flex;gap:6px;">
                         <button class="btn-sm" onclick="syncFromCloud()">🔄 تحديث</button>
+                        <button class="export-selected-btn btn-sm" id="printSelectedBtn" onclick="printManifestSelected()" style="display:none;">🖨️ طباعة المحدد</button>
                         <button class="export-selected-btn btn-sm" id="exportSelectedBtn" onclick="exportLogCSV(true)">📥 تصدير المحدد</button>
                         <button class="btn-sm" onclick="exportLogCSV(false)">📥 تصدير الكل</button>
                     </div>
@@ -1565,7 +1568,16 @@
         }
 
         function onLogCheckChange() {
-            document.getElementById('exportSelectedBtn').classList.toggle('visible', document.querySelectorAll('.log-check:checked').length > 0);
+            const checked = document.querySelectorAll('.log-check:checked');
+            const hasAny  = checked.length > 0;
+            document.getElementById('exportSelectedBtn').classList.toggle('visible', hasAny);
+
+            // زر طباعة المحدد: يظهر فقط لو في عمليتين+ وكلهم Shipped
+            const fullLog = getLog();
+            const selectedEntries = [...checked].map(cb => fullLog[parseInt(cb.dataset.logIndex)]).filter(Boolean);
+            const allShipped = selectedEntries.length >= 2 && selectedEntries.every(e => e.status === 'Shipped');
+            const printBtn = document.getElementById('printSelectedBtn');
+            if (printBtn) printBtn.style.display = allShipped ? 'inline-flex' : 'none';
         }
 
         // ── Log Filters ───────────────────────────────────────────────
@@ -1679,16 +1691,44 @@
         }
 
         // ── Manifest Print ────────────────────────────────────────────
-        async function printManifest(logIndex) {
-            const log   = getLog();
-            const entry = log[logIndex];
-            if (!entry) return;
+        async function printManifestSelected() {
+            const fullLog = getLog();
+            const indices = [...document.querySelectorAll('.log-check:checked')].map(cb => parseInt(cb.dataset.logIndex));
+            if (indices.length < 2) { alert('اختر عمليتين على الأقل'); return; }
+
+            const entries = indices.map(i => fullLog[i]).filter(Boolean);
+
+            // تحقق: كل العمليات لازم تكون Shipped
+            const nonShipped = entries.filter(e => e.status !== 'Shipped');
+            if (nonShipped.length > 0) {
+                alert('⚠️ بعض العمليات المحددة ليست Shipped. طباعة المحدد متاحة فقط لعمليات Shipped.');
+                return;
+            }
+
+            // تحقق من المندوب
+            const couriers = [...new Set(entries.map(e => e.courier).filter(Boolean))];
+            if (couriers.length > 1) {
+                alert(`⚠️ لا يمكن طباعة manifest واحد لمناديب مختلفين:\n\n${couriers.join('، ')}\n\nاختر عمليات لنفس المندوب فقط.`);
+                return;
+            }
+
+            await printManifest(null, entries);
+        }
+
+        async function printManifest(logIndex, entriesOverride = null) {
+            const log     = getLog();
+            // entriesOverride = array of entries (multi-print), logIndex = single entry
+            const entries = entriesOverride || [log[logIndex]];
+            if (!entries.length || !entries[0]) return;
 
             const { url, secret } = getLogConfig();
             if (!url || !secret) { alert('أدخل Log Worker URL و Secret في الإعدادات'); openSettings(); return; }
 
-            const successOrders = entry.orders.filter(o => o.status === 'success');
+            // دمج كل الـ successOrders من كل العمليات
+            const successOrders = entries.flatMap(e => e.orders.filter(o => o.status === 'success'));
             const orderIds      = successOrders.map(o => o.order);
+            // التاريخ والمندوب من أول عملية
+            const entry         = entries[0];
 
             showToast('⏳ جاري جلب بيانات العملاء...', '');
 

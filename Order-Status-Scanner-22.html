@@ -1,0 +1,1855 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Status Updater</title>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --bg:           #f5f6fa;
+            --surface:      #ffffff;
+            --border:       #e2e5ed;
+            --border-light: #eef0f5;
+            --text:         #1a1d27;
+            --text-sub:     #6b7280;
+            --text-muted:   #9ca3af;
+            --radius:       10px;
+            --shadow:       0 1px 3px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.04);
+            --shadow-md:    0 4px 12px rgba(0,0,0,.08);
+
+            --primary:      #0284c7;
+            --primary-h:    #0369a1;
+            --primary-bg:   #f0f9ff;
+            --primary-b:    #bae6fd;
+
+            --success:      #16a34a;
+            --success-bg:   #f0fdf4;
+            --success-b:    #bbf7d0;
+            --error:        #dc2626;
+            --error-bg:     #fef2f2;
+            --error-b:      #fecaca;
+            --orange:       #d97706;
+            --orange-bg:    #fffbeb;
+            --orange-b:     #fde68a;
+            --purple:       #7c3aed;
+            --purple-bg:    #f5f3ff;
+            --purple-b:     #ddd6fe;
+            --pink:         #db2777;
+            --pink-bg:      #fdf2f8;
+            --pink-b:       #fbcfe8;
+            --accent:       #f43f5e;
+
+            --amber:        #C9925B;
+            --amber-dark:   #A0714A;
+            --amber-bg:     #FDF6EE;
+            --amber-b:      #E8C49A;
+        }
+
+        body {
+            font-family: 'IBM Plex Sans Arabic', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            padding: 24px 16px;
+            font-size: 14px;
+            transition: background 0.4s ease;
+        }
+
+        body.field-s1 { background: #eaf4ff; }
+        body.field-s2 { background: #fdf5ec; }
+
+        .wrapper { max-width: 1100px; margin: 0 auto; display: flex; flex-direction: column; gap: 16px; }
+
+        .page-border { position: fixed; top: 0; left: 0; right: 0; height: 3px; z-index: 50; background: var(--border); transition: background 0.4s; }
+        body.field-s1 .page-border { background: var(--primary); }
+        body.field-s2 .page-border { background: var(--amber); }
+
+        .header {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: var(--radius); padding: 16px 20px;
+            box-shadow: var(--shadow);
+            display: flex; align-items: center; justify-content: space-between; gap: 12px;
+        }
+        .header-left { display: flex; align-items: center; gap: 12px; }
+        .header-icon { width: 40px; height: 40px; background: var(--primary-bg); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+        .header-title h1 { font-size: 17px; font-weight: 700; display: flex; align-items: center; }
+        .header-title p  { font-size: 12px; color: var(--text-sub); margin-top: 2px; }
+        
+        .version-badge {
+            display: inline-block; padding: 2px 6px; margin-right: 8px;
+            background: var(--primary-bg); color: var(--primary); border: 1px solid var(--primary-b);
+            border-radius: 6px; font-size: 11px; font-family: 'JetBrains Mono', monospace;
+            font-weight: 700; vertical-align: middle; direction: ltr;
+        }
+
+        .tabs-card {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: var(--radius); padding: 10px 14px;
+            box-shadow: var(--shadow);
+        }
+        .tabs { display: flex; gap: 4px; background: var(--bg); border-radius: 8px; padding: 3px; }
+        .tab-btn {
+            flex: 1; padding: 8px 16px; border-radius: 6px; border: none;
+            font-size: 13px; font-weight: 500; cursor: pointer;
+            background: none; color: var(--text-sub);
+            transition: all 0.15s; font-family: inherit;
+        }
+        .tab-btn.active { background: var(--surface); color: var(--text); box-shadow: var(--shadow); font-weight: 600; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        .card {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden;
+        }
+        body.field-s2 .card { border-color: var(--amber-b); }
+
+        .card-header {
+            padding: 12px 18px; border-bottom: 1px solid var(--border-light);
+            display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+        }
+        .card-header h2 { font-size: 13px; font-weight: 600; color: var(--text); display: flex; align-items: center; gap: 6px; }
+        .card-body { padding: 16px 18px; }
+
+        .scanner-tab-content { display: flex; flex-direction: column; gap: 14px; }
+
+        .field-selector { display: flex; flex-direction: column; gap: 8px; }
+        .field-btn {
+            padding: 1rem 1rem; border-radius: 10px; font-family: inherit;
+            cursor: pointer; border: 2px solid var(--border); background: var(--bg);
+            color: var(--text-sub); transition: all 0.2s;
+            display: flex; flex-direction: column; align-items: center; gap: 3px;
+        }
+        .field-btn .field-main { font-size: 1rem; font-weight: 700; line-height: 1.2; }
+        .field-btn .field-tag  { font-size: 0.6rem; font-weight: 500; opacity: 0.55; font-family: 'JetBrains Mono', monospace; }
+        .field-btn:hover { border-color: #9ca3af; }
+        .field-btn.active.s1 { border-color: var(--primary); background: var(--primary-bg); color: var(--primary); box-shadow: 0 0 0 3px rgba(2,132,199,0.1); }
+        .field-btn.active.s1 .field-tag { opacity: 0.7; }
+        .field-btn.active.s2 { border-color: var(--amber); background: var(--amber-bg); color: var(--amber-dark); box-shadow: 0 0 0 3px rgba(201,146,91,0.12); }
+        .field-btn.active.s2 .field-main { color: var(--amber); }
+        .field-btn.active.s2 .field-tag  { opacity: 0.7; color: var(--amber); }
+
+        .status-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+        .status-btn {
+            padding: 0.65rem 0.3rem; border-radius: 9px; font-family: inherit;
+            font-size: 0.72rem; font-weight: 600; cursor: pointer;
+            border: 2px solid var(--border); background: var(--bg);
+            color: var(--text-sub); transition: all 0.15s; text-align: center;
+        }
+        .status-btn:hover { border-color: #9ca3af; background: white; }
+        .status-btn.active { transform: scale(1.03); }
+        .status-btn .icon  { font-size: 1.15rem; display: block; margin-bottom: 3px; }
+        .status-btn.Shipped.active   { border-color: var(--primary);  background: var(--primary-bg);  color: var(--primary); }
+        .status-btn.Delivered.active { border-color: var(--success);  background: var(--success-bg);  color: var(--success); }
+        .status-btn.Returned.active  { border-color: var(--orange);   background: var(--orange-bg);   color: var(--orange); }
+        .status-btn.Cancelled.active { border-color: var(--error);    background: var(--error-bg);    color: var(--error); }
+        .status-btn.Ready.active     { border-color: var(--purple);   background: var(--purple-bg);   color: var(--purple); }
+
+        .courier-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin-bottom: 12px; }
+        .courier-btn {
+            padding: 0.55rem 0.4rem; border-radius: 7px; font-family: inherit;
+            font-size: 0.78rem; font-weight: 500; cursor: pointer;
+            border: 1.5px solid var(--border); background: var(--bg);
+            color: var(--text-sub); transition: all 0.15s; text-align: center;
+        }
+        .courier-btn:hover  { border-color: var(--pink); color: var(--pink); background: var(--pink-bg); }
+        .courier-btn.active { border-color: var(--pink); background: var(--pink-bg); color: var(--pink); font-weight: 600; }
+        .courier-loading { padding: 0.75rem; color: var(--text-muted); font-size: 0.8rem; }
+
+        .scanner-row { position: relative; }
+        .scanner-icon { position: absolute; right: 0.85rem; top: 50%; transform: translateY(-50%); font-size: 1rem; pointer-events: none; }
+        .scanner-input {
+            width: 100%; padding: 10px 14px 10px 2.8rem;
+            border: 2px solid var(--border); border-radius: 8px;
+            font-size: 14px; color: var(--text); background: white;
+            transition: border-color 0.15s; font-family: 'JetBrains Mono', monospace;
+            direction: ltr;
+        }
+        .scanner-input:focus { outline: none; border-color: var(--primary); }
+        .scanner-input::placeholder { color: var(--text-muted); font-size: 13px; font-family: 'IBM Plex Sans Arabic', sans-serif; }
+
+        .manual-row { display: flex; gap: 8px; align-items: center; position: relative; }
+        .manual-icon { position: absolute; right: 0.85rem; top: 50%; transform: translateY(-50%); font-family: 'JetBrains Mono', monospace; font-size: 1rem; color: var(--text-muted); pointer-events: none; font-weight: 700; }
+        .manual-input {
+            flex: 1; padding: 10px 14px 10px 2.2rem;
+            border: 1.5px solid var(--border); border-radius: 8px;
+            font-size: 14px; color: var(--text); background: white;
+            font-family: 'JetBrains Mono', monospace; direction: ltr; outline: none;
+            transition: border-color 0.15s;
+        }
+        .manual-input:focus { border-color: var(--orange); }
+        .manual-input::placeholder { color: var(--text-muted); font-size: 12px; font-family: 'IBM Plex Sans Arabic', sans-serif; }
+        .manual-btn {
+            background: var(--primary); color: white; border: none;
+            padding: 10px 16px; border-radius: 8px; font-family: inherit;
+            font-size: 13px; font-weight: 600; cursor: pointer; white-space: nowrap;
+            transition: background 0.15s;
+        }
+        .manual-btn:hover:not(:disabled) { background: var(--primary-h); }
+        .manual-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        .input-hint { font-size: 11px; color: var(--text-muted); margin-top: 5px; }
+        .input-divider { border: none; border-top: 1px solid var(--border-light); margin: 10px 0; }
+
+        .scan-feedback {
+            display: none; font-size: 12px; padding: 6px 10px;
+            border-radius: 7px; margin-top: 8px; text-align: center;
+            font-weight: 500;
+        }
+
+        .scanned-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        .scanned-table thead th {
+            text-align: right; padding: 8px 12px;
+            background: var(--bg); border-bottom: 1.5px solid var(--border);
+            font-size: 11px; font-weight: 700; color: var(--text-sub);
+            text-transform: uppercase; letter-spacing: 0.04em; white-space: nowrap;
+        }
+        .scanned-table thead th.col-del { width: 32px; }
+        .scanned-table thead th.col-num { width: 28px; text-align: center; }
+        .scanned-table thead th.col-id  { direction: ltr; text-align: left; }
+        .scanned-table thead th.col-s1, .scanned-table thead th.col-s2 { min-width: 110px; }
+        .scanned-table tbody tr { border-bottom: 1px solid var(--border-light); transition: background 0.1s; }
+        .scanned-table tbody tr:last-child { border-bottom: none; }
+        .scanned-table tbody tr:hover { background: #fafbfd; }
+        .scanned-table tbody tr.row-new { animation: rowHighlight 1s ease; }
+        
+        /* Validation & States rows */
+        .scanned-table tbody tr.row-cancelled { background: #fef2f2; opacity: 0.7; }
+        .scanned-table tbody tr.row-invalid   { background: #fff1f2; opacity: 0.9; border-left: 3px solid var(--error); }
+        
+        @keyframes rowHighlight { 0% { background: #dcfce7; } 100% { background: transparent; } }
+        .scanned-table tbody td { padding: 9px 12px; vertical-align: middle; }
+        .scanned-table tbody td.col-num { text-align: center; color: var(--text-muted); font-size: 11px; }
+        .scanned-table tbody td.col-order { font-weight: 700; color: var(--primary); font-size: 13px; white-space: nowrap; }
+        .scanned-table tbody td.col-id { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text-muted); direction: ltr; text-align: left; }
+        .scanned-table tbody td.col-del { text-align: center; }
+        
+        .status-pill {
+            display: inline-block; padding: 2px 8px; border-radius: 5px;
+            font-size: 11px; font-weight: 600; white-space: nowrap;
+        }
+        .status-pill.s-Shipped    { background: #f0f9ff; color: #0284c7; border: 1px solid #bae6fd; }
+        .status-pill.s-Delivered  { background: #f0fdf4; color: #16a34a; border: 1px solid #bbf7d0; }
+        .status-pill.s-Returned   { background: #fffbeb; color: #d97706; border: 1px solid #fde68a; }
+        .status-pill.s-Cancelled  { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
+        .status-pill.s-Ready      { background: #f5f3ff; color: #7c3aed; border: 1px solid #ddd6fe; }
+        .status-pill.s-neutral    { background: #f3f4f6; color: #6b7280; border: 1px solid #e5e7eb; }
+        .status-empty { color: var(--text-muted); font-size: 11px; }
+        .empty-state { text-align: center; padding: 28px; color: var(--text-muted); font-size: 13px; }
+        .empty-state .empty-icon { font-size: 28px; margin-bottom: 8px; }
+
+        .order-cancelled-badge {
+            display: inline-block; padding: 2px 8px; border-radius: 5px;
+            font-size: 11px; font-weight: 700; background: #fef2f2;
+            color: #dc2626; border: 1px solid #fecaca; margin-right: 6px;
+        }
+        .order-invalid-badge {
+            display: inline-block; padding: 2px 8px; border-radius: 5px;
+            font-size: 11px; font-weight: 700; background: #fff1f2;
+            color: #be123c; border: 1px solid #fda4af; margin-right: 6px;
+        }
+
+        .summary-banner {
+            padding: 14px 16px; text-align: center; font-size: 14px; font-weight: 700;
+            background: var(--bg); color: var(--text-muted); letter-spacing: 0.02em;
+            border-bottom: 1px solid var(--border-light); transition: all 0.3s;
+        }
+        .summary-banner.s1 { background: var(--primary-bg); color: var(--primary); }
+        .summary-banner.s2 { background: var(--amber-bg); color: var(--amber-dark); }
+
+        .summary-rows { padding: 10px 16px; }
+        .summary-row { display: flex; justify-content: space-between; align-items: center; padding: 7px 0; border-bottom: 1px solid var(--border-light); font-size: 13px; }
+        .summary-row:last-child { border-bottom: none; }
+        .summary-label { color: var(--text-sub); }
+        .summary-val { font-weight: 600; font-family: 'JetBrains Mono', monospace; font-size: 12px; }
+        .summary-val.courier { color: var(--pink); font-family: 'IBM Plex Sans Arabic', sans-serif; }
+        .summary-val.count   { color: var(--accent); font-size: 1.1rem; }
+
+        .sidebar-actions { padding: 12px 16px; display: flex; flex-direction: column; gap: 8px; border-top: 1px solid var(--border-light); }
+
+        .btn-update {
+            width: 100%; padding: 12px; border-radius: 9px; font-family: inherit;
+            font-size: 14px; font-weight: 700; cursor: pointer; border: none;
+            background: var(--accent); color: white; transition: all 0.15s;
+            box-shadow: var(--shadow-md);
+        }
+        .btn-update:hover { filter: brightness(1.06); }
+        .btn-update:disabled { opacity: 0.5; cursor: not-allowed; }
+        .btn-update.Shipped   { background: var(--primary); }
+        .btn-update.Delivered { background: var(--success); }
+        .btn-update.Returned  { background: var(--orange); }
+        .btn-update.Cancelled { background: var(--error); }
+        .btn-update.Ready     { background: var(--purple); }
+
+        .progress-wrap { height: 4px; background: var(--border-light); border-radius: 4px; overflow: hidden; display: none; }
+        .progress-wrap.active { display: block; }
+        .progress-bar  { height: 100%; background: var(--primary); border-radius: 4px; transition: width 0.3s; width: 0%; }
+
+        .results { display: none; }
+        .results.active { display: block; }
+        .results-header { display: flex; justify-content: space-between; font-size: 12px; font-weight: 600; margin-bottom: 6px; }
+        .stat-ok  { color: var(--success); }
+        .stat-err { color: var(--error); }
+        .results-list { max-height: 160px; overflow-y: auto; border: 1px solid var(--border); border-radius: 8px; background: var(--bg); }
+        .result-item { display: flex; justify-content: space-between; align-items: center; padding: 6px 12px; border-bottom: 1px solid var(--border-light); font-size: 12px; }
+        .result-item:last-child { border-bottom: none; }
+        .result-badge { padding: 2px 8px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+        .result-pending { background: #eff6ff; color: #2563eb; }
+        .result-success { background: var(--success-bg); color: var(--success); }
+        .result-error   { background: var(--error-bg);   color: var(--error); }
+
+        .btn-sm {
+            display: inline-flex; align-items: center; gap: 5px; justify-content: center;
+            padding: 6px 12px; border-radius: 7px; font-size: 12px; font-weight: 600;
+            border: 1px solid var(--border); background: var(--surface); color: var(--text-sub);
+            cursor: pointer; font-family: inherit; transition: all 0.15s; white-space: nowrap;
+        }
+        .btn-sm:hover { background: var(--bg); border-color: #9ca3af; color: var(--text); }
+        .btn-sm.danger { color: var(--error); border-color: var(--error-b); }
+        .btn-sm.danger:hover { background: var(--error-bg); }
+        .btn-sm.primary { background: var(--primary-bg); color: var(--primary); border-color: var(--primary-b); }
+        .btn-sm.primary:hover { background: var(--primary); color: white; }
+
+        /* ── Log Filters ── */
+        .log-filter-bar {
+            padding: 12px 18px;
+            border-bottom: 1px solid var(--border-light);
+            display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+            background: var(--bg);
+        }
+        .log-filter-input {
+            flex: 1; min-width: 160px;
+            padding: 7px 12px; border: 1.5px solid var(--border);
+            border-radius: 7px; font-family: 'JetBrains Mono', monospace;
+            font-size: 13px; color: var(--text); background: white;
+            outline: none; direction: ltr; transition: border-color 0.15s;
+        }
+        .log-filter-input:focus { border-color: var(--primary); }
+        .log-filter-input::placeholder { font-family: 'IBM Plex Sans Arabic', sans-serif; color: var(--text-muted); font-size: 12px; direction: rtl; }
+        .log-filter-select {
+            padding: 7px 10px; border: 1.5px solid var(--border);
+            border-radius: 7px; font-family: inherit; font-size: 12px;
+            color: var(--text); background: white; outline: none;
+            cursor: pointer; transition: border-color 0.15s; max-width: 140px;
+        }
+        .log-filter-select:focus { border-color: var(--primary); }
+        .log-filter-clear {
+            padding: 7px 12px; border-radius: 7px; font-family: inherit;
+            font-size: 12px; font-weight: 600; cursor: pointer;
+            border: 1.5px solid var(--border); background: var(--surface);
+            color: var(--text-sub); transition: all 0.15s; white-space: nowrap;
+        }
+        .log-filter-clear:hover { border-color: var(--error); color: var(--error); background: var(--error-bg); }
+        .log-filter-count { font-size: 11px; color: var(--text-muted); white-space: nowrap; }
+
+        /* ── Log Section ── */
+        .log-entry { border: 1px solid var(--border); border-radius: 8px; overflow: hidden; margin-bottom: 8px; }
+        .log-entry-header { background: var(--bg); padding: 9px 14px; display: flex; align-items: center; justify-content: space-between; font-size: 12px; color: var(--text-sub); gap: 10px; flex-wrap: wrap; cursor: pointer; }
+        .log-entry-header strong { color: var(--text); font-size: 13px; }
+        .log-entry-details { display: none; border-top: 1px solid var(--border-light); max-height: 200px; overflow-y: auto; background: white; }
+        .log-entry.open .log-entry-details { display: block; }
+        .log-toggle { transition: transform 0.2s; font-size: 10px; }
+        .log-entry.open .log-toggle { transform: rotate(90deg); }
+        .log-detail-item { display: flex; justify-content: space-between; align-items: center; padding: 6px 14px; border-bottom: 1px solid var(--border-light); font-size: 12px; }
+        .log-detail-item:last-child { border-bottom: none; }
+        .log-detail-order { font-family: 'JetBrains Mono', monospace; font-weight: 600; }
+        .log-detail-status { padding: 2px 8px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+        .log-detail-success { background: var(--success-bg); color: var(--success); }
+        .log-detail-error   { background: var(--error-bg);   color: var(--error); }
+        .log-tag { padding: 2px 8px; border-radius: 5px; font-size: 11px; font-weight: 600; }
+        .log-tag.s1 { background: var(--primary-bg); color: var(--primary); border: 1px solid var(--primary-b); }
+        .log-tag.s2 { background: var(--amber-bg); color: var(--amber-dark); border: 1px solid var(--amber-b); }
+        .log-tag.status-Shipped   { background: var(--primary-bg); color: var(--primary); border: 1px solid var(--primary-b); }
+        .log-tag.status-Delivered { background: var(--success-bg); color: var(--success); border: 1px solid var(--success-b); }
+        .log-tag.status-Returned  { background: var(--orange-bg);  color: var(--orange);  border: 1px solid var(--orange-b); }
+        .log-tag.status-Cancelled { background: var(--error-bg);   color: var(--error);   border: 1px solid var(--error-b); }
+        .log-tag.status-Ready     { background: var(--purple-bg);  color: var(--purple);  border: 1px solid var(--purple-b); }
+        .log-tag.courier          { background: var(--pink-bg);    color: var(--pink);    border: 1px solid var(--pink-b); }
+        .log-tag.count            { background: #fef2f2; color: var(--accent); border: 1px solid #fecaca; }
+        .log-sync-status { font-size: 11px; padding: 2px 7px; border-radius: 5px; font-weight: 600; }
+        .log-sync-status.synced  { color: var(--success); background: var(--success-bg); border: 1px solid var(--success-b); }
+        .log-sync-status.local   { color: var(--orange);  background: var(--orange-bg);  border: 1px solid var(--orange-b); }
+        .log-sync-status.loading { color: var(--primary); background: var(--primary-bg); border: 1px solid var(--primary-b); }
+        .log-empty { text-align: center; padding: 32px; color: var(--text-muted); font-size: 13px; }
+        .log-check { width: 14px; height: 14px; accent-color: var(--accent); cursor: pointer; flex-shrink: 0; margin-left: 6px; }
+        .export-selected-btn { display: none; }
+        .export-selected-btn.visible { display: inline-flex; }
+
+        /* highlight matching order rows */
+        .log-detail-item.highlight-match { background: #fefce8; }
+
+        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.3); z-index: 200; align-items: center; justify-content: center; padding: 1rem; }
+        .modal-overlay.active { display: flex; }
+        .modal { background: var(--surface); border-radius: 14px; padding: 22px; width: 100%; max-width: 420px; box-shadow: 0 20px 60px rgba(0,0,0,0.15); animation: modalIn 0.2s ease; }
+        @keyframes modalIn { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; }
+        .modal-title  { font-size: 15px; font-weight: 700; }
+        .modal-close  { background: none; border: none; font-size: 1.2rem; cursor: pointer; color: var(--text-muted); }
+        .modal-close:hover { color: var(--error); }
+        .form-group { margin-bottom: 14px; }
+        .form-group label { display: block; font-size: 11px; font-weight: 700; color: var(--text-sub); margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.05em; }
+        .form-group input { width: 100%; background: var(--bg); border: 1.5px solid var(--border); border-radius: 8px; padding: 10px 14px; color: var(--text); font-family: 'JetBrains Mono', monospace; font-size: 13px; outline: none; transition: border-color 0.15s; direction: ltr; }
+        .form-group input:focus { border-color: var(--primary); }
+        .modal-footer { display: flex; gap: 8px; margin-top: 18px; }
+        .modal-cancel { flex: 1; padding: 10px; border-radius: 8px; font-family: inherit; font-size: 13px; font-weight: 600; cursor: pointer; border: 1.5px solid var(--border); background: var(--bg); color: var(--text-sub); }
+        .modal-save   { flex: 1; padding: 10px; border-radius: 8px; font-family: inherit; font-size: 13px; font-weight: 600; cursor: pointer; border: none; background: var(--primary); color: white; }
+        .modal-save:hover { background: var(--primary-h); }
+
+        .toast-container { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 300; display: flex; flex-direction: column; gap: 6px; align-items: center; }
+        .toast { background: #1a1d27; color: white; padding: 9px 18px; border-radius: 8px; font-size: 12px; box-shadow: var(--shadow-md); animation: slideUp 0.2s ease; white-space: nowrap; font-weight: 500; }
+        .toast.success { background: var(--success); }
+        .toast.error   { background: var(--error); }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+        .spinner { width: 14px; height: 14px; border: 2px solid transparent; border-top-color: currentColor; border-radius: 50%; animation: spin 0.8s linear infinite; display: inline-block; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        
+        /* ── Change Log Styles ── */
+        .changelog-list { max-height: 350px; overflow-y: auto; padding-right: 4px; display: flex; flex-direction: column; gap: 16px; }
+        .changelog-item { border-bottom: 1px solid var(--border-light); padding-bottom: 16px; }
+        .changelog-item:last-child { border-bottom: none; padding-bottom: 0; }
+        .changelog-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+        .changelog-version { font-family: 'JetBrains Mono', monospace; font-weight: 700; font-size: 13px; color: var(--text); background: var(--bg); padding: 2px 8px; border-radius: 6px; border: 1px solid var(--border); direction: ltr; }
+        .changelog-date { font-size: 12px; color: var(--text-muted); font-family: 'JetBrains Mono', monospace; direction: ltr; }
+        .changelog-desc { list-style-type: disc; margin-right: 20px; font-size: 13px; color: var(--text-sub); line-height: 1.6; }
+        .changelog-desc li { margin-bottom: 4px; }
+        
+        /* ── Courier Search Modal Styles ── */
+        .courier-order-check { width: 16px; height: 16px; accent-color: var(--primary); cursor: pointer; }
+        .truncated-warning {
+            background: var(--orange-bg); color: var(--orange-b);
+            border: 1.5px solid var(--orange-b); border-radius: 7px;
+            padding: 8px 12px; margin-bottom: 12px; font-size: 12px;
+            font-weight: 600; color: var(--orange);
+        }
+    </style>
+</head>
+<body>
+    <div class="page-border"></div>
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Settings Modal -->
+    <div class="modal-overlay" id="settingsModal">
+        <div class="modal">
+            <div class="modal-header">
+                <span class="modal-title">⚙️ الإعدادات</span>
+                <button class="modal-close" onclick="closeSettings()">✕</button>
+            </div>
+            <div class="form-group">
+                <label>Flow Companion API Token</label>
+                <input type="password" id="apiToken" placeholder="أدخل الـ Token">
+            </div>
+            <div class="form-group">
+                <label>Log Worker URL</label>
+                <input type="text" id="logWorkerUrl" placeholder="https://...workers.dev">
+            </div>
+            <div class="form-group" style="margin-bottom:0">
+                <label>Log Worker Secret</label>
+                <input type="password" id="logWorkerSecret" placeholder="WORKER_SECRET">
+            </div>
+            <div class="modal-footer">
+                <button class="modal-cancel" onclick="closeSettings()">إلغاء</button>
+                <button class="modal-save"   onclick="saveSettings()">حفظ</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Change Log Modal -->
+    <div class="modal-overlay" id="changeLogModal">
+        <div class="modal" style="max-width: 500px;">
+            <div class="modal-header">
+                <span class="modal-title">📝 سجل التحديثات (Change Log)</span>
+                <button class="modal-close" onclick="closeChangeLog()">✕</button>
+            </div>
+            <div class="changelog-list">
+                <div class="changelog-item">
+                    <div class="changelog-header">
+                        <span class="changelog-version">v1.3.2</span>
+                        <span class="changelog-date">21-04-2026</span>
+                    </div>
+                    <ul class="changelog-desc">
+                        <li>🖨️ تحسين طباعة المانفيست: تصغير عمود الباركود للنصف، توسيع عمود العنوان لضعفه، تقليل الهوامش بين الأعمدة لأدنى قيمة ممكنة.</li>
+                        <li>إزالة العلامات العشرية من أرقام COD والإجمالي (أرقام صحيحة فقط).</li>
+                        <li>توحيد جميع الأرقام في المانفيست بالشكل الإنجليزي.</li>
+                    </ul>
+                </div>
+                <div class="changelog-item">
+                    <div class="changelog-header">
+                        <span class="changelog-version">v1.3.1</span>
+                        <span class="changelog-date">19-04-2026</span>
+                    </div>
+                    <ul class="changelog-desc">
+                        <li>🎯 تصحيح جوهري: البحث عن أوردرات المندوب الآن يجلب الأوردرات <strong>القابلة للتحويل</strong> للحالة المختارة (بدلاً من الأوردرات التي هي بالفعل في تلك الحالة).</li>
+                        <li>مثال: عند اختيار "Delivered"، يتم جلب الأوردرات التي حالتها الحالية <code>Shipped</code> (وليس Delivered).</li>
+                        <li>الـ Worker يبني الآن Shopify query ديناميكي بناءً على قواعد الانتقال الـ 8، مع دعم قيم مثل <code>Confirmed + Edit</code> و <code>Confirmed + RETURN</code>.</li>
+                    </ul>
+                </div>
+                <div class="changelog-item">
+                    <div class="changelog-header">
+                        <span class="changelog-version">v1.3.0</span>
+                        <span class="changelog-date">19-04-2026</span>
+                    </div>
+                    <ul class="changelog-desc">
+                        <li>تحسين أداء البحث عن أوردرات المندوب — الفلترة الآن تتم على Shopify مباشرة بناءً على الحالة المختارة (أسرع بكتير).</li>
+                        <li>الـ Modal الآن يعرض كل أوردرات المندوب المطابقة للحالة، وفلترة الانتقالات (S1/S2 conditions) تُطبَّق في الجدول الرئيسي بعد الإضافة.</li>
+                        <li>إضافة تحذير عند تجاوز سقف النتائج (1000 أوردر).</li>
+                    </ul>
+                </div>
+                <div class="changelog-item">
+                    <div class="changelog-header">
+                        <span class="changelog-version">v1.2.0</span>
+                        <span class="changelog-date">19-04-2026</span>
+                    </div>
+                    <ul class="changelog-desc">
+                        <li>إضافة خاصية "البحث التلقائي عن أوردرات المندوب" لجلب الأوردرات المتطابقة مع الحالة المستهدفة وإضافتها للقائمة بضغطة زر.</li>
+                        <li>تحديث شروط تحديث الحالة (Validation) لتشمل السماح بالانتقال لـ Delivered حتى وإن كانت S2 فارغة.</li>
+                    </ul>
+                </div>
+                <div class="changelog-item">
+                    <div class="changelog-header">
+                        <span class="changelog-version">v1.1.0</span>
+                        <span class="changelog-date">19-04-2026</span>
+                    </div>
+                    <ul class="changelog-desc">
+                        <li>إضافة فحص صارم للحالات (State Transition Validation) لمنع تحديث الأوردرات إلا بالترتيب المنطقي المتفق عليه.</li>
+                        <li>تمييز الأوردرات غير المطابقة للشروط باللون الأحمر داخل القائمة لمنع الأخطاء مبكراً.</li>
+                        <li>إضافة قسم سجل التحديثات وعرض رقم النسخة في واجهة الأداة.</li>
+                    </ul>
+                </div>
+                <div class="changelog-item">
+                    <div class="changelog-header">
+                        <span class="changelog-version">v1.0.0</span>
+                        <span class="changelog-date">18-04-2026</span>
+                    </div>
+                    <ul class="changelog-desc">
+                        <li>الإطلاق الأولي لأداة تحديث حالة الأوردرات.</li>
+                        <li>دعم كامل لاستخدام Scanner Gun وإدخال أرقام الأوردرات يدوياً.</li>
+                        <li>ربط الأداة بـ Cloudflare Worker للاحتفاظ بسجل دائم بالعمليات السابقة.</li>
+                        <li>إمكانية تصدير السجل بصيغة CSV وطباعة بيان شحن (Manifest) للمناديب بالباركود.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Courier Search Modal -->
+    <div class="modal-overlay" id="courierSearchModal">
+        <div class="modal" style="max-width: 600px;">
+            <div class="modal-header">
+                <span class="modal-title">🔍 أوردرات المندوب: <span id="searchModalCourierName" style="color:var(--primary);"></span></span>
+                <button class="modal-close" onclick="closeCourierSearch()">✕</button>
+            </div>
+            
+            <div id="courierSearchLoading" style="text-align:center; padding: 30px; color: var(--text-sub);">
+                <span class="spinner" style="border-top-color: var(--primary);"></span><br><br>
+                جاري البحث في Shopify عن أوردرات المندوب...<br>
+                <small style="opacity:0.7;" id="courierSearchLoadingHint">سيتم جلب الأوردرات القابلة للتحويل للحالة المختارة</small>
+            </div>
+
+            <div id="courierSearchContent" style="display:none;">
+                <div id="truncatedWarning" class="truncated-warning" style="display:none;">
+                    ⚠️ تم الوصول للحد الأقصى (1000 أوردر). قد توجد نتائج إضافية لم تُعرض.
+                </div>
+                <div style="max-height: 350px; overflow-y: auto; border: 1px solid var(--border); border-radius: 8px; margin-bottom: 16px;">
+                    <table class="scanned-table" style="margin-bottom: 0;">
+                        <thead style="position: sticky; top: 0; z-index: 10;">
+                            <tr>
+                                <th style="width:40px;text-align:center;"><input type="checkbox" id="selectAllCourierOrders" class="courier-order-check" onchange="toggleAllCourierOrders(this)"></th>
+                                <th>رقم الأوردر</th>
+                                <th style="min-width: 110px;">S1 الحالية</th>
+                                <th style="min-width: 110px;">S2 الحالية</th>
+                            </tr>
+                        </thead>
+                        <tbody id="courierSearchTableBody">
+                            <!-- Rows will be populated here -->
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button class="modal-cancel" onclick="closeCourierSearch()">إلغاء</button>
+                    <button class="modal-save" onclick="addSelectedCourierOrders()">➕ إضافة المحدد (<span id="selectedCourierOrdersCount">0</span>)</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="wrapper">
+
+        <!-- Header -->
+        <div class="header">
+            <div class="header-left">
+                <div class="header-icon">📦</div>
+                <div class="header-title">
+                    <h1>Order Status Updater <span class="version-badge">v1.3.2</span></h1>
+                    <p>تحديث حالة الأوردرات</p>
+                </div>
+            </div>
+            <div style="display:flex; gap:8px;">
+                <button class="btn-sm" onclick="openChangeLog()">📝 التحديثات</button>
+                <button class="btn-sm" onclick="openSettings()">⚙️ الإعدادات</button>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs-card">
+            <div class="tabs">
+                <button class="tab-btn active" onclick="switchTab('scanner', this)">📦 تحديث الأوردرات</button>
+                <button class="tab-btn" onclick="switchTab('log', this)">📜 سجل التحديثات السابقة</button>
+            </div>
+        </div>
+
+        <!-- ══ TAB: Scanner ══ -->
+        <div id="tab-scanner" class="tab-content active">
+            <div class="scanner-tab-content">
+
+                <!-- Row 1 -->
+                <div style="display:grid;grid-template-columns:220px 1fr 280px;gap:14px;align-items:start;">
+
+                    <!-- Field Selector -->
+                    <div class="card">
+                        <div class="card-header"><h2>🔀 نوع التحديث</h2></div>
+                        <div class="card-body">
+                            <div class="field-selector">
+                                <button class="field-btn s1" id="fieldBtnS1" onclick="selectField('S1')">
+                                    <span class="field-main">توصيل عادي</span>
+                                    <span class="field-tag">S1</span>
+                                </button>
+                                <button class="field-btn s2" id="fieldBtnS2" onclick="selectField('S2')">
+                                    <span class="field-main">استبدال / استرجاع</span>
+                                    <span class="field-tag">S2</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Status Selector -->
+                    <div class="card">
+                        <div class="card-header"><h2>📌 الحالة</h2></div>
+                        <div class="card-body">
+                            <div class="status-grid" id="statusSelector"></div>
+                        </div>
+                    </div>
+
+                    <!-- Summary + Action -->
+                    <div class="card" style="overflow:hidden;">
+                        <div class="summary-banner" id="summaryFieldBanner">— اختر نوع التحديث —</div>
+                        <div class="summary-rows">
+                            <div class="summary-row">
+                                <span class="summary-label">الحالة</span>
+                                <span class="summary-val" id="summaryStatus">—</span>
+                            </div>
+                            <div class="summary-row" id="courierRow" style="display:none">
+                                <span class="summary-label">المندوب</span>
+                                <span class="summary-val courier" id="summaryCourier">—</span>
+                            </div>
+                            <div class="summary-row">
+                                <span class="summary-label">الأوردرات</span>
+                                <span class="summary-val count" id="summaryCount">0</span>
+                            </div>
+                        </div>
+                        <div class="sidebar-actions">
+                            <button class="btn-update" id="updateBtn" onclick="startUpdate()">🚀 تحديث الكل</button>
+                            <div class="progress-wrap" id="progressBar">
+                                <div class="progress-bar" id="progressFill" style="width:0%"></div>
+                            </div>
+                            <div class="results" id="results">
+                                <div class="results-header">
+                                    <span>النتائج</span>
+                                    <span>
+                                        <span class="stat-ok">✓ <span id="successCount">0</span></span>
+                                        &nbsp;
+                                        <span class="stat-err">✗ <span id="errorCount">0</span></span>
+                                    </span>
+                                </div>
+                                <div class="results-list" id="resultsList"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Row 2: Courier -->
+                <div class="card" id="courierCard" style="display:none">
+                    <div class="card-header">
+                        <h2>🛵 المندوب</h2>
+                        <button class="btn-sm primary" id="btnSearchCourierOrders" onclick="openCourierSearchModal()" style="display:none;">🔍 البحث عن أوردرات المندوب</button>
+                    </div>
+                    <div class="card-body">
+                        <div class="courier-grid" id="courierSelector">
+                            <div class="courier-loading">⏳ جاري التحميل...</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Row 3: Input -->
+                <div class="card">
+                    <div class="card-header"><h2>🔫 إدخال الأوردرات</h2></div>
+                    <div class="card-body">
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+                            <div>
+                                <div class="scanner-row">
+                                    <span class="scanner-icon">🔫</span>
+                                    <input type="text" id="scannerGunInput" class="scanner-input"
+                                        placeholder="امسح الباركود هنا..." autofocus autocomplete="off">
+                                </div>
+                                <p class="input-hint" style="text-align:center;">💡 Scanner Gun: امسح وسيتم الإضافة تلقائياً</p>
+                            </div>
+                            <div>
+                                <div class="manual-row">
+                                    <span class="manual-icon">#</span>
+                                    <input type="text" id="manualOrderInput" class="manual-input"
+                                        placeholder="رقم الأوردر يدوياً..."
+                                        autocomplete="off" spellcheck="false" inputmode="numeric">
+                                    <button class="manual-btn" id="manualOrderBtn" onclick="handleManualOrderAdd()">إضافة</button>
+                                </div>
+                                <p class="input-hint">💡 أدخل الرقم مع أو بدون #</p>
+                            </div>
+                        </div>
+                        <div class="scan-feedback" id="scanStatus"></div>
+                    </div>
+                </div>
+
+                <!-- Row 4: Orders -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2>📋 الأوردرات</h2>
+                        <div style="display:flex;align-items:center;gap:10px;">
+                            <span class="counter-badge" id="count">0</span>
+                            <button class="btn-sm danger" onclick="clearList()">مسح الكل</button>
+                        </div>
+                    </div>
+                    <div style="overflow-x:auto;">
+                        <div id="scannedList">
+                            <div class="empty-state" style="padding:32px;">
+                                <div class="empty-icon">📋</div>
+                                <div>لم يتم مسح أو إضافة أي أوردرات بعد</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div><!-- /tab-scanner -->
+
+        <!-- ══ TAB: Log ══ -->
+        <div id="tab-log" class="tab-content">
+            <div class="card">
+                <div class="card-header">
+                    <h2>📜 سجل التحديثات السابقة <span class="log-sync-status local" id="logSyncStatus">محلي</span></h2>
+                    <div style="display:flex;gap:6px;">
+                        <button class="btn-sm" onclick="syncFromCloud()">🔄 تحديث</button>
+                        <button class="export-selected-btn btn-sm" id="exportSelectedBtn" onclick="exportLogCSV(true)">📥 تصدير المحدد</button>
+                        <button class="btn-sm" onclick="exportLogCSV(false)">📥 تصدير الكل</button>
+                    </div>
+                </div>
+
+                <!-- Filter Bar -->
+                <div class="log-filter-bar">
+                    <input type="text" class="log-filter-input" id="logSearchInput"
+                        placeholder="ابحث برقم الأوردر... (#37269)"
+                        oninput="applyLogFilters()" autocomplete="off" spellcheck="false">
+                    <select class="log-filter-select" id="logStatusFilter" onchange="applyLogFilters()">
+                        <option value="">كل الحالات</option>
+                        <option value="Shipped">Shipped</option>
+                        <option value="Delivered">Delivered</option>
+                        <option value="Returned">Returned</option>
+                        <option value="Cancelled">Cancelled</option>
+                        <option value="Ready">Ready</option>
+                    </select>
+                    <select class="log-filter-select" id="logCourierFilter" onchange="applyLogFilters()">
+                        <option value="">كل المناديب</option>
+                    </select>
+                    <button class="log-filter-clear" onclick="clearLogFilters()">✕ مسح الفلتر</button>
+                    <span class="log-filter-count" id="logFilterCount"></span>
+                </div>
+
+                <div class="card-body">
+                    <div id="logList">
+                        <div class="log-empty">لا توجد عمليات مسجلة</div>
+                    </div>
+                </div>
+            </div>
+        </div><!-- /tab-log -->
+
+    </div><!-- /wrapper -->
+
+    <script>
+        const FLOW_API_URL = 'https://flow-companion.mivicle.app/rest/1/flow/start/order';
+
+        const STATUSES = {
+            S1: [
+                { specifier: 'Shipped',   label: 'Shipped',   icon: '🚚' },
+                { specifier: 'Delivered', label: 'Delivered', icon: '✅' },
+                { specifier: 'Returned',  label: 'Returned',  icon: '↩️' },
+                { specifier: 'Cancelled', label: 'Cancelled', icon: '❌' },
+                { specifier: 'Ready',     label: 'Ready',     icon: '📦' },
+            ],
+            S2: [
+                { specifier: 'Ready_S2',    label: 'Ready',    icon: '📦' },
+                { specifier: 'Shipped_S2',  label: 'Shipped',  icon: '🚚' },
+                { specifier: 'Returned_S2', label: 'Returned', icon: '↩️' },
+            ],
+        };
+
+        const COURIER_SPECIFIERS = new Set([
+            'Shipped', 'Delivered', 'Returned',
+            'Shipped_S2', 'Returned_S2',
+        ]);
+
+        let scannedOrders    = [];
+        let currentField     = '';
+        let currentSpecifier = '';
+        let currentStatusLabel = '';
+        let currentCourier   = '';
+        const orderNameMap   = {};
+        const orderStatusMap = {};
+        const orderCancelledMap = {};
+
+        const STATUS_COLOR_MAP = {
+            'Shipped':   's-Shipped',
+            'Delivered': 's-Delivered',
+            'Returned':  's-Returned',
+            'Cancelled': 's-Cancelled',
+            'Ready':     's-Ready',
+        };
+
+        // ── Validation Logic ──────────────────────────────────────────
+        function isTransitionValid(targetField, targetStatusLabel, currentS1, currentS2) {
+            const s1 = (currentS1 || '').trim();
+            const s2 = (currentS2 || '').trim();
+            const isBlankS2 = s2 === '';
+
+            if (targetField === 'S1') {
+                if (targetStatusLabel === 'Ready') {
+                    return (s1 === 'Confirmed' || s1 === 'Confirmed + Edit' || s1 === 'Shipped') && isBlankS2;
+                }
+                if (targetStatusLabel === 'Shipped') {
+                    return s1 === 'Ready' && isBlankS2;
+                }
+                if (targetStatusLabel === 'Delivered') {
+                    return s1 === 'Shipped' && (s2 === 'Confirmed + RETURN' || s2 === 'Confirmed + EXCHANGE' || s2 === 'Ready' || isBlankS2);
+                }
+                if (targetStatusLabel === 'Cancelled') {
+                    return (s1 === 'Ready' || s1 === 'Shipped') && isBlankS2;
+                }
+                if (targetStatusLabel === 'Returned') {
+                    return s1 === 'Shipped' && isBlankS2;
+                }
+            } else if (targetField === 'S2') {
+                if (targetStatusLabel === 'Ready') {
+                    return (s1 === 'Shipped' || s1 === 'Delivered') && (s2 === 'Confirmed + RETURN' || s2 === 'Confirmed + EXCHANGE' || s2 === 'Shipped');
+                }
+                if (targetStatusLabel === 'Shipped') {
+                    return s1 === 'Delivered' && s2 === 'Ready';
+                }
+                if (targetStatusLabel === 'Returned') {
+                    return s1 === 'Delivered' && s2 === 'Shipped';
+                }
+            }
+            return false;
+        }
+
+        function needsCourier(s) { return COURIER_SPECIFIERS.has(s); }
+
+        function statusPillClass(value) {
+            if (!value) return null;
+            const base = value.replace(/_S2$/, '');
+            return STATUS_COLOR_MAP[base] || 's-neutral';
+        }
+
+        function statusPill(value) {
+            if (!value) return '<span class="status-empty">—</span>';
+            const cls = statusPillClass(value);
+            return `<span class="status-pill ${cls}">${value}</span>`;
+        }
+
+        // ── Tabs ──────────────────────────────────────────────────────
+        function switchTab(tab, btn) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById(`tab-${tab}`).classList.add('active');
+            btn.classList.add('active');
+            if (tab === 'log') syncFromCloud();
+        }
+
+        // ── Settings ──────────────────────────────────────────────────
+        function openSettings() {
+            document.getElementById('apiToken').value        = localStorage.getItem('api_token') || '';
+            document.getElementById('logWorkerUrl').value    = localStorage.getItem('log_worker_url') || '';
+            document.getElementById('logWorkerSecret').value = localStorage.getItem('log_worker_secret') || '';
+            document.getElementById('settingsModal').classList.add('active');
+        }
+        function closeSettings() {
+            document.getElementById('settingsModal').classList.remove('active');
+            scannerGunInput.focus();
+        }
+        function saveSettings() {
+            localStorage.setItem('api_token',         document.getElementById('apiToken').value.trim());
+            localStorage.setItem('log_worker_url',    document.getElementById('logWorkerUrl').value.trim());
+            localStorage.setItem('log_worker_secret', document.getElementById('logWorkerSecret').value.trim());
+            closeSettings();
+            showToast('تم حفظ الإعدادات', 'success');
+            if (currentField) loadCouriers();
+        }
+        document.getElementById('settingsModal').addEventListener('click', e => {
+            if (e.target === document.getElementById('settingsModal')) closeSettings();
+        });
+        
+        // ── Change Log Modal ──────────────────────────────────────────
+        function openChangeLog() {
+            document.getElementById('changeLogModal').classList.add('active');
+        }
+        function closeChangeLog() {
+            document.getElementById('changeLogModal').classList.remove('active');
+            scannerGunInput.focus();
+        }
+        document.getElementById('changeLogModal').addEventListener('click', e => {
+            if (e.target === document.getElementById('changeLogModal')) closeChangeLog();
+        });
+        
+        // ── Courier Search Modal & Logic ──────────────────────────────
+        let currentCourierSearchResults = [];
+        
+        function openCourierSearchModal() {
+            if (!currentCourier || !currentField || !currentStatusLabel) return;
+            document.getElementById('searchModalCourierName').textContent = currentCourier;
+            document.getElementById('courierSearchLoadingHint').textContent =
+                `سيتم جلب أوردرات المندوب القابلة للتحويل إلى ${currentField}=${currentStatusLabel}`;
+            document.getElementById('courierSearchModal').classList.add('active');
+            document.getElementById('courierSearchLoading').style.display = 'block';
+            document.getElementById('courierSearchContent').style.display = 'none';
+            document.getElementById('truncatedWarning').style.display = 'none';
+            document.getElementById('selectAllCourierOrders').checked = false;
+            fetchCourierOrders();
+        }
+
+        function closeCourierSearch() {
+            document.getElementById('courierSearchModal').classList.remove('active');
+        }
+        
+        document.getElementById('courierSearchModal').addEventListener('click', e => {
+            if (e.target === document.getElementById('courierSearchModal')) closeCourierSearch();
+        });
+
+        async function fetchCourierOrders() {
+            const url = localStorage.getItem('log_worker_url') || '';
+            const secret = localStorage.getItem('log_worker_secret') || '';
+            
+            if (!url || !secret) {
+                alert('أدخل Log Worker URL و Secret في الإعدادات');
+                closeCourierSearch();
+                openSettings();
+                return;
+            }
+
+            try {
+                const res = await fetch(`${url}/search-courier-orders`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${secret}` },
+                    body: JSON.stringify({
+                        courier: currentCourier,
+                        targetField: currentField,
+                        targetStatus: currentStatusLabel,
+                    })
+                });
+                
+                const data = await res.json();
+                if (data.success) {
+                    const allOrders = data.orders || [];
+                    currentCourierSearchResults = allOrders.filter(o => !o.isCancelled);
+
+                    if (data.truncated) {
+                        document.getElementById('truncatedWarning').style.display = 'block';
+                    }
+                    renderCourierSearchResults();
+                } else {
+                    alert('خطأ في جلب الأوردرات من شوبيفاي: ' + (data.error || 'Unknown'));
+                    closeCourierSearch();
+                }
+            } catch (err) {
+                alert('خطأ في الاتصال بالسيرفر');
+                closeCourierSearch();
+            }
+        }
+
+        function renderCourierSearchResults() {
+            document.getElementById('courierSearchLoading').style.display = 'none';
+            document.getElementById('courierSearchContent').style.display = 'block';
+            const tbody = document.getElementById('courierSearchTableBody');
+
+            if (currentCourierSearchResults.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:30px;color:var(--text-muted);">لا توجد أوردرات لهذا المندوب بالحالة المطلوبة 🤷‍♂️</td></tr>';
+                document.getElementById('selectedCourierOrdersCount').textContent = '0';
+                return;
+            }
+
+            tbody.innerHTML = currentCourierSearchResults.map(o => `
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                    <td style="text-align:center; padding: 10px;">
+                        <input type="checkbox" class="courier-order-check" value="${o.id}" onchange="updateSelectedCourierCount()">
+                    </td>
+                    <td style="font-weight:bold;color:var(--primary); padding: 10px; font-family:'JetBrains Mono', monospace; direction:ltr; text-align:left;">${o.name}</td>
+                    <td style="padding: 10px;">${statusPill(o.s1)}</td>
+                    <td style="padding: 10px;">${statusPill(o.s2)}</td>
+                </tr>
+            `).join('');
+            
+            updateSelectedCourierCount();
+        }
+
+        function toggleAllCourierOrders(checkbox) {
+            const checks = document.querySelectorAll('.courier-order-check');
+            checks.forEach(c => c.checked = checkbox.checked);
+            updateSelectedCourierCount();
+        }
+
+        function updateSelectedCourierCount() {
+            const count = document.querySelectorAll('.courier-order-check:checked').length;
+            document.getElementById('selectedCourierOrdersCount').textContent = count;
+            
+            const total = document.querySelectorAll('.courier-order-check').length;
+            const selectAll = document.getElementById('selectAllCourierOrders');
+            if (total > 0) {
+                selectAll.checked = (count === total);
+                selectAll.indeterminate = (count > 0 && count < total);
+            }
+        }
+
+        function addSelectedCourierOrders() {
+            const checks = document.querySelectorAll('.courier-order-check:checked');
+            if (checks.length === 0) {
+                alert('يرجى تحديد أوردر واحد على الأقل');
+                return;
+            }
+
+            let addedCount = 0;
+            checks.forEach(c => {
+                const id = c.value;
+                if (!scannedOrders.includes(id)) {
+                    scannedOrders.unshift(id);
+                    
+                    const orderData = currentCourierSearchResults.find(o => o.id === id);
+                    if (orderData) {
+                        orderNameMap[id] = orderData.name;
+                        orderStatusMap[id] = { s1: orderData.s1, s2: orderData.s2 };
+                        orderCancelledMap[id] = orderData.isCancelled;
+                    }
+                    addedCount++;
+                }
+            });
+
+            if (addedCount > 0) {
+                saveOrders();
+                renderList(true);
+                updateSummaryCount();
+                showToast(`✅ تم إضافة ${addedCount} أوردر للقائمة بنجاح`, 'success');
+            } else {
+                showToast('⚠️ كل الأوردرات المحددة موجودة بالفعل في القائمة', 'error');
+            }
+
+            closeCourierSearch();
+        }
+
+        // ── Restore state ─────────────────────────────────────────────
+        const saved = localStorage.getItem('scanned_orders');
+        if (saved) { scannedOrders = JSON.parse(saved); renderList(); }
+
+        const savedField = localStorage.getItem('selected_field');
+        if (savedField) selectField(savedField, false);
+
+        const savedStatus = localStorage.getItem('selected_status');
+        if (savedStatus) { const s = JSON.parse(savedStatus); selectStatus(s.specifier, s.label, s.icon, false); }
+
+        const savedCourier = localStorage.getItem('selected_courier');
+        if (savedCourier) selectCourier(savedCourier, false);
+
+        // ── Scanner Gun ───────────────────────────────────────────────
+        const scannerGunInput = document.getElementById('scannerGunInput');
+        let inputTimeout = null, lastInputTime = 0;
+
+        function focusInput() { scannerGunInput.focus(); }
+        window.addEventListener('load', focusInput);
+
+        document.addEventListener('click', e => {
+            const tag = e.target.tagName;
+            if (tag !== 'BUTTON' && tag !== 'INPUT' && tag !== 'SELECT' && !e.target.closest('.log-entry')
+                && !e.target.closest('.results') && !e.target.closest('.modal')) {
+                if (document.getElementById('tab-scanner').classList.contains('active')) {
+                    setTimeout(focusInput, 150);
+                }
+            }
+        });
+
+        function handleScan() {
+            const val = scannerGunInput.value.trim();
+            scannerGunInput.value = '';
+            scannerGunInput.focus();
+            if (!val || val.length < 3) return;
+            if (!scannedOrders.includes(val)) {
+                addOrder(val);
+                showToast('✓ تم المسح', 'success');
+                if (navigator.vibrate) navigator.vibrate(100);
+            } else {
+                showScanStatus('⚠️ موجود بالفعل: ' + val);
+            }
+        }
+
+        scannerGunInput.addEventListener('input', () => {
+            if (inputTimeout) clearTimeout(inputTimeout);
+            const now = Date.now(), gap = now - lastInputTime;
+            lastInputTime = now;
+            inputTimeout = setTimeout(handleScan, gap < 80 ? 150 : 400);
+        });
+
+        scannerGunInput.addEventListener('keypress', e => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                if (inputTimeout) clearTimeout(inputTimeout);
+                handleScan();
+            }
+        });
+
+        // ── Manual Order Add ──────────────────────────────────────────
+        document.getElementById('manualOrderInput').addEventListener('keypress', e => {
+            if (e.key === 'Enter') { e.preventDefault(); handleManualOrderAdd(); }
+        });
+
+        async function handleManualOrderAdd() {
+            const input  = document.getElementById('manualOrderInput');
+            const btn    = document.getElementById('manualOrderBtn');
+            const raw    = input.value.trim().replace(/^#/, '');
+            if (!raw) { input.focus(); return; }
+
+            const url    = localStorage.getItem('log_worker_url') || '';
+            const secret = localStorage.getItem('log_worker_secret') || '';
+            if (!url || !secret) { alert('أدخل Log Worker URL و Secret في الإعدادات'); openSettings(); return; }
+
+            btn.disabled = true; btn.innerHTML = '<span class="spinner"></span>';
+            input.disabled = true;
+
+            try {
+                const res  = await fetch(`${url}/resolveByName`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${secret}` },
+                    body: JSON.stringify({ orderName: '#' + raw })
+                });
+                const data = await res.json();
+                if (!data.success) {
+                    showScanStatus(data.notFound ? `⚠️ #${raw} غير موجود` : '⚠️ خطأ في الاستعلام');
+                } else {
+                    if (scannedOrders.includes(data.orderId)) {
+                        showScanStatus(`⚠️ موجود بالفعل: ${data.orderName}`);
+                    } else {
+                        orderNameMap[data.orderId] = data.orderName;
+                        addOrder(data.orderId);
+                        showToast(`✓ تمت إضافة ${data.orderName}`, 'success');
+                    }
+                }
+            } catch { showScanStatus('⚠️ خطأ في الاتصال'); }
+
+            input.value = ''; btn.disabled = false; btn.textContent = 'إضافة';
+            input.disabled = false; scannerGunInput.focus();
+        }
+
+        function showScanStatus(msg) {
+            const el = document.getElementById('scanStatus');
+            el.textContent = msg;
+            el.style.display = 'block';
+            el.style.background = '#fffbeb';
+            el.style.color      = '#d97706';
+            el.style.border     = '1px solid #fde68a';
+            clearTimeout(el._t);
+            el._t = setTimeout(() => { el.style.display = 'none'; }, 2500);
+        }
+
+        // ── Field Selection ───────────────────────────────────────────
+        function selectField(field, save = true) {
+            currentField = field;
+            document.getElementById('fieldBtnS1').classList.toggle('active', field === 'S1');
+            document.getElementById('fieldBtnS2').classList.toggle('active', field === 'S2');
+            document.body.classList.remove('field-s1', 'field-s2');
+            document.body.classList.add(`field-${field.toLowerCase()}`);
+
+            const banner = document.getElementById('summaryFieldBanner');
+            banner.textContent = field === 'S1' ? 'S1 — توصيل عادي' : 'S2 — استبدال / استرجاع';
+            banner.className   = `summary-banner ${field.toLowerCase()}`;
+
+            renderStatusButtons(field);
+            currentSpecifier = ''; currentStatusLabel = '';
+            document.getElementById('summaryStatus').textContent = '—';
+            document.getElementById('summaryStatus').className   = 'summary-val';
+            document.getElementById('updateBtn').className = 'btn-update';
+            document.getElementById('courierCard').style.display = 'none';
+            document.getElementById('courierRow').style.display  = 'none';
+            
+            updateCourierSearchButtonVisibility();
+
+            loadCouriers();
+            if (save) { localStorage.setItem('selected_field', field); localStorage.removeItem('selected_status'); }
+            renderList();
+        }
+
+        function renderStatusButtons(field) {
+            document.getElementById('statusSelector').innerHTML = (STATUSES[field] || []).map(s =>
+                `<button class="status-btn ${s.label}" onclick="selectStatus('${s.specifier}','${s.label}','${s.icon}')">
+                    <span class="icon">${s.icon}</span>${s.label}
+                </button>`
+            ).join('');
+        }
+
+        // ── Couriers ──────────────────────────────────────────────────
+        async function loadCouriers() {
+            const url    = localStorage.getItem('log_worker_url') || '';
+            const secret = localStorage.getItem('log_worker_secret') || '';
+            const sel    = document.getElementById('courierSelector');
+            sel.innerHTML = '<div class="courier-loading">⏳ جاري التحميل...</div>';
+            if (!url || !secret) { sel.innerHTML = '<div class="courier-loading" style="color:var(--error)">⚠️ أدخل Worker URL في الإعدادات</div>'; return; }
+            try {
+                const res  = await fetch(`${url}/courier-values`, { headers: { 'Authorization': `Bearer ${secret}` } });
+                const data = await res.json();
+                if (data.success && data.values?.length) {
+                    sel.innerHTML = data.values.map(n =>
+                        `<button class="courier-btn" data-courier="${n}" onclick="selectCourier(this)">${n}</button>`
+                    ).join('');
+                } else { sel.innerHTML = '<div class="courier-loading" style="color:var(--error)">⚠️ لا توجد بيانات مناديب</div>'; }
+            } catch { sel.innerHTML = '<div class="courier-loading" style="color:var(--error)">⚠️ خطأ في الاتصال</div>'; }
+            if (currentCourier) selectCourier(currentCourier, false);
+        }
+        
+        function updateCourierSearchButtonVisibility() {
+            const btn = document.getElementById('btnSearchCourierOrders');
+            if (btn) {
+                if (currentCourier && currentField && currentStatusLabel && needsCourier(currentSpecifier)) {
+                    btn.style.display = 'inline-flex';
+                    btn.innerHTML = `🔍 البحث عن أوردرات المندوب (${currentCourier})`;
+                } else {
+                    btn.style.display = 'none';
+                }
+            }
+        }
+
+        // ── Status Selection ──────────────────────────────────────────
+        function selectStatus(specifier, label, icon, save = true) {
+            if (!currentField) { alert('اختر نوع التحديث أولاً'); return; }
+            currentSpecifier = specifier; currentStatusLabel = label;
+            document.querySelectorAll('.status-btn').forEach(b => b.classList.remove('active'));
+            const btn = document.querySelector(`.status-btn.${label}`);
+            if (btn) btn.classList.add('active');
+            document.getElementById('summaryStatus').textContent = `${icon} ${label}`;
+            document.getElementById('summaryStatus').className   = 'summary-val';
+            document.getElementById('updateBtn').className = `btn-update ${label}`;
+            const show = needsCourier(specifier);
+            document.getElementById('courierCard').style.display = show ? '' : 'none';
+            document.getElementById('courierRow').style.display  = show ? 'flex' : 'none';
+            
+            updateCourierSearchButtonVisibility();
+            
+            if (save) localStorage.setItem('selected_status', JSON.stringify({ specifier, label, icon }));
+            
+            renderList();
+        }
+
+        // ── Courier Selection ─────────────────────────────────────────
+        function selectCourier(element, save = true) {
+            let courier, btnEl;
+            if (typeof element === 'string') { courier = element; btnEl = document.querySelector(`.courier-btn[data-courier="${courier}"]`); }
+            else { btnEl = element; courier = element.getAttribute('data-courier'); }
+            currentCourier = courier;
+            document.querySelectorAll('.courier-btn').forEach(b => b.classList.remove('active'));
+            if (btnEl) btnEl.classList.add('active');
+            document.getElementById('summaryCourier').textContent = `🛵 ${courier}`;
+            
+            updateCourierSearchButtonVisibility();
+            
+            if (save) localStorage.setItem('selected_courier', courier);
+        }
+
+        // ── Order List ────────────────────────────────────────────────
+        function resolveNameInBackground(orderId) {
+            const url    = localStorage.getItem('log_worker_url') || '';
+            const secret = localStorage.getItem('log_worker_secret') || '';
+            if (!url || !secret) return;
+
+            Promise.all([
+                fetch(`${url}/resolve`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${secret}` },
+                    body: JSON.stringify({ orderIds: [orderId] })
+                }).then(r => r.json()).catch(() => null),
+
+                fetch(`${url}/order-statuses`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${secret}` },
+                    body: JSON.stringify({ orderIds: [orderId] })
+                }).then(r => r.json()).catch(() => null),
+            ]).then(([nameData, statusData]) => {
+                let changed = false;
+                if (nameData?.success && nameData.names && Object.keys(nameData.names).length > 0) {
+                    Object.assign(orderNameMap, nameData.names);
+                    changed = true;
+                }
+                if (statusData?.success && statusData.statuses) {
+                    Object.assign(orderStatusMap, statusData.statuses);
+                    for (const [id, stat] of Object.entries(statusData.statuses)) {
+                        orderCancelledMap[id] = stat.isCancelled;
+                    }
+                    changed = true;
+                }
+                if (changed) renderList();
+            });
+        }
+
+        function addOrder(code)    { scannedOrders.unshift(code); saveOrders(); renderList(true); updateSummaryCount(); resolveNameInBackground(code); }
+        function removeOrder(code) { scannedOrders = scannedOrders.filter(o => o !== code); saveOrders(); renderList(); updateSummaryCount(); }
+        function clearList()       { if (confirm('مسح كل الأوردرات؟')) { scannedOrders = []; saveOrders(); renderList(); updateSummaryCount(); } }
+        function saveOrders()      { localStorage.setItem('scanned_orders', JSON.stringify(scannedOrders)); }
+        function updateSummaryCount() {
+            const n = scannedOrders.length;
+            document.getElementById('count').textContent        = n;
+            document.getElementById('summaryCount').textContent = n;
+        }
+
+        function renderList(isNew = false) {
+            const container = document.getElementById('scannedList');
+            document.getElementById('count').textContent = scannedOrders.length;
+            if (!scannedOrders.length) {
+                container.innerHTML = '<div class="empty-state" style="padding:32px;"><div class="empty-icon">📋</div><div>لم يتم مسح أو إضافة أي أوردرات بعد</div></div>';
+                return;
+            }
+            container.innerHTML = `
+                <table class="scanned-table">
+                    <thead>
+                        <tr>
+                            <th class="col-del"></th>
+                            <th class="col-num">#</th>
+                            <th>رقم الأوردر</th>
+                            <th class="col-id">Order ID</th>
+                            <th class="col-s1">الحالة الأساسية</th>
+                            <th class="col-s2">استبدال / استرجاع</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${scannedOrders.map((order, i) => {
+                            const name     = orderNameMap[order];
+                            const statuses = orderStatusMap[order];
+                            const s1 = statuses?.s1 || null;
+                            const s2 = statuses?.s2 || null;
+                            const isCancelled = orderCancelledMap[order];
+                            
+                            let isInvalid = false;
+                            if (currentField && currentStatusLabel && statuses && !isCancelled) {
+                                if (!isTransitionValid(currentField, currentStatusLabel, s1, s2)) {
+                                    isInvalid = true;
+                                }
+                            }
+                            
+                            const rowClass = isCancelled ? 'row-cancelled' : (isInvalid ? 'row-invalid' : (i === 0 && isNew ? 'row-new' : ''));
+                            const cancelledBadge = isCancelled ? '<span class="order-cancelled-badge">❌ ملغي على الموقع</span>' : '';
+                            const invalidBadge   = isInvalid ? '<span class="order-invalid-badge">⚠️ غير مطابق</span>' : '';
+                            
+                            return `<tr class="${rowClass}">
+                                <td class="col-del"><button class="chip-del" data-remove="${order}">×</button></td>
+                                <td class="col-num">${i + 1}</td>
+                                <td class="col-order">${cancelledBadge}${invalidBadge}${name || '—'}</td>
+                                <td class="col-id">${order}</td>
+                                <td>${statusPill(s1)}</td>
+                                <td>${statusPill(s2)}</td>
+                            </tr>`;
+                        }).join('')}
+                    </tbody>
+                </table>`;
+            container.querySelectorAll('.chip-del[data-remove]').forEach(btn => {
+                btn.addEventListener('click', () => removeOrder(btn.dataset.remove));
+            });
+        }
+
+        // ── Update ────────────────────────────────────────────────────
+        async function startUpdate() {
+            const token = localStorage.getItem('api_token') || '';
+            if (!token)            { alert('أدخل API Token في الإعدادات'); openSettings(); return; }
+            if (!currentField)     { alert('اختر نوع التحديث أولاً'); return; }
+            if (!currentSpecifier) { alert('اختر الحالة أولاً'); return; }
+            if (needsCourier(currentSpecifier) && !currentCourier) { alert('اختر المندوب أولاً'); return; }
+            if (!scannedOrders.length) { alert('لا توجد أوردرات'); return; }
+
+            const cancelledOrders = scannedOrders.filter(o => orderCancelledMap[o]);
+            if (cancelledOrders.length > 0) {
+                const cancelledNames = cancelledOrders.map(o => orderNameMap[o] || o).join('، ');
+                alert(`⚠️ لا يمكن تحديث الأوردرات المُلغاة على الموقع:\n\n${cancelledNames}\n\nيرجى حذفها من القائمة أولاً.`);
+                return;
+            }
+
+            const invalidOrders = [];
+            const missingStatusOrders = [];
+            
+            for (const o of scannedOrders) {
+                const statuses = orderStatusMap[o];
+                if (!statuses) {
+                    missingStatusOrders.push(o);
+                    continue;
+                }
+                if (!isTransitionValid(currentField, currentStatusLabel, statuses.s1, statuses.s2)) {
+                    invalidOrders.push({
+                        id: o, 
+                        name: orderNameMap[o] || o, 
+                        s1: statuses.s1 || 'فارغ', 
+                        s2: statuses.s2 || 'فارغ'
+                    });
+                }
+            }
+
+            if (missingStatusOrders.length > 0) {
+                alert(`⚠️ جاري جلب حالة الأوردرات من Shopify (${missingStatusOrders.length} أوردر).\nيرجى الانتظار ثواني والمحاولة مرة أخرى للتحقق من تطابق الحالة.`);
+                return;
+            }
+
+            if (invalidOrders.length > 0) {
+                let msg = `⚠️ لا يمكن التحديث! يوجد ${invalidOrders.length} أوردر لا تتطابق حالتهم الحالية مع قواعد التحديث إلى "${currentStatusLabel}":\n\n`;
+                invalidOrders.slice(0, 10).forEach(inv => {
+                    msg += `- ${inv.name}  (S1: ${inv.s1} | S2: ${inv.s2})\n`;
+                });
+                if (invalidOrders.length > 10) {
+                    msg += `... بالإضافة إلى ${invalidOrders.length - 10} أوردر آخر\n`;
+                }
+                msg += `\nيرجى حذفهم من القائمة أولاً للمتابعة.`;
+                alert(msg);
+                return;
+            }
+
+            const fieldLabel = currentField === 'S1' ? 'S1 — توصيل عادي' : 'S2 — استبدال / استرجاع';
+            const confirmMsg = needsCourier(currentSpecifier)
+                ? `تحديث ${scannedOrders.length} أوردر؟\n\nالنوع: ${fieldLabel}\nالحالة: ${currentStatusLabel}\nالمندوب: ${currentCourier}`
+                : `تحديث ${scannedOrders.length} أوردر؟\n\nالنوع: ${fieldLabel}\nالحالة: ${currentStatusLabel}`;
+            if (!confirm(confirmMsg)) return;
+
+            const btn = document.getElementById('updateBtn');
+            btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> جاري التحديث...';
+            document.getElementById('progressBar').classList.add('active');
+            document.getElementById('results').classList.add('active');
+
+            document.getElementById('resultsList').innerHTML = scannedOrders.map(order => {
+                const name = orderNameMap[order];
+                const display = name ? `${name} <span style="color:var(--text-muted);font-size:11px">${order}</span>` : order;
+                return `<div class="result-item" data-order="${order}"><span>${display}</span><span class="result-badge result-pending">⏳</span></div>`;
+            }).join('');
+
+            let success = 0, errors = 0;
+            const orderResults = [];
+
+            for (let i = 0; i < scannedOrders.length; i++) {
+                const order = scannedOrders[i];
+                let orderStatus = 'error';
+                try {
+                    const body = { itemId: order, specifier: currentSpecifier };
+                    if (needsCourier(currentSpecifier)) body.additionalParameters = { stringParameter: currentCourier };
+                    const res = await fetch(FLOW_API_URL, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'Authorization': `bearer ${token}` },
+                        body: JSON.stringify(body)
+                    });
+                    if (res.ok) { updateResult(order, 'success', '✓'); success++; orderStatus = 'success'; }
+                    else { updateResult(order, 'error', '✗'); errors++; }
+                } catch { updateResult(order, 'error', '✗'); errors++; }
+
+                orderResults.push({ order, status: orderStatus });
+                document.getElementById('progressFill').style.width = `${((i+1)/scannedOrders.length)*100}%`;
+                document.getElementById('successCount').textContent  = success;
+                document.getElementById('errorCount').textContent    = errors;
+                await new Promise(r => setTimeout(r, 300));
+            }
+
+            saveLogEntry({
+                date: new Date().toISOString(), field: currentField,
+                status: currentStatusLabel, statusSpecifier: currentSpecifier,
+                courier: needsCourier(currentSpecifier) ? currentCourier : null,
+                totalOrders: scannedOrders.length, success, errors, orders: orderResults
+            });
+
+            btn.disabled = false; btn.innerHTML = '🚀 تحديث الكل';
+
+            if (errors === 0) {
+                showToast(`✅ تم تحديث ${success} أوردر بنجاح!`, 'success');
+                scannedOrders = []; saveOrders(); renderList(); updateSummaryCount();
+            } else { showToast(`تم: ${success} ناجح، ${errors} فشل`, 'error'); }
+        }
+
+        function updateResult(order, status, text) {
+            const item = document.querySelector(`[data-order="${order}"] .result-badge`);
+            if (item) { item.className = `result-badge result-${status}`; item.textContent = text; }
+        }
+
+        updateSummaryCount();
+
+        // ── Toast ─────────────────────────────────────────────────────
+        function showToast(msg, type = '') {
+            const c = document.getElementById('toastContainer');
+            const t = document.createElement('div');
+            t.className = `toast ${type}`;
+            t.textContent = msg;
+            c.appendChild(t);
+            setTimeout(() => t.remove(), 2800);
+        }
+
+        // ── Log ───────────────────────────────────────────────────────
+        function getLogConfig() {
+            return { url: localStorage.getItem('log_worker_url')||'', secret: localStorage.getItem('log_worker_secret')||'' };
+        }
+        function hasLogWorker() { const { url, secret } = getLogConfig(); return url && secret; }
+
+        function updateSyncStatus(status) {
+            const el = document.getElementById('logSyncStatus');
+            el.className = `log-sync-status ${status}`;
+            el.textContent = status==='synced' ? '☁️ متزامن' : status==='loading' ? '⏳ جاري...' : '💾 محلي';
+        }
+
+        function getLog() { try { return JSON.parse(localStorage.getItem('update_log')||'[]'); } catch { return []; } }
+
+        async function saveLogEntry(entry) {
+            const log = getLog(); log.unshift(entry);
+            localStorage.setItem('update_log', JSON.stringify(log));
+            renderLog(log);
+            if (hasLogWorker()) {
+                try {
+                    updateSyncStatus('loading');
+                    const { url, secret } = getLogConfig();
+                    const res = await fetch(`${url}/log`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${secret}` },
+                        body: JSON.stringify(entry)
+                    });
+                    if (res.ok) {
+                        const data = await res.json();
+                        if (data.entry?.orders) {
+                            const localLog = getLog();
+                            if (localLog.length > 0 && localLog[0].date === entry.date) {
+                                localLog[0] = data.entry;
+                                localStorage.setItem('update_log', JSON.stringify(localLog));
+                            }
+                        }
+                        updateSyncStatus('synced');
+                    } else { updateSyncStatus('local'); }
+                } catch { updateSyncStatus('local'); }
+            }
+        }
+
+        async function syncFromCloud() {
+            if (!hasLogWorker()) { renderLog(); return; }
+            try {
+                updateSyncStatus('loading');
+                const { url, secret } = getLogConfig();
+                const res = await fetch(`${url}/log`, { method: 'GET', headers: { 'Authorization': `Bearer ${secret}` } });
+                if (!res.ok) throw new Error();
+                const data = await res.json();
+                const merged = mergeAndDedupe(getLog(), data.log||[]);
+                localStorage.setItem('update_log', JSON.stringify(merged));
+                populateCourierFilter(merged);
+                renderLog(merged); updateSyncStatus('synced');
+            } catch { updateSyncStatus('local'); renderLog(); }
+        }
+
+        function mergeAndDedupe(a, b) {
+            const seen = new Set(), m = [];
+            for (const e of [...a, ...b]) { if (!seen.has(e.date)) { seen.add(e.date); m.push(e); } }
+            m.sort((x, y) => new Date(y.date) - new Date(x.date));
+            return m;
+        }
+
+        function toggleLogEntry(el) { el.closest('.log-entry').classList.toggle('open'); }
+
+        function formatDate(iso) {
+            const d = new Date(iso);
+            return `${d.toLocaleDateString('en-GB', {day:'2-digit',month:'2-digit',year:'numeric'})} — ${d.toLocaleTimeString('en-GB', {hour:'2-digit',minute:'2-digit',hour12:true})}`;
+        }
+
+        function onLogCheckChange() {
+            document.getElementById('exportSelectedBtn').classList.toggle('visible', document.querySelectorAll('.log-check:checked').length > 0);
+        }
+
+        // ── Log Filters ───────────────────────────────────────────────
+        function populateCourierFilter(log) {
+            const sel = document.getElementById('logCourierFilter');
+            if (!sel) return;
+            const current = sel.value;
+            const couriers = [...new Set((log || getLog()).filter(e => e.courier).map(e => e.courier))].sort();
+            sel.innerHTML = '<option value="">كل المناديب</option>' +
+                couriers.map(c => `<option value="${c}"${c === current ? ' selected' : ''}>${c}</option>`).join('');
+        }
+
+        function applyLogFilters() {
+            const search  = (document.getElementById('logSearchInput')?.value || '').trim().replace(/^#/, '').toLowerCase();
+            const status  = document.getElementById('logStatusFilter')?.value || '';
+            const courier = document.getElementById('logCourierFilter')?.value || '';
+
+            const fullLog = getLog();
+            let filtered  = fullLog;
+
+            if (search) {
+                filtered = filtered.filter(entry =>
+                    entry.orders?.some(o =>
+                        (o.order || '').toLowerCase().includes(search) ||
+                        (o.orderName || '').toLowerCase().replace(/^#/, '').includes(search)
+                    )
+                );
+            }
+            if (status) {
+                filtered = filtered.filter(entry =>
+                    (entry.statusSpecifier || '').replace('_S2', '') === status ||
+                    entry.status === status
+                );
+            }
+            if (courier) {
+                filtered = filtered.filter(entry => entry.courier === courier);
+            }
+
+            const countEl = document.getElementById('logFilterCount');
+            const isFiltered = search || status || courier;
+            if (countEl) {
+                countEl.textContent = isFiltered ? `${filtered.length} من ${fullLog.length} عملية` : '';
+            }
+
+            renderLog(filtered, true, search);
+        }
+
+        function clearLogFilters() {
+            const s  = document.getElementById('logSearchInput');
+            const st = document.getElementById('logStatusFilter');
+            const co = document.getElementById('logCourierFilter');
+            if (s)  s.value  = '';
+            if (st) st.value = '';
+            if (co) co.value = '';
+            const countEl = document.getElementById('logFilterCount');
+            if (countEl) countEl.textContent = '';
+            renderLog(getLog());
+        }
+
+        // ── Render Log ────────────────────────────────────────────────
+        function renderLog(log, skipCourierPopulate = false, highlightSearch = '') {
+            if (!log) log = getLog();
+            if (!skipCourierPopulate) populateCourierFilter(log);
+            const container = document.getElementById('logList');
+            if (!container) return;
+            if (!log.length) { container.innerHTML = '<div class="log-empty">لا توجد عمليات مسجلة</div>'; return; }
+
+            container.innerHTML = log.map((entry, i) => {
+                const field = entry.field || 'S1';
+                const successOrders = entry.orders.filter(o => o.status === 'success');
+                const showPrint = entry.status === 'Shipped' && successOrders.length > 0;
+
+                const ordersHTML = entry.orders.map(o => {
+                    const isMatch = highlightSearch && (
+                        (o.order || '').toLowerCase().includes(highlightSearch) ||
+                        (o.orderName || '').toLowerCase().replace(/^#/, '').includes(highlightSearch)
+                    );
+                    return `<div class="log-detail-item${isMatch ? ' highlight-match' : ''}">
+                        <span class="log-detail-order">${o.orderName||''} <span style="color:var(--text-muted);font-size:11px">${o.order}</span></span>
+                        <span class="log-detail-status log-detail-${o.status}">${o.status==='success'?'✓ ناجح':'✗ فشل'}</span>
+                    </div>`;
+                }).join('');
+
+                const autoOpen = highlightSearch ? 'open' : '';
+
+                return `
+                <div class="log-entry ${autoOpen}">
+                    <div class="log-entry-header" onclick="toggleLogEntry(this)">
+                        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+                            <input type="checkbox" class="log-check" data-log-index="${i}" onchange="onLogCheckChange()" onclick="event.stopPropagation()">
+                            <strong>${formatDate(entry.date)}</strong>
+                            <span class="log-tag ${field.toLowerCase()}">${field}</span>
+                            <span class="log-tag status-${entry.statusSpecifier.replace('_S2','')}">${entry.status}</span>
+                            ${entry.courier ? `<span class="log-tag courier">${entry.courier}</span>` : ''}
+                            <span class="log-tag count">${entry.totalOrders} أوردر</span>
+                        </div>
+                        <div style="display:flex;align-items:center;gap:8px;">
+                            <span style="color:var(--success);font-weight:600;font-size:12px;">✓${entry.success}</span>
+                            <span style="color:var(--error);font-weight:600;font-size:12px;">✗${entry.errors}</span>
+                            ${showPrint ? `<button class="btn-sm" style="font-size:11px;padding:4px 10px;" onclick="event.stopPropagation();printManifest(${i})">🖨️ طباعة</button>` : ''}
+                            <span class="log-toggle">▶</span>
+                        </div>
+                    </div>
+                    <div class="log-entry-details">
+                        ${ordersHTML}
+                    </div>
+                </div>`;
+            }).join('');
+
+            document.getElementById('exportSelectedBtn').classList.remove('visible');
+        }
+
+        // ── Manifest Print ────────────────────────────────────────────
+        async function printManifest(logIndex) {
+            const log   = getLog();
+            const entry = log[logIndex];
+            if (!entry) return;
+
+            const { url, secret } = getLogConfig();
+            if (!url || !secret) { alert('أدخل Log Worker URL و Secret في الإعدادات'); openSettings(); return; }
+
+            const successOrders = entry.orders.filter(o => o.status === 'success');
+            const orderIds      = successOrders.map(o => o.order);
+
+            showToast('⏳ جاري جلب بيانات العملاء...', '');
+
+            let details = {};
+            try {
+                const res  = await fetch(`${url}/order-details`, {
+                    method:  'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${secret}` },
+                    body:    JSON.stringify({ orderIds }),
+                });
+                const data = await res.json();
+                if (data.success) details = data.details;
+            } catch { showToast('⚠️ خطأ في جلب بيانات العملاء', 'error'); return; }
+
+            // ── أرقام إنجليزية + بدون علامات عشرية ──
+            const date     = new Date(entry.date).toLocaleDateString('en-GB', { day:'2-digit', month:'2-digit', year:'numeric' });
+            const courier  = entry.courier || '—';
+            const totalCOD = orderIds.reduce((s, id) => s + parseFloat(details[id]?.cod || 0), 0);
+
+            const rows = successOrders.map((o, i) => {
+                const d      = details[o.order] || {};
+                const codVal = Math.round(parseFloat(d.cod || 0));
+                return `
+                <tr>
+                    <td style="text-align:center;font-weight:600;">${i + 1}</td>
+                    <td style="font-weight:700;color:#0284c7;text-align:right;">${d.orderName || o.orderName || '—'}</td>
+                    <td style="text-align:center;">
+                        <svg id="bc-${i}" style="display:block;margin:auto;"></svg>
+                    </td>
+                    <td style="text-align:right;">${d.customerName || '—'}</td>
+                    <td style="text-align:center;direction:ltr;">${d.phone || '—'}</td>
+                    <td style="text-align:right;font-size:11px;">${d.address || '—'}</td>
+                    <td style="text-align:left;font-weight:700;direction:ltr;">${codVal.toLocaleString('en-US')}</td>
+                </tr>`;
+            }).join('');
+
+            // باركود أصغر: width:1.2, height:28
+            const barcodeScripts = successOrders.map((o, i) =>
+                `JsBarcode("#bc-${i}", "${o.order}", { format:"CODE128", width:1.2, height:28, displayValue:false, margin:1 });`
+            ).join('\n');
+
+            const manifestHTML = `<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>Manifest — ${courier} — ${date}</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jsbarcode/3.11.6/JsBarcode.all.min.js"><\/script>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; padding: 20px; font-size: 13px; color: #1a1d27; direction: rtl; }
+        .manifest-header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:20px; padding-bottom:14px; border-bottom:2px solid #1a1d27; }
+        .manifest-title { font-size:20px; font-weight:800; margin-bottom:6px; }
+        .manifest-meta { display:flex; gap:24px; margin-top:8px; }
+        .meta-item { display:flex; flex-direction:column; }
+        .meta-label { font-size:10px; color:#6b7280; text-transform:uppercase; letter-spacing:0.05em; }
+        .meta-value { font-size:14px; font-weight:700; margin-top:2px; }
+        table { width:100%; border-collapse:collapse; margin-bottom:16px; table-layout:fixed; }
+        col.col-num     { width:26px; }
+        col.col-order   { width:68px; }
+        col.col-barcode { width:80px; }
+        col.col-name    { width:100px; }
+        col.col-phone   { width:98px; }
+        col.col-address { width:auto; }
+        col.col-cod     { width:62px; }
+        thead th { background:#f5f6fa; padding:5px 3px; font-size:11px; font-weight:700; color:#6b7280; text-transform:uppercase; letter-spacing:0.04em; border-bottom:1.5px solid #e2e5ed; white-space:nowrap; overflow:hidden; }
+        tbody td { padding:5px 3px; border-bottom:1px solid #eef0f5; vertical-align:middle; overflow:hidden; word-break:break-word; }
+        tbody tr:last-child td { border-bottom:none; }
+        tbody tr:nth-child(even) { background:#fafbfd; }
+        .manifest-footer { display:flex; justify-content:space-between; align-items:center; padding-top:12px; border-top:2px solid #1a1d27; margin-top:8px; }
+        .total-value { font-size:20px; font-weight:800; direction:ltr; }
+        .sign-box { border:1px solid #e2e5ed; border-radius:8px; padding:8px 20px; font-size:11px; color:#9ca3af; text-align:center; min-width:160px; }
+        @media print { body { padding:10px; } @page { margin:10mm; size:A4; } }
+    </style>
+</head>
+<body>
+    <div class="manifest-header">
+        <div>
+            <div class="manifest-title">📦 Manifest — بيان شحن</div>
+            <div class="manifest-meta">
+                <div class="meta-item"><span class="meta-label">المندوب</span><span class="meta-value">${courier}</span></div>
+                <div class="meta-item"><span class="meta-label">التاريخ</span><span class="meta-value">${date}</span></div>
+                <div class="meta-item"><span class="meta-label">عدد الأوردرات</span><span class="meta-value">${successOrders.length}</span></div>
+                <div class="meta-item"><span class="meta-label">إجمالي COD</span><span class="meta-value" style="direction:ltr;">${Math.round(totalCOD).toLocaleString('en-US')} EGP</span></div>
+            </div>
+        </div>
+        <div style="font-size:28px;">🛵</div>
+    </div>
+    <table>
+        <colgroup>
+            <col class="col-num">
+            <col class="col-order">
+            <col class="col-barcode">
+            <col class="col-name">
+            <col class="col-phone">
+            <col class="col-address">
+            <col class="col-cod">
+        </colgroup>
+        <thead>
+            <tr>
+                <th style="text-align:center;">#</th>
+                <th style="text-align:right;">رقم الأوردر</th>
+                <th style="text-align:center;">الباركود</th>
+                <th style="text-align:right;">اسم العميل</th>
+                <th style="text-align:center;">التليفون</th>
+                <th style="text-align:right;">العنوان</th>
+                <th style="text-align:left;">COD</th>
+            </tr>
+        </thead>
+        <tbody>${rows}</tbody>
+    </table>
+    <div class="manifest-footer">
+        <div>
+            <div style="font-size:13px;color:#6b7280;">إجمالي التحصيل</div>
+            <div class="total-value">${Math.round(totalCOD).toLocaleString('en-US')} EGP</div>
+        </div>
+        <div class="sign-box">توقيع المندوب<br><br><br></div>
+        <div class="sign-box">توقيع المستلم<br><br><br></div>
+    </div>
+    <script>
+        window.onload = function() {
+            ${barcodeScripts}
+            setTimeout(() => window.print(), 400);
+        };
+    <\/script>
+</body>
+</html>`;
+
+            const win = window.open('', '_blank');
+            win.document.write(manifestHTML);
+            win.document.close();
+        }
+
+        function exportLogCSV(selectedOnly) {
+            const fullLog = getLog();
+            if (!fullLog.length) { alert('السجل فارغ'); return; }
+            let log;
+            if (selectedOnly) {
+                const idx = [...document.querySelectorAll('.log-check:checked')].map(cb => parseInt(cb.dataset.logIndex));
+                if (!idx.length) { alert('اختر عمليات أولاً'); return; }
+                log = idx.map(i => fullLog[i]).filter(Boolean);
+            } else { log = fullLog; }
+
+            const BOM  = '\uFEFF';
+            const rows = [['التاريخ','الوقت','النوع','الحالة','المندوب','رقم الأوردر','Order ID','النتيجة'].join(',')];
+            for (const entry of log) {
+                const d = new Date(entry.date);
+                const date = d.toLocaleDateString('en-GB');
+                const time = d.toLocaleTimeString('en-GB', {hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false});
+                for (const o of entry.orders) {
+                    rows.push([date, time, entry.field||'S1', entry.status, entry.courier||'—', o.orderName||'—', `="${o.order}"`, o.status==='success'?'ناجح':'فشل'].join(','));
+                }
+            }
+            const blob = new Blob([BOM+rows.join('\n')], {type:'text/csv;charset=utf-8;'});
+            const url  = URL.createObjectURL(blob);
+            const a    = document.createElement('a'); a.href = url;
+            a.download = `order-log-${new Date().toISOString().slice(0,10)}.csv`;
+            a.click(); URL.revokeObjectURL(url);
+        }
+
+        renderLog();
+        if (hasLogWorker()) syncFromCloud();
+    </script>
+</body>
+</html>

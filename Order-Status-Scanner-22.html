@@ -1765,9 +1765,9 @@
                 </tr>`;
             }).join('');
 
-            // باركود أصغر: width:1.2, height:28
+            // باركود: width:1.5, height:36
             const barcodeScripts = successOrders.map((o, i) =>
-                `JsBarcode("#bc-${i}", "${o.order}", { format:"CODE128", width:1.2, height:28, displayValue:false, margin:1 });`
+                `JsBarcode("#bc-${i}", "${o.order}", { format:"CODE128", width:1.5, height:36, displayValue:false, margin:1 });`
             ).join('\n');
 
             const manifestHTML = `<!DOCTYPE html>
@@ -1778,7 +1778,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jsbarcode/3.11.6/JsBarcode.all.min.js"><\/script>
     <style>
         * { margin:0; padding:0; box-sizing:border-box; }
-        body { font-family: 'Segoe UI', Arial, sans-serif; padding: 20px; font-size: 13px; color: #1a1d27; direction: rtl; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; padding: 20px; font-size: 11px; color: #1a1d27; direction: rtl; }
         .manifest-header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:20px; padding-bottom:14px; border-bottom:2px solid #1a1d27; }
         .manifest-title { font-size:20px; font-weight:800; margin-bottom:6px; }
         .manifest-meta { display:flex; gap:24px; margin-top:8px; }
@@ -1788,13 +1788,13 @@
         table { width:100%; border-collapse:collapse; margin-bottom:16px; table-layout:fixed; }
         col.col-num     { width:26px; }
         col.col-order   { width:68px; }
-        col.col-barcode { width:80px; }
+        col.col-barcode { width:110px; }
         col.col-name    { width:100px; }
         col.col-phone   { width:98px; }
         col.col-address { width:auto; }
         col.col-cod     { width:62px; }
-        thead th { background:#f5f6fa; padding:5px 3px; font-size:11px; font-weight:700; color:#6b7280; text-transform:uppercase; letter-spacing:0.04em; border-bottom:1.5px solid #e2e5ed; white-space:nowrap; overflow:hidden; }
-        tbody td { padding:5px 3px; border-bottom:1px solid #eef0f5; vertical-align:middle; overflow:hidden; word-break:break-word; }
+        thead th { background:#f5f6fa; padding:4px 3px; font-size:11px; font-weight:700; color:#6b7280; text-transform:uppercase; letter-spacing:0.04em; border-bottom:1.5px solid #e2e5ed; white-space:nowrap; overflow:hidden; }
+        tbody td { padding:3px 3px; border-bottom:1px solid #eef0f5; vertical-align:middle; overflow:hidden; word-break:break-word; }
         tbody tr:last-child td { border-bottom:none; }
         tbody tr:nth-child(even) { background:#fafbfd; }
         .manifest-footer { display:flex; justify-content:space-between; align-items:center; padding-top:12px; border-top:2px solid #1a1d27; margin-top:8px; }

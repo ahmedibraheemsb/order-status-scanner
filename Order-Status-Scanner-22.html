@@ -1756,7 +1756,7 @@
                     <td style="text-align:center;font-weight:600;">${i + 1}</td>
                     <td style="font-weight:700;color:#0284c7;text-align:right;">${d.orderName || o.orderName || '—'}</td>
                     <td style="text-align:center;">
-                        <svg id="bc-${i}" style="display:block;margin:auto;"></svg>
+                        <svg id="bc-${i}" style="display:block;margin:auto;shape-rendering:crispEdges;"></svg>
                     </td>
                     <td style="text-align:right;">${d.customerName || '—'}</td>
                     <td style="text-align:center;direction:ltr;">${d.phone || '—'}</td>
@@ -1765,9 +1765,9 @@
                 </tr>`;
             }).join('');
 
-            // باركود: width:1.5, height:36
+            // باركود: width:2 (integer - no anti-aliasing fractions), height:40, margin:4 quiet zone
             const barcodeScripts = successOrders.map((o, i) =>
-                `JsBarcode("#bc-${i}", "${o.order}", { format:"CODE128", width:1.5, height:36, displayValue:false, margin:1 });`
+                `JsBarcode("#bc-${i}", "${o.order}", { format:"CODE128", width:2, height:40, displayValue:false, margin:4 });`
             ).join('\n');
 
             const manifestHTML = `<!DOCTYPE html>
@@ -1788,7 +1788,7 @@
         table { width:100%; border-collapse:collapse; margin-bottom:16px; table-layout:fixed; }
         col.col-num     { width:26px; }
         col.col-order   { width:68px; }
-        col.col-barcode { width:110px; }
+        col.col-barcode { width:120px; }
         col.col-name    { width:100px; }
         col.col-phone   { width:98px; }
         col.col-address { width:auto; }

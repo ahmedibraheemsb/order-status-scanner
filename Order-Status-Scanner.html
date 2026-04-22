@@ -467,6 +467,19 @@
             <div class="changelog-list">
                 <div class="changelog-item">
                     <div class="changelog-header">
+                        <span class="changelog-version">v1.3.3</span>
+                        <span class="changelog-date">21-04-2026</span>
+                    </div>
+                    <ul class="changelog-desc">
+                        <li>🖨️ إضافة "طباعة المحدد": تحديد عمليتين أو أكثر من نوع Shipped لنفس المندوب وطباعتهم في manifest واحد مجمع.</li>
+                        <li>رفض الطباعة تلقائياً لو كانت العمليات المحددة لمناديب مختلفين مع رسالة توضيحية.</li>
+                        <li>🖨️ تحسين طباعة المانفيست: تصغير عمود الباركود للنصف، توسيع عمود العنوان لضعفه، تقليل الهوامش بين الأعمدة لأدنى قيمة ممكنة.</li>
+                        <li>إزالة العلامات العشرية من أرقام COD والإجمالي (أرقام صحيحة فقط).</li>
+                        <li>توحيد جميع الأرقام في المانفيست بالشكل الإنجليزي.</li>
+                    </ul>
+                </div>
+                <div class="changelog-item">
+                    <div class="changelog-header">
                         <span class="changelog-version">v1.3.1</span>
                         <span class="changelog-date">19-04-2026</span>
                     </div>
@@ -573,7 +586,7 @@
             <div class="header-left">
                 <div class="header-icon">📦</div>
                 <div class="header-title">
-                    <h1>Order Status Updater <span class="version-badge">v1.3.1</span></h1>
+                    <h1>Order Status Updater <span class="version-badge">v1.3.3</span></h1>
                     <p>تحديث حالة الأوردرات</p>
                 </div>
             </div>
@@ -730,6 +743,7 @@
                     <h2>📜 سجل التحديثات السابقة <span class="log-sync-status local" id="logSyncStatus">محلي</span></h2>
                     <div style="display:flex;gap:6px;">
                         <button class="btn-sm" onclick="syncFromCloud()">🔄 تحديث</button>
+                        <button class="export-selected-btn btn-sm" id="printSelectedBtn" onclick="printManifestSelected()" style="display:none;">🖨️ طباعة المحدد</button>
                         <button class="export-selected-btn btn-sm" id="exportSelectedBtn" onclick="exportLogCSV(true)">📥 تصدير المحدد</button>
                         <button class="btn-sm" onclick="exportLogCSV(false)">📥 تصدير الكل</button>
                     </div>
@@ -795,7 +809,7 @@
         let currentCourier   = '';
         const orderNameMap   = {};
         const orderStatusMap = {};
-        const orderCancelledMap = {}; // Track which orders are cancelled on Shopify
+        const orderCancelledMap = {};
 
         const STATUS_COLOR_MAP = {
             'Shipped':   's-Shipped',
@@ -806,7 +820,6 @@
         };
 
         // ── Validation Logic ──────────────────────────────────────────
-        // Validate transition states strictly against the agreed rules
         function isTransitionValid(targetField, targetStatusLabel, currentS1, currentS2) {
             const s1 = (currentS1 || '').trim();
             const s2 = (currentS2 || '').trim();
@@ -820,7 +833,6 @@
                     return s1 === 'Ready' && isBlankS2;
                 }
                 if (targetStatusLabel === 'Delivered') {
-                    // التعديل الجديد: تم إضافة isBlankS2 كشرط مسموح به
                     return s1 === 'Shipped' && (s2 === 'Confirmed + RETURN' || s2 === 'Confirmed + EXCHANGE' || s2 === 'Ready' || isBlankS2);
                 }
                 if (targetStatusLabel === 'Cancelled') {
@@ -840,7 +852,7 @@
                     return s1 === 'Delivered' && s2 === 'Shipped';
                 }
             }
-            return false; // Fallback rule: block unknown state transitions
+            return false;
         }
 
         function needsCourier(s) { return COURIER_SPECIFIERS.has(s); }
@@ -856,10 +868,6 @@
             const cls = statusPillClass(value);
             return `<span class="status-pill ${cls}">${value}</span>`;
         }
-
-        // Strategy: We send the selected status (currentStatusLabel) to the worker so it can filter
-        // by that exact metafield value (e.g. manual_status:Delivered or status_2_r_e:Shipped).
-        // The S1/S2 transition rules are then applied later in the main table after adding (via row-invalid).
 
         // ── Tabs ──────────────────────────────────────────────────────
         function switchTab(tab, btn) {
@@ -941,10 +949,6 @@
             }
 
             try {
-                // Send courier + targetField + targetStatus to the worker.
-                // The worker uses these to query Shopify directly with the correct metafield filter.
-                // Note: targetStatus is the label without the _S2 suffix (e.g. "Shipped" not "Shipped_S2"),
-                // and targetField tells the worker whether to query manual_status or status_2_r_e.
                 const res = await fetch(`${url}/search-courier-orders`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${secret}` },
@@ -957,9 +961,6 @@
                 
                 const data = await res.json();
                 if (data.success) {
-                    // The worker already filtered by courier + status,
-                    // we just exclude cancelled orders here.
-                    // S1/S2 transition validity is shown in the main table after adding.
                     const allOrders = data.orders || [];
                     currentCourierSearchResults = allOrders.filter(o => !o.isCancelled);
 
@@ -1012,7 +1013,6 @@
             const count = document.querySelectorAll('.courier-order-check:checked').length;
             document.getElementById('selectedCourierOrdersCount').textContent = count;
             
-            // Sync the "Select All" checkbox state
             const total = document.querySelectorAll('.courier-order-check').length;
             const selectAll = document.getElementById('selectAllCourierOrders');
             if (total > 0) {
@@ -1032,9 +1032,8 @@
             checks.forEach(c => {
                 const id = c.value;
                 if (!scannedOrders.includes(id)) {
-                    scannedOrders.unshift(id); // Add to top of list
+                    scannedOrders.unshift(id);
                     
-                    // Populate the maps so we don't need to fetch them again
                     const orderData = currentCourierSearchResults.find(o => o.id === id);
                     if (orderData) {
                         orderNameMap[id] = orderData.name;
@@ -1193,7 +1192,7 @@
 
             loadCouriers();
             if (save) { localStorage.setItem('selected_field', field); localStorage.removeItem('selected_status'); }
-            renderList(); // Re-render to clear or update validation highlights
+            renderList();
         }
 
         function renderStatusButtons(field) {
@@ -1253,7 +1252,7 @@
             
             if (save) localStorage.setItem('selected_status', JSON.stringify({ specifier, label, icon }));
             
-            renderList(); // Re-render to show validation highlights for the newly selected status
+            renderList();
         }
 
         // ── Courier Selection ─────────────────────────────────────────
@@ -1297,7 +1296,6 @@
                 }
                 if (statusData?.success && statusData.statuses) {
                     Object.assign(orderStatusMap, statusData.statuses);
-                    // Track cancelled status
                     for (const [id, stat] of Object.entries(statusData.statuses)) {
                         orderCancelledMap[id] = stat.isCancelled;
                     }
@@ -1380,7 +1378,6 @@
             if (needsCourier(currentSpecifier) && !currentCourier) { alert('اختر المندوب أولاً'); return; }
             if (!scannedOrders.length) { alert('لا توجد أوردرات'); return; }
 
-            // 1. Check for cancelled orders
             const cancelledOrders = scannedOrders.filter(o => orderCancelledMap[o]);
             if (cancelledOrders.length > 0) {
                 const cancelledNames = cancelledOrders.map(o => orderNameMap[o] || o).join('، ');
@@ -1388,7 +1385,6 @@
                 return;
             }
 
-            // 2. Strict State Transition Validation
             const invalidOrders = [];
             const missingStatusOrders = [];
             
@@ -1426,7 +1422,6 @@
                 return;
             }
 
-            // 3. Confirm Dialog
             const fieldLabel = currentField === 'S1' ? 'S1 — توصيل عادي' : 'S2 — استبدال / استرجاع';
             const confirmMsg = needsCourier(currentSpecifier)
                 ? `تحديث ${scannedOrders.length} أوردر؟\n\nالنوع: ${fieldLabel}\nالحالة: ${currentStatusLabel}\nالمندوب: ${currentCourier}`
@@ -1573,7 +1568,16 @@
         }
 
         function onLogCheckChange() {
-            document.getElementById('exportSelectedBtn').classList.toggle('visible', document.querySelectorAll('.log-check:checked').length > 0);
+            const checked = document.querySelectorAll('.log-check:checked');
+            const hasAny  = checked.length > 0;
+            document.getElementById('exportSelectedBtn').classList.toggle('visible', hasAny);
+
+            // زر طباعة المحدد: يظهر فقط لو في عمليتين+ وكلهم Shipped
+            const fullLog = getLog();
+            const selectedEntries = [...checked].map(cb => fullLog[parseInt(cb.dataset.logIndex)]).filter(Boolean);
+            const allShipped = selectedEntries.length >= 2 && selectedEntries.every(e => e.status === 'Shipped');
+            const printBtn = document.getElementById('printSelectedBtn');
+            if (printBtn) printBtn.style.display = allShipped ? 'inline-flex' : 'none';
         }
 
         // ── Log Filters ───────────────────────────────────────────────
@@ -1618,7 +1622,6 @@
                 countEl.textContent = isFiltered ? `${filtered.length} من ${fullLog.length} عملية` : '';
             }
 
-            // pass search term so we can highlight matched orders
             renderLog(filtered, true, search);
         }
 
@@ -1647,7 +1650,6 @@
                 const successOrders = entry.orders.filter(o => o.status === 'success');
                 const showPrint = entry.status === 'Shipped' && successOrders.length > 0;
 
-                // highlight matched order rows if searching
                 const ordersHTML = entry.orders.map(o => {
                     const isMatch = highlightSearch && (
                         (o.order || '').toLowerCase().includes(highlightSearch) ||
@@ -1659,7 +1661,6 @@
                     </div>`;
                 }).join('');
 
-                // auto-open entry if a search is active and the entry matched
                 const autoOpen = highlightSearch ? 'open' : '';
 
                 return `
@@ -1690,16 +1691,44 @@
         }
 
         // ── Manifest Print ────────────────────────────────────────────
-        async function printManifest(logIndex) {
+        async function printManifestSelected() {
+            const fullLog = getLog();
+            const indices = [...document.querySelectorAll('.log-check:checked')].map(cb => parseInt(cb.dataset.logIndex));
+            if (indices.length < 2) { alert('اختر عمليتين على الأقل'); return; }
+
+            const entries = indices.map(i => fullLog[i]).filter(Boolean);
+
+            // تحقق: كل العمليات لازم تكون Shipped
+            const nonShipped = entries.filter(e => e.status !== 'Shipped');
+            if (nonShipped.length > 0) {
+                alert('⚠️ بعض العمليات المحددة ليست Shipped. طباعة المحدد متاحة فقط لعمليات Shipped.');
+                return;
+            }
+
+            // تحقق من المندوب
+            const couriers = [...new Set(entries.map(e => e.courier).filter(Boolean))];
+            if (couriers.length > 1) {
+                alert(`⚠️ لا يمكن طباعة manifest واحد لمناديب مختلفين:\n\n${couriers.join('، ')}\n\nاختر عمليات لنفس المندوب فقط.`);
+                return;
+            }
+
+            await printManifest(null, entries);
+        }
+
+        async function printManifest(logIndex, entriesOverride = null) {
             const log     = getLog();
-            const entry   = log[logIndex];
-            if (!entry) return;
+            // entriesOverride = array of entries (multi-print), logIndex = single entry
+            const entries = entriesOverride || [log[logIndex]];
+            if (!entries.length || !entries[0]) return;
 
             const { url, secret } = getLogConfig();
             if (!url || !secret) { alert('أدخل Log Worker URL و Secret في الإعدادات'); openSettings(); return; }
 
-            const successOrders = entry.orders.filter(o => o.status === 'success');
+            // دمج كل الـ successOrders من كل العمليات
+            const successOrders = entries.flatMap(e => e.orders.filter(o => o.status === 'success'));
             const orderIds      = successOrders.map(o => o.order);
+            // التاريخ والمندوب من أول عملية
+            const entry         = entries[0];
 
             showToast('⏳ جاري جلب بيانات العملاء...', '');
 
@@ -1714,26 +1743,29 @@
                 if (data.success) details = data.details;
             } catch { showToast('⚠️ خطأ في جلب بيانات العملاء', 'error'); return; }
 
-            const date      = new Date(entry.date).toLocaleDateString('ar-EG', { day:'2-digit', month:'2-digit', year:'numeric' });
-            const courier   = entry.courier || '—';
-            const totalCOD  = orderIds.reduce((s, id) => s + parseFloat(details[id]?.cod || 0), 0);
+            // ── أرقام إنجليزية + بدون علامات عشرية ──
+            const date     = new Date(entry.date).toLocaleDateString('en-GB', { day:'2-digit', month:'2-digit', year:'numeric' });
+            const courier  = entry.courier || '—';
+            const totalCOD = orderIds.reduce((s, id) => s + parseFloat(details[id]?.cod || 0), 0);
 
             const rows = successOrders.map((o, i) => {
-                const d = details[o.order] || {};
+                const d      = details[o.order] || {};
+                const codVal = Math.round(parseFloat(d.cod || 0));
                 return `
                 <tr>
-                    <td style="text-align:center;font-weight:600;">${i + 1}</td>
-                    <td style="font-weight:700;color:#0284c7;text-align:right;">${d.orderName || o.orderName || '—'}</td>
-                    <td style="text-align:center;">
-                        <svg id="bc-${i}" style="display:block;margin:auto;"></svg>
+                    <td style="text-align:center;font-weight:600;vertical-align:middle;">${i + 1}</td>
+                    <td style="font-weight:700;color:#0284c7;text-align:right;vertical-align:middle;white-space:nowrap;">${d.orderName || o.orderName || '—'}</td>
+                    <td style="text-align:center;vertical-align:middle;">
+                        <svg id="bc-${i}" style="display:block;margin:auto;shape-rendering:crispEdges;"></svg>
                     </td>
-                    <td style="text-align:right;">${d.customerName || '—'}</td>
-                    <td style="text-align:center;direction:ltr;">${d.phone || '—'}</td>
-                    <td style="text-align:right;font-size:11px;">${d.address || '—'}</td>
-                    <td style="text-align:left;font-weight:700;direction:ltr;">${d.cod || '—'}</td>
+                    <td style="text-align:right;vertical-align:middle;">${d.customerName || '—'}</td>
+                    <td style="text-align:center;direction:ltr;vertical-align:middle;white-space:nowrap;">${d.phone || '—'}</td>
+                    <td style="text-align:right;font-size:9.5px;vertical-align:middle;">${d.address || '—'}</td>
+                    <td style="text-align:left;font-weight:700;direction:ltr;vertical-align:middle;white-space:nowrap;">${codVal.toLocaleString('en-US')}</td>
                 </tr>`;
             }).join('');
 
+            // الإعدادات الأصلية اللي كانت شغالة + crispEdges على الـ SVG مباشرة
             const barcodeScripts = successOrders.map((o, i) =>
                 `JsBarcode("#bc-${i}", "${o.order}", { format:"CODE128", width:1.5, height:36, displayValue:false, margin:2 });`
             ).join('\n');
@@ -1746,18 +1778,27 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jsbarcode/3.11.6/JsBarcode.all.min.js"><\/script>
     <style>
         * { margin:0; padding:0; box-sizing:border-box; }
-        body { font-family: 'Segoe UI', Arial, sans-serif; padding: 20px; font-size: 13px; color: #1a1d27; direction: rtl; }
-        .manifest-header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:20px; padding-bottom:14px; border-bottom:2px solid #1a1d27; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; padding: 20px; font-size: 11px; color: #1a1d27; direction: rtl; }
+        .manifest-header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:16px; padding-bottom:12px; border-bottom:2px solid #1a1d27; }
         .manifest-title { font-size:20px; font-weight:800; margin-bottom:6px; }
         .manifest-meta { display:flex; gap:24px; margin-top:8px; }
         .meta-item { display:flex; flex-direction:column; }
         .meta-label { font-size:10px; color:#6b7280; text-transform:uppercase; letter-spacing:0.05em; }
         .meta-value { font-size:14px; font-weight:700; margin-top:2px; }
-        table { width:100%; border-collapse:collapse; margin-bottom:16px; }
-        thead th { background:#f5f6fa; padding:8px 10px; font-size:11px; font-weight:700; color:#6b7280; text-transform:uppercase; letter-spacing:0.04em; border-bottom:1.5px solid #e2e5ed; white-space:nowrap; }
-        tbody td { padding:8px 10px; border-bottom:1px solid #eef0f5; vertical-align:middle; }
+        table { width:100%; border-collapse:collapse; margin-bottom:16px; table-layout:fixed; }
+        col.col-num     { width:22px; }
+        col.col-order   { width:60px; }
+        col.col-barcode { width:200px; }
+        col.col-name    { width:90px; }
+        col.col-phone   { width:88px; }
+        col.col-address { width:auto; }
+        col.col-cod     { width:55px; }
+        thead th { background:#f5f6fa; padding:4px 3px; font-size:10px; font-weight:700; color:#6b7280; text-transform:uppercase; letter-spacing:0.04em; border-bottom:1.5px solid #e2e5ed; white-space:nowrap; overflow:hidden; }
+        tbody td { padding:3px 3px; border-bottom:1px solid #eef0f5; vertical-align:middle; overflow:hidden; line-height:1.3; }
         tbody tr:last-child td { border-bottom:none; }
         tbody tr:nth-child(even) { background:#fafbfd; }
+        svg rect { shape-rendering: crispEdges; }
+        svg path { shape-rendering: crispEdges; }
         .manifest-footer { display:flex; justify-content:space-between; align-items:center; padding-top:12px; border-top:2px solid #1a1d27; margin-top:8px; }
         .total-value { font-size:20px; font-weight:800; direction:ltr; }
         .sign-box { border:1px solid #e2e5ed; border-radius:8px; padding:8px 20px; font-size:11px; color:#9ca3af; text-align:center; min-width:160px; }
@@ -1772,17 +1813,26 @@
                 <div class="meta-item"><span class="meta-label">المندوب</span><span class="meta-value">${courier}</span></div>
                 <div class="meta-item"><span class="meta-label">التاريخ</span><span class="meta-value">${date}</span></div>
                 <div class="meta-item"><span class="meta-label">عدد الأوردرات</span><span class="meta-value">${successOrders.length}</span></div>
-                <div class="meta-item"><span class="meta-label">إجمالي COD</span><span class="meta-value" style="direction:ltr;">${totalCOD.toLocaleString('en-US', {minimumFractionDigits:2})} EGP</span></div>
+                <div class="meta-item"><span class="meta-label">إجمالي COD</span><span class="meta-value" style="direction:ltr;">${Math.round(totalCOD).toLocaleString('en-US')} EGP</span></div>
             </div>
         </div>
         <div style="font-size:28px;">🛵</div>
     </div>
     <table>
+        <colgroup>
+            <col class="col-num">
+            <col class="col-order">
+            <col class="col-barcode">
+            <col class="col-name">
+            <col class="col-phone">
+            <col class="col-address">
+            <col class="col-cod">
+        </colgroup>
         <thead>
             <tr>
-                <th style="width:32px;text-align:center;">#</th>
+                <th style="text-align:center;">#</th>
                 <th style="text-align:right;">رقم الأوردر</th>
-                <th style="width:160px;text-align:center;">الباركود</th>
+                <th style="text-align:center;">الباركود</th>
                 <th style="text-align:right;">اسم العميل</th>
                 <th style="text-align:center;">التليفون</th>
                 <th style="text-align:right;">العنوان</th>
@@ -1794,7 +1844,7 @@
     <div class="manifest-footer">
         <div>
             <div style="font-size:13px;color:#6b7280;">إجمالي التحصيل</div>
-            <div class="total-value">${totalCOD.toLocaleString('en-US', {minimumFractionDigits:2})} EGP</div>
+            <div class="total-value">${Math.round(totalCOD).toLocaleString('en-US')} EGP</div>
         </div>
         <div class="sign-box">توقيع المندوب<br><br><br></div>
         <div class="sign-box">توقيع المستلم<br><br><br></div>
